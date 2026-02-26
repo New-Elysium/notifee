@@ -1,4 +1,4 @@
-import { EventEmitter, NativeEventEmitter, NativeModulesStatic } from 'react-native';
+import { NativeEventEmitter, NativeModulesStatic } from 'react-native';
 
 export interface NativeModuleConfig {
   version: string;
@@ -15,7 +15,7 @@ export default class NotifeeNativeModule {
     this._moduleConfig = Object.assign({}, config);
   }
 
-  public get emitter(): EventEmitter {
+  public get emitter(): NativeEventEmitter {
     return new NativeEventEmitter();
   }
 

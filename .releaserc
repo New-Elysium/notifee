@@ -1,6 +1,6 @@
 {
   "extends": "./.releaserc.react-native-path-filter.js",
-  "tagFormat": "@notifee/react-native@${version}",
+  "tagFormat": "@psync/notifee@${version}",
   "plugins": [
     [
       "@semantic-release/commit-analyzer",

@@ -1,0 +1,7 @@
+[install]
+legacy-peer-deps = true
+proxy = "$HTTPS_PROXY"
+
+[publish]
+access = "public"
+token = "$NPM_ACCESS_TOKEN"

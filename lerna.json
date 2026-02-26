@@ -1,8 +1,5 @@
 {
-  "npmClient": "yarn",
-  "npmClientArgs": [
-    "--no-lockfile"
-  ],
+  "npmClient": "bun",
   "packages": [
     "packages/*",
     "tests_react_native"
