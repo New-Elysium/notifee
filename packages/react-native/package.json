@@ -1,5 +1,5 @@
 {
-  "name": "@notifee/react-native",
+  "name": "@psync/notifee",
   "version": "9.1.8",
   "author": "Invertase <oss@invertase.io> (http://invertase.io)",
   "description": "Notifee - a feature rich notifications library for React Native.",
@@ -8,18 +8,16 @@
   "scripts": {
     "validate:all:js": "eslint . --ext .js,.jsx,.ts,.tsx --resolve-plugins-relative-to .",
     "validate:all:ts": "tsc --project ./",
-    "build": "genversion --es6 --semi src/version.ts && tsc",
+    "build": "bunx genversion --es6 --semi src/version.ts && tsc",
     "build:clean": "rimraf android/libs && rimraf android/build && rimraf ios/build && rimraf dist",
     "build:watch": "tsc --watch",
-    "prepare": "yarn run build",
-    "prepublishOnly": "cd ../.. && yarn run build:core && yarn gen:reference",
+    "prepare": "bun run build",
     "format:android": "google-java-format --replace -i $(find . -type f -name \"*.java\" ! -path \"*/node_modules/*\" ! -path \"*/generated/*\")",
     "format:android:check": "google-java-format --set-exit-if-changed --replace -i $(find . -type f -name \"*.java\" ! -path \"*/node_modules/*\" ! -path \"*/generated/*\")",
     "format:ios": "npm_config_yes=true npx clang-format -i --glob=\"ios/**/*.{h,cpp,m,mm}\" --style=Google",
     "format:ios:check": "npm_config_yes=true npx clang-format --glob=\"ios/**/*.{h,cpp,m,mm}\" --style=Google -n -Werror"
   },
   "devDependencies": {
-    "@types/react-native": "0.67.2",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
     "eslint": "^7.32.0",
@@ -27,11 +25,15 @@
     "eslint-plugin-prettier": "^4.0.0",
     "genversion": "^3.0.2",
     "prettier": "^2.5.1",
+    "react": "^19.0.0",
+    "react-native": "^0.81.0",
     "rimraf": "^3.0.2",
     "typescript": "^5.7.2"
   },
   "peerDependencies": {
-    "react-native": "*"
+    "react": ">=19.0.0",
+    "react-native": ">=0.81.0",
+    "scheduler": "0.25.0"
   },
   "repository": {
     "type": "git",
@@ -52,8 +54,7 @@
     "onesignal"
   ],
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "files": [
     "README.md",
