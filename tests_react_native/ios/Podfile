@@ -37,7 +37,7 @@ pre_install do |installer|
   installer.aggregate_targets.each do |target|
     target.user_project.targets.each do |app_target|
       app_target.build_configurations.each do |config|
-        config.build_settings['SWIFT_VERSION'] = '5.0'
+        config.build_settings['SWIFT_VERSION'] = '6.0'
       end
     end
     target.user_project.save
@@ -51,7 +51,7 @@ post_install do |installer|
   installer.aggregate_targets.each do |target|
     target.user_project.targets.each do |app_target|
       app_target.build_configurations.each do |config|
-        config.build_settings['SWIFT_VERSION'] = '5.0'
+        config.build_settings['SWIFT_VERSION'] = '6.0'
       end
     end
     target.user_project.save
@@ -59,7 +59,7 @@ post_install do |installer|
 
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['SWIFT_VERSION'] = '5.0'
+      config.build_settings['SWIFT_VERSION'] = '6.0'
     end
 
     # Turn off warnings on non-Notifee dependencies - some like libevent are really really noisy

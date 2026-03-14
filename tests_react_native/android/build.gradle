@@ -2,12 +2,11 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 buildscript {
   ext {
-    buildToolsVersion = "36.0.0"
     minSdkVersion = 28
     compileSdkVersion = 36
-    targetSdkVersion = 35
-    ndkVersion = "27.1.12297006"
-    kotlinVersion = "1.8.22"
+    targetSdkVersion = 36
+    ndkVersion = "27.2.12479018"
+    kotlinVersion = "1.9.25"
     enableHermes = true
   }
 
