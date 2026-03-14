@@ -106,5 +106,8 @@
     "axios": "^0.26.0",
     "shelljs": "^0.8.5"
   },
-  "packageManager": "bun@1.3.9"
+  "resolutions": {
+    "scheduler": "0.25.0"
+  },
+  "packageManager": "bun@1.3.10"
 }
