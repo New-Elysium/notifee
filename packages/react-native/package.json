@@ -1,7 +1,7 @@
 {
   "name": "@psync/notifee",
-  "version": "9.1.8",
-  "author": "Invertase <oss@invertase.io> (http://invertase.io)",
+  "version": "9.2.0",
+  "author": "Psync <oss@psync.dev> (https://psync.club)",
   "description": "Notifee - a feature rich notifications library for React Native.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,26 +18,26 @@
     "format:ios:check": "npm_config_yes=true npx clang-format --glob=\"ios/**/*.{h,cpp,m,mm}\" --style=Google -n -Werror"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.14.0",
-    "@typescript-eslint/parser": "^5.14.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "genversion": "^3.0.2",
-    "prettier": "^2.5.1",
-    "react": "^19.0.0",
-    "react-native": "^0.81.0",
-    "rimraf": "^3.0.2",
-    "typescript": "^5.7.2"
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "genversion": "^3.2.0",
+    "prettier": "^3.8.1",
+    "react": "^19.2.0",
+    "react-native": "^0.83.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "react": ">=19.0.0",
-    "react-native": ">=0.81.0",
-    "scheduler": "0.25.0"
+    "react": ">=19.2.4",
+    "react-native": ">=0.83.2",
+    "scheduler": ">=0.25.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/invertase/notifee.git"
+    "url": "git+https://github.com/New-Elysium/notifee.git"
   },
   "license": "Apache-2.0",
   "keywords": [
