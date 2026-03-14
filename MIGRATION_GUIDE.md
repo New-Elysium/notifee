@@ -40,7 +40,7 @@ This guide provides a complete migration path from React Native 0.69.12 to 0.83.
 {
   "dependencies": {
     "@babel/runtime": "^7.28.6",
-    "@notifee/react-native": "*",
+    "@psync/notifee": "*",
     "@react-native-firebase/app": "^14.12.0",
     "@react-native-firebase/messaging": "^14.12.0",
     "axios": "^0.26.0",

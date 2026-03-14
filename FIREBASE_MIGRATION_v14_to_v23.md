@@ -280,7 +280,7 @@ globalThis.RNFB_SILENCE_MODULAR_DEPRECATION_WARNINGS = true;
 import { AppRegistry } from 'react-native';
 import '@react-native-firebase/messaging';
 import firebase from '@react-native-firebase/app';
-import notifee from '@notifee/react-native';
+import notifee from '@psync/notifee';
 
 import App from './example/app';
 
@@ -299,7 +299,7 @@ AppRegistry.registerComponent('testing', () => App);
 
 ```javascript
 import { AppRegistry } from 'react-native';
-import notifee from '@notifee/react-native';
+import notifee from '@psync/notifee';
 import { getMessaging, setBackgroundMessageHandler } from '@react-native-firebase/messaging';
 
 import App from './example/app';

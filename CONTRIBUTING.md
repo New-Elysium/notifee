@@ -98,7 +98,7 @@ Simply navigate to the release publish workflow, and use the manual trigger to p
 Afterwards, you may verify that everything worked by checking the expected work products:
 
 1. Verify that there is a new github release: https://github.com/invertase/notifee/releases
-1. Verify that there is a new npmjs release (may take a moment to update): https://www.npmjs.com/package/@notifee/react-native?activeTab=versions
+1. Verify that there is a new npmjs release (may take a moment to update): https://www.npmjs.com/package/@psync/notifee?activeTab=versions
 1. Verify that the changelog is updated: https://docs.page/invertase/notifee/react-native/release-notes
 1. Verify that there is a new tag correctly created: https://github.com/invertase/notifee/tags
 1. Verify that there is a commit with that tag, with the updated release notes: https://github.com/invertase/notifee/commits/main/
@@ -112,7 +112,7 @@ If for some reason the automated process is not working, or you want to re-autom
 1. Bump version: `npm version {major/minor/patch} --legacy-peer-deps`
 1. Publish to npm: `npm publish` (this generates a new core AAR, and requires a valid NPM login with permission to publish the Notifee package on npmjs.com)
 1. Commit those changes (after npm publish so new AAR files are committed)
-1. Tag the repo (current format is `@notifee/react-native@x.y.z`)
+1. Tag the repo (current format is `@psync/notifee@x.y.z`)
 1. Push the release notes / version / tag to the repo: `git push --tags`
 1. Create a release on the repo:
 
