@@ -1,5 +1,16 @@
 # Notifee example project
 
+> ⚠️ **New Architecture Only**: This example project is built **exclusively for React Native New Architecture** with React Native 0.81+.
+
+## Platform Requirements
+
+| Requirement | Minimum Version |
+|-------------|-----------------|
+| React Native | 0.81+ (New Architecture enabled) |
+| iOS Deployment Target | 15.0+ |
+| Android minSdk | 28+ |
+| Xcode | 16.2+ (for iOS development) |
+
 ## Installation
 
 * `git clone https://github.com/invertase/notifee.git`

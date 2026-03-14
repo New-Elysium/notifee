@@ -13,6 +13,7 @@
 
 <!-- markdownlint-disable MD041 -->
 
+> ⚠️ **New Architecture Only**: This version of Notifee is built **exclusively for React Native New Architecture**. It requires React Native 0.81+ with the New Architecture enabled. For the legacy architecture, use the stable release branch.
 
 A feature rich Android & iOS notifications library for React Native.
 
@@ -21,6 +22,26 @@ A feature rich Android & iOS notifications library for React Native.
 ---
 
 > Notifee is going Noti-'free' - free and fully open source. [[Learn more]](https://invertase.io/blog/open-sourcing-notifee)
+
+---
+
+## Platform Requirements
+
+| Requirement | Minimum Version |
+|-------------|-----------------|
+| React Native | 0.81+ (New Architecture only) |
+| iOS Deployment Target | 15.1+ |
+| Android minSdk | 28+ |
+| Xcode | 16.2+ (for iOS development) |
+
+Ideally rn >=0.83.2 and expo SDK 55+
+Lower versions may work but will not be tested or supported.
+
+### Firebase Integration
+
+If using Firebase Cloud Messaging with Notifee, see the [Firebase Migration Guide](./FIREBASE_MIGRATION_v14_to_v23.md) for upgrading from v14 to v23.
+
+**Note**: Firebase Dynamic Links has been deprecated and removed. Migrate to Universal Links (iOS) and App Links (Android) for deep linking functionality.
 
 ---
 

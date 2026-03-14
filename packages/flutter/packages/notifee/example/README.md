@@ -1,16 +1,26 @@
-# example
+# Notifee Flutter Example
 
-A new Flutter project.
+> ⚠️ **New Architecture Only**: This example project uses Notifee with Flutter's New Architecture enabled.
+
+A Flutter example project demonstrating Notifee notification functionality.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+1. Ensure you have Flutter 3.22+ installed with New Architecture support
+2. Run `flutter pub get` to install dependencies
+3. Run `flutter run` to start the app
 
-A few resources to get you started if this is your first Flutter project:
+## Platform Requirements
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+| Requirement | Minimum Version |
+|-------------|-----------------|
+| Flutter | 3.22+ (New Architecture enabled) |
+| iOS Deployment Target | 15.0+ |
+| Android minSdk | 23+ |
+| Xcode | 16.2+ (for iOS development) |
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Resources
+
+- [Notifee Documentation](https://docs.page/invertase/notifee/)
+- [Flutter Documentation](https://flutter.dev/docs)
+- [Flutter New Architecture](https://docs.flutter.dev/platform-integration/android/ndk)

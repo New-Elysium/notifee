@@ -2,12 +2,14 @@
 
 Tests are powered by [Jet ✈️](https://github.com/invertase/jet).
 
+> ⚠️ **New Architecture Only**: This test project is built **exclusively for React Native New Architecture** with React Native 0.83+.
+
 > **Note**: instructions in this file assume you're running terminal commands from the root of the project and not from inside the tests directory.
 
 ## Requirements
 
-- Make sure you have Xcode installed (tested with Xcode 10+).
-- Make sure you have NodeJS installed (Node 8.4.0 and up is required).
+- Make sure you have **Xcode 16.2+** installed (required for Firebase v23+).
+- Make sure you have NodeJS installed (Node 20+ is required for Firebase JS SDK v12+).
 - Make sure you have all required dependencies installed:
 
   - [Apple Sim Utils](https://github.com/wix/AppleSimulatorUtils):
@@ -18,6 +20,13 @@ Tests are powered by [Jet ✈️](https://github.com/invertase/jet).
     ```
 
 > **Note**: If Homebrew complains about a conflict in the `wix/brew` tap, run `brew untap wix/brew && brew tap wix/brew` and try installing again
+
+### Firebase Integration
+
+This test project uses Firebase Cloud Messaging for push notification testing. The Firebase packages have been updated to v23.
+
+- See [Firebase Migration Guide](../../FIREBASE_MIGRATION_v14_to_v23.md) for details on breaking changes
+- **Note**: Firebase Dynamic Links has been removed. If you need deep linking, use Universal Links (iOS) and App Links (Android)
 
 ---
 
