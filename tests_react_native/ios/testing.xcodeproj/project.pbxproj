@@ -583,6 +583,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.notifee.testing;
 				PRODUCT_NAME = Notifee;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WARNING_CFLAGS = "-Wno-nullability-completeness";
 			};
@@ -614,6 +615,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.notifee.testing;
 				PRODUCT_NAME = Notifee;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WARNING_CFLAGS = "-Wno-nullability-completeness";
 			};
@@ -655,6 +657,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.notifee.testing.NotifeeTestingNSE;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -695,6 +698,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.notifee.testing.NotifeeTestingNSE;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
