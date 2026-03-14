@@ -1,16 +1,36 @@
 /* eslint-disable no-undef */
 
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-
-  RN.NativeModules.NotifeeApiModule = {
-    addListener: () => jest.fn(),
-  };
-
-  RN.Platform = jest.fn().mockImplementation(() => ({
-    ...RN.Platform,
-    OS: 'android',
-    Version: 123,
+// Mock React Native internal modules with Flow types before they are imported
+jest.mock('react-native/Libraries/vendor/emitter/EventEmitter', () => {
+  return jest.fn().mockImplementation(() => ({
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    emit: jest.fn(),
   }));
-  return RN;
+});
+
+// Mock react-native
+jest.mock('react-native', () => {
+  return {
+    NativeModules: {
+      NotifeeApiModule: {
+        addListener: () => jest.fn(),
+      },
+    },
+    NativeEventEmitter: jest.fn().mockImplementation(() => ({
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      emit: jest.fn(),
+    })),
+    Platform: {
+      OS: 'android',
+      Version: 123,
+    },
+    Image: {
+      resolveAssetSource: jest.fn((source) => source),
+    },
+    AppRegistry: {
+      registerHeadlessTask: jest.fn(),
+    },
+  };
 });

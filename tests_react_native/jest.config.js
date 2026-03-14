@@ -1,9 +1,9 @@
 module.exports = {
   maxConcurrency: 30,
-  preset: './tests_react_native/node_modules/react-native/jest-preset.js',
+  // Don't use preset - we'll configure manually to avoid ESM issues
+  testEnvironment: 'node',
   transform: {
-    '^.+\\.(js)$': 'babel-jest',
-    '\\.(ts|tsx)$': 'ts-jest',
+    '^.+\\.(js|ts|tsx)$': ['babel-jest', { rootMode: 'upward' }],
   },
   rootDir: '..',
   testMatch: [
@@ -20,7 +20,15 @@ module.exports = {
     '!**/vendor/**',
   ],
 
+  setupFiles: ['<rootDir>/tests_react_native/jest-setup.js'],
   setupFilesAfterEnv: ['<rootDir>/tests_react_native/jest-mock.js'],
 
-  moduleFileExtensions: ['ts', 'tsx', 'js'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+
+  transformIgnorePatterns: [
+    'node_modules/(?!(react-native|@react-native|@psync/notifee)/)',
+  ],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
 };

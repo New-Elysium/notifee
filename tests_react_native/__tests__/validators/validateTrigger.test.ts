@@ -1,4 +1,4 @@
-import validateTrigger from '@notifee/react-native/src/validators/validateTrigger';
+import validateTrigger from '../../../packages/react-native/src/validators/validateTrigger';
 import {
   Trigger,
   TimestampTrigger,
@@ -6,29 +6,29 @@ import {
   IntervalTrigger,
   TimeUnit,
   AlarmType,
-} from '@notifee/react-native/src/types/Trigger';
+} from '../../../packages/react-native/src/types/Trigger';
 
 describe('Validate Trigger', () => {
   describe('validateTrigger()', () => {
     test('throws error if value is not an object', () => {
       // @ts-ignore
-      expect(() => validateTrigger(null)).toThrowError("'trigger' expected an object value.");
+      expect(() => validateTrigger(null)).toThrow("'trigger' expected an object value.");
 
       // @ts-ignore
-      expect(() => validateTrigger(undefined)).toThrowError("'trigger' expected an object value.");
+      expect(() => validateTrigger(undefined)).toThrow("'trigger' expected an object value.");
 
       // @ts-ignore
-      expect(() => validateTrigger('string')).toThrowError("'trigger' expected an object value.");
+      expect(() => validateTrigger('string')).toThrow("'trigger' expected an object value.");
 
       // @ts-ignore
-      expect(() => validateTrigger(1)).toThrowError("'trigger' expected an object value.");
+      expect(() => validateTrigger(1)).toThrow("'trigger' expected an object value.");
     });
 
     test('throws an error if trigger type is unknown', () => {
       // @ts-ignore
       const trigger: Trigger = { type: -1 };
 
-      expect(() => validateTrigger(trigger)).toThrowError('Unknown trigger type');
+      expect(() => validateTrigger(trigger)).toThrow('Unknown trigger type');
     });
 
     describe('validateTimestampTrigger()', () => {
@@ -39,7 +39,7 @@ describe('Validate Trigger', () => {
           timestamp: null,
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "trigger.timestamp' expected a number value.",
         );
 
@@ -49,7 +49,7 @@ describe('Validate Trigger', () => {
           timestamp: '',
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "trigger.timestamp' expected a number value.",
         );
       });
@@ -61,7 +61,7 @@ describe('Validate Trigger', () => {
           timestamp: date.getTime(),
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "'trigger.timestamp' date must be in the future.",
         );
       });
@@ -90,7 +90,7 @@ describe('Validate Trigger', () => {
           repeatFrequency: 3,
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "'trigger.repeatFrequency' expected a RepeatFrequency value.",
         );
       });
@@ -219,7 +219,7 @@ describe('Validate Trigger', () => {
           interval: null,
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "trigger.interval' expected a number value.",
         );
 
@@ -229,7 +229,7 @@ describe('Validate Trigger', () => {
           interval: '',
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "trigger.interval' expected a number value.",
         );
       });
@@ -255,7 +255,7 @@ describe('Validate Trigger', () => {
           interval: 60,
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "'trigger.timeUnit' expected a TimeUnit value.",
         );
       });
@@ -267,7 +267,7 @@ describe('Validate Trigger', () => {
           interval: 60,
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "'trigger.interval' expected to be at least 15 minutes.",
         );
 
@@ -277,7 +277,7 @@ describe('Validate Trigger', () => {
           interval: 12,
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "'trigger.interval' expected to be at least 15 minutes.",
         );
 
@@ -287,7 +287,7 @@ describe('Validate Trigger', () => {
           interval: 0.5,
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "'trigger.interval' expected to be at least 15 minutes.",
         );
 
@@ -297,7 +297,7 @@ describe('Validate Trigger', () => {
           interval: 0.5,
         };
 
-        expect(() => validateTrigger(trigger)).toThrowError(
+        expect(() => validateTrigger(trigger)).toThrow(
           "'trigger.interval' expected to be at least 15 minutes.",
         );
       });

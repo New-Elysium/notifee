@@ -4,7 +4,7 @@ import {
   AndroidStyle,
   AndroidVisibility,
   Notification,
-} from '@notifee/react-native';
+} from '@psync/notifee';
 
 type NotificationItems = {
   basic: Notification;

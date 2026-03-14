@@ -1,5 +1,5 @@
-import validateIOSNotification from '@notifee/react-native/src/validators/validateIOSNotification';
-import { NotificationIOS } from '@notifee/react-native/src/types/NotificationIOS';
+import validateIOSNotification from '../../../packages/react-native/src/validators/validateIOSNotification';
+import { NotificationIOS } from '../../../packages/react-native/src/types/NotificationIOS';
 
 describe('Validate IOS Notification', () => {
   describe('validateIOSNotification()', () => {
@@ -101,7 +101,7 @@ describe('Validate IOS Notification', () => {
         critical: {} as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.ios.critical' must be a boolean value if specified.",
       );
     });
@@ -111,7 +111,7 @@ describe('Validate IOS Notification', () => {
         criticalVolume: {} as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.ios.criticalVolume' must be a number value if specified.",
       );
     });
@@ -121,7 +121,7 @@ describe('Validate IOS Notification', () => {
         sound: {} as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.sound' must be a string value if specified.",
       );
 
@@ -129,7 +129,7 @@ describe('Validate IOS Notification', () => {
         sound: [] as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.sound' must be a string value if specified.",
       );
     });
@@ -139,7 +139,7 @@ describe('Validate IOS Notification', () => {
         badgeCount: [] as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.ios.badgeCount' expected a number value >=0.",
       );
     });
@@ -149,7 +149,7 @@ describe('Validate IOS Notification', () => {
         categoryId: {} as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.ios.categoryId' expected a of string value",
       );
     });
@@ -159,7 +159,7 @@ describe('Validate IOS Notification', () => {
         threadId: {} as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.ios.threadId' expected a string value.",
       );
     });
@@ -169,7 +169,7 @@ describe('Validate IOS Notification', () => {
         summaryArgument: {} as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.ios.summaryArgument' expected a string value.",
       );
     });
@@ -179,7 +179,7 @@ describe('Validate IOS Notification', () => {
         launchImageName: {} as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.ios.launchImageName' expected a string value.",
       );
     });
@@ -189,7 +189,7 @@ describe('Validate IOS Notification', () => {
         communicationInfo: '' as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'ios.communicationInfo' expected an object.",
       );
 
@@ -197,7 +197,7 @@ describe('Validate IOS Notification', () => {
         communicationInfo: {} as any,
       };
 
-      expect(() => validateIOSNotification(notification)).toThrowError(
+      expect(() => validateIOSNotification(notification)).toThrow(
         "'ios.communicationInfo' 'conversationId' expected a valid string value.",
       );
     });

@@ -8,7 +8,7 @@
     "send-pn": "node ./sendPushNotification.js"
   },
   "dependencies": {
-    "@notifee/react-native": "*",
+    "@psync/notifee": "*",
     "@react-native-firebase/app": "^14.5.1",
     "@react-native-firebase/messaging": "^14.5.1",
     "axios": "^0.26.0",

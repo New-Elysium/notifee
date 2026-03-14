@@ -1,5 +1,5 @@
-import validateNotification from '@notifee/react-native/src/validators/validateNotification';
-import { Notification } from '@notifee/react-native/src/types/Notification';
+import validateNotification from '../../../packages/react-native/src/validators/validateNotification';
+import { Notification } from '../../../packages/react-native/src/types/Notification';
 import { setPlatform } from '../testSetup';
 
 describe('Validate Notification', () => {
@@ -95,7 +95,7 @@ describe('Validate Notification', () => {
         id: null as any,
       };
 
-      expect(() => validateNotification(notification)).toThrowError(
+      expect(() => validateNotification(notification)).toThrow(
         "'notification.id' invalid notification ID, expected a unique string value.",
       );
     });
@@ -105,7 +105,7 @@ describe('Validate Notification', () => {
         title: null as any,
       };
 
-      expect(() => validateNotification(notification)).toThrowError(
+      expect(() => validateNotification(notification)).toThrow(
         "'notification.title' expected a string value or undefined.",
       );
     });
@@ -115,7 +115,7 @@ describe('Validate Notification', () => {
         body: null as any,
       };
 
-      expect(() => validateNotification(notification)).toThrowError(
+      expect(() => validateNotification(notification)).toThrow(
         "'notification.body' expected a string value or undefined.",
       );
     });
@@ -125,7 +125,7 @@ describe('Validate Notification', () => {
         subtitle: null as any,
       };
 
-      expect(() => validateNotification(notification)).toThrowError(
+      expect(() => validateNotification(notification)).toThrow(
         "'notification.subtitle' expected a string value or undefined.",
       );
     });
@@ -135,7 +135,7 @@ describe('Validate Notification', () => {
         data: [] as any,
       };
 
-      expect(() => validateNotification(notification)).toThrowError(
+      expect(() => validateNotification(notification)).toThrow(
         "'notification.data' expected an object value containing key/value pairs.",
       );
     });
@@ -145,7 +145,7 @@ describe('Validate Notification', () => {
         data: { id: [] as any },
       };
 
-      expect(() => validateNotification(notification)).toThrowError(
+      expect(() => validateNotification(notification)).toThrow(
         '\'notification.data\' value for key "id" is invalid, expected a string value.',
       );
     });

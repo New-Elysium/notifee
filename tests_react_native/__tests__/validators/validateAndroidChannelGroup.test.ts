@@ -1,5 +1,5 @@
-import validateAndroidChannelGroup from '@notifee/react-native/src/validators/validateAndroidChannelGroup';
-import { AndroidChannelGroup } from '@notifee/react-native/src/types/NotificationAndroid';
+import validateAndroidChannelGroup from '../../../packages/react-native/src/validators/validateAndroidChannelGroup';
+import { AndroidChannelGroup } from '../../../packages/react-native/src/types/NotificationAndroid';
 
 describe('Validate Android Channel Group', () => {
   describe('validateAndroidChannelGroup()', () => {
@@ -17,7 +17,7 @@ describe('Validate Android Channel Group', () => {
     });
 
     test('throws an error with an invalid channel ', () => {
-      expect(() => validateAndroidChannelGroup([] as any)).toThrowError(
+      expect(() => validateAndroidChannelGroup([] as any)).toThrow(
         "'group' expected an object value.",
       );
     });
@@ -29,7 +29,7 @@ describe('Validate Android Channel Group', () => {
         description: 'description',
       };
 
-      expect(() => validateAndroidChannelGroup(channelGroup)).toThrowError(
+      expect(() => validateAndroidChannelGroup(channelGroup)).toThrow(
         "'group.id' expected a string value.",
       );
     });
@@ -41,7 +41,7 @@ describe('Validate Android Channel Group', () => {
         description: 'description',
       };
 
-      expect(() => validateAndroidChannelGroup(channelGroup)).toThrowError(
+      expect(() => validateAndroidChannelGroup(channelGroup)).toThrow(
         "'group.name' expected a string value.",
       );
     });
@@ -53,7 +53,7 @@ describe('Validate Android Channel Group', () => {
         description: [] as any,
       };
 
-      expect(() => validateAndroidChannelGroup(channelGroup)).toThrowError(
+      expect(() => validateAndroidChannelGroup(channelGroup)).toThrow(
         "'group.description' expected a string value.",
       );
     });

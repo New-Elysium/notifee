@@ -24,8 +24,9 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "types": ["jest"],
     "lib": [
-      "es6"
+      "ES2017"
     ]
   },
   "exclude": [

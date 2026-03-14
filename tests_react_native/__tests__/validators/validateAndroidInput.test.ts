@@ -1,5 +1,5 @@
-import validateAndroidInput from '@notifee/react-native/src/validators/validateAndroidInput';
-import { AndroidInput } from '@notifee/react-native/src/types/NotificationAndroid';
+import validateAndroidInput from '../../../packages/react-native/src/validators/validateAndroidInput';
+import { AndroidInput } from '../../../packages/react-native/src/types/NotificationAndroid';
 
 describe('Validate Android Channel Group', () => {
   describe('validateAndroidChannelGroup()', () => {
@@ -24,7 +24,7 @@ describe('Validate Android Channel Group', () => {
       const androidInput: AndroidInput = {
         allowGeneratedReplies: [] as any,
       };
-      expect(() => validateAndroidInput(androidInput)).toThrowError(
+      expect(() => validateAndroidInput(androidInput)).toThrow(
         "'input.allowGeneratedReplies' expected a boolean value.",
       );
     });
@@ -34,7 +34,7 @@ describe('Validate Android Channel Group', () => {
         choices: {} as any,
       };
 
-      expect(() => validateAndroidInput(androidInput)).toThrowError(
+      expect(() => validateAndroidInput(androidInput)).toThrow(
         "'input.choices' expected an array of string values.",
       );
     });
@@ -44,7 +44,7 @@ describe('Validate Android Channel Group', () => {
         editableChoices: [] as any,
       };
 
-      expect(() => validateAndroidInput(androidInput)).toThrowError(
+      expect(() => validateAndroidInput(androidInput)).toThrow(
         "'input.editableChoices' expected a boolean value.",
       );
     });
@@ -54,7 +54,7 @@ describe('Validate Android Channel Group', () => {
         placeholder: [] as any,
       };
 
-      expect(() => validateAndroidInput(androidInput)).toThrowError(
+      expect(() => validateAndroidInput(androidInput)).toThrow(
         "'input.placeholder' expected a string value.",
       );
     });
@@ -65,7 +65,7 @@ describe('Validate Android Channel Group', () => {
         choices: [] as any,
       };
 
-      expect(() => validateAndroidInput(androidInput)).toThrowError(
+      expect(() => validateAndroidInput(androidInput)).toThrow(
         "'input.allowFreeFormInput' when false, you must provide at least one choice.",
       );
     });
@@ -77,7 +77,7 @@ describe('Validate Android Channel Group', () => {
         choices: ['test'],
       };
 
-      expect(() => validateAndroidInput(androidInput)).toThrowError(
+      expect(() => validateAndroidInput(androidInput)).toThrow(
         "'input.editableChoices' when true, allowFreeFormInput must also be true.",
       );
     });

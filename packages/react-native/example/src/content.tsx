@@ -3,7 +3,7 @@ import {View, Button, StyleSheet, Text, Platform} from 'react-native';
 import notifee, {
   AndroidImportance,
   AndroidVisibility,
-} from '@notifee/react-native';
+} from '@psync/notifee';
 
 import {notifications} from './utils/notifications';
 import {triggers} from './utils/triggers';

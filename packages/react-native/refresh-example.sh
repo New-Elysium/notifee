@@ -31,9 +31,9 @@ pushd example
 # Update package.json
 echo "Adding Notifee app package"
 # add notifee dependency
-npx json -I -f package.json -e 'this.dependencies["@notifee/react-native"] = "file:../"'
+npx json -I -f package.json -e 'this.dependencies["@psync/notifee"] = "file:../"'
 # add post install step for notifee
-npx json -I -f package.json -e 'this.scripts.postinstall = "cd node_modules/@notifee/react-native && yarn"'
+npx json -I -f package.json -e 'this.scripts.postinstall = "cd node_modules/@psync/notifee && yarn"'
 
 # Update compileSdkVersion and targetSdkVersion to 33
 echo "Updating android/build.gradle"

@@ -1,9 +1,9 @@
-import validateAndroidChannel from '@notifee/react-native/src/validators/validateAndroidChannel';
+import validateAndroidChannel from '../../../packages/react-native/src/validators/validateAndroidChannel';
 import {
   AndroidChannel,
   AndroidVisibility,
-} from '@notifee/react-native/src/types/NotificationAndroid';
-import { AndroidImportance } from '@notifee/react-native/src/types/NotificationAndroid';
+} from '../../../packages/react-native/src/types/NotificationAndroid';
+import { AndroidImportance } from '../../../packages/react-native/src/types/NotificationAndroid';
 
 describe('Validate Android Channel', () => {
   describe('validateAndroidChannel()', () => {
@@ -38,7 +38,7 @@ describe('Validate Android Channel', () => {
     });
 
     test('throws an error with an invalid channel ', () => {
-      expect(() => validateAndroidChannel([] as any)).toThrowError(
+      expect(() => validateAndroidChannel([] as any)).toThrow(
         "'channel' expected an object value.",
       );
     });
@@ -49,7 +49,7 @@ describe('Validate Android Channel', () => {
         name: 'name',
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.id' expected a string value.",
       );
 
@@ -58,7 +58,7 @@ describe('Validate Android Channel', () => {
         name: 'name',
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.id' expected a valid string id.",
       );
     });
@@ -69,7 +69,7 @@ describe('Validate Android Channel', () => {
         name: 0 as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.name' expected a string value.",
       );
     });
@@ -80,7 +80,7 @@ describe('Validate Android Channel', () => {
         name: '' as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.name' expected a valid channel name.",
       );
     });
@@ -92,7 +92,7 @@ describe('Validate Android Channel', () => {
         badge: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.badge' expected a boolean value.",
       );
     });
@@ -104,7 +104,7 @@ describe('Validate Android Channel', () => {
         bypassDnd: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.bypassDnd' expected a boolean value.",
       );
     });
@@ -116,7 +116,7 @@ describe('Validate Android Channel', () => {
         description: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.description' expected a string value.",
       );
     });
@@ -128,7 +128,7 @@ describe('Validate Android Channel', () => {
         lights: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.lights' expected a boolean value.",
       );
     });
@@ -140,7 +140,7 @@ describe('Validate Android Channel', () => {
         vibration: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.vibration' expected a boolean value.",
       );
     });
@@ -152,7 +152,7 @@ describe('Validate Android Channel', () => {
         groupId: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.groupId' expected a string value.",
       );
     });
@@ -164,7 +164,7 @@ describe('Validate Android Channel', () => {
         importance: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.importance' expected an Importance value.",
       );
     });
@@ -176,7 +176,7 @@ describe('Validate Android Channel', () => {
         lightColor: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.lightColor' expected a string value.",
       );
     });
@@ -188,7 +188,7 @@ describe('Validate Android Channel', () => {
         lightColor: 'unknown',
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.lightColor' invalid color. Expected an AndroidColor or hexadecimal string value",
       );
     });
@@ -200,7 +200,7 @@ describe('Validate Android Channel', () => {
         visibility: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.visibility' expected visibility to be an AndroidVisibility value.",
       );
     });
@@ -212,7 +212,7 @@ describe('Validate Android Channel', () => {
         sound: [] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.sound' expected a string value.",
       );
     });
@@ -224,7 +224,7 @@ describe('Validate Android Channel', () => {
         vibrationPattern: {} as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.vibrationPattern' expected an array.",
       );
     });
@@ -236,7 +236,7 @@ describe('Validate Android Channel', () => {
         vibrationPattern: ['test'] as any,
       };
 
-      expect(() => validateAndroidChannel(channel)).toThrowError(
+      expect(() => validateAndroidChannel(channel)).toThrow(
         "'channel.vibrationPattern' expected an array containing an even number of positive values.",
       );
     });

@@ -1,4 +1,4 @@
-import validateAndroidNotification from '@notifee/react-native/src/validators/validateAndroidNotification';
+import validateAndroidNotification from '../../../packages/react-native/src/validators/validateAndroidNotification';
 import {
   NotificationAndroid,
   AndroidVisibility,
@@ -9,8 +9,8 @@ import {
   AndroidCategory,
   AndroidProgress,
   AndroidImportance,
-} from '@notifee/react-native/src/types/NotificationAndroid';
-import { NotificationPressAction } from '@notifee/react-native/src/types/Notification';
+} from '../../../packages/react-native/src/types/NotificationAndroid';
+import { NotificationPressAction } from '../../../packages/react-native/src/types/Notification';
 
 describe('Validate Android Notification', () => {
   describe('validateAndroidNotification()', () => {
@@ -117,7 +117,7 @@ describe('Validate Android Notification', () => {
     });
 
     test('throws an error with an invalid param ', () => {
-      expect(() => validateAndroidNotification([] as any)).toThrowError(
+      expect(() => validateAndroidNotification([] as any)).toThrow(
         "'notification.android' expected an object value.",
       );
     });
@@ -128,7 +128,7 @@ describe('Validate Android Notification', () => {
         actions: {} as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.actions' expected an array of AndroidAction types.",
       );
     });
@@ -139,7 +139,7 @@ describe('Validate Android Notification', () => {
         actions: ['test'] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.actions' invalid AndroidAction. 'action' expected an object value..",
       );
     });
@@ -150,7 +150,7 @@ describe('Validate Android Notification', () => {
         asForegroundService: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.asForegroundService' expected a boolean value.",
       );
     });
@@ -161,7 +161,7 @@ describe('Validate Android Notification', () => {
         lightUpScreen: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.lightUpScreen' expected a boolean value.",
       );
     });
@@ -172,7 +172,7 @@ describe('Validate Android Notification', () => {
         autoCancel: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.autoCancel' expected a boolean value.",
       );
     });
@@ -182,7 +182,7 @@ describe('Validate Android Notification', () => {
         badgeCount: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.badgeCount' expected a number value.",
       );
     });
@@ -193,7 +193,7 @@ describe('Validate Android Notification', () => {
         badgeIconType: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.badgeIconType' expected a valid AndroidBadgeIconType.",
       );
     });
@@ -204,7 +204,7 @@ describe('Validate Android Notification', () => {
         category: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.category' expected a valid AndroidCategory.",
       );
     });
@@ -215,7 +215,7 @@ describe('Validate Android Notification', () => {
         color: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.color' expected a string value.",
       );
     });
@@ -226,7 +226,7 @@ describe('Validate Android Notification', () => {
         color: 'unknown',
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.color' invalid color. Expected an AndroidColor or hexadecimal string value.",
       );
     });
@@ -237,7 +237,7 @@ describe('Validate Android Notification', () => {
         colorized: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.colorized' expected a boolean value.",
       );
     });
@@ -248,7 +248,7 @@ describe('Validate Android Notification', () => {
         chronometerDirection: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.chronometerDirection' expected a string value.",
       );
     });
@@ -259,7 +259,7 @@ describe('Validate Android Notification', () => {
         chronometerDirection: '' as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         `'notification.android.chronometerDirection' must be one of "up" or "down".`,
       );
     });
@@ -270,7 +270,7 @@ describe('Validate Android Notification', () => {
         defaults: {} as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.defaults' expected an array.",
       );
     });
@@ -281,7 +281,7 @@ describe('Validate Android Notification', () => {
         defaults: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.defaults' expected an array containing AndroidDefaults.",
       );
     });
@@ -292,7 +292,7 @@ describe('Validate Android Notification', () => {
         groupId: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.groupId' expected a string value.",
       );
     });
@@ -303,7 +303,7 @@ describe('Validate Android Notification', () => {
         groupAlertBehavior: ['test'] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.groupAlertBehavior' expected a valid AndroidGroupAlertBehavior.",
       );
     });
@@ -314,7 +314,7 @@ describe('Validate Android Notification', () => {
         groupSummary: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.groupSummary' expected a boolean value.",
       );
     });
@@ -325,7 +325,7 @@ describe('Validate Android Notification', () => {
         inputHistory: {} as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.inputHistory' expected an array of string values.",
       );
     });
@@ -336,7 +336,7 @@ describe('Validate Android Notification', () => {
         largeIcon: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.largeIcon' expected a React Native ImageResource value or a valid string URL.",
       );
     });
@@ -347,7 +347,7 @@ describe('Validate Android Notification', () => {
         lights: {} as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.lights' expected an array value containing the color, on ms and off ms.",
       );
     });
@@ -358,7 +358,7 @@ describe('Validate Android Notification', () => {
         lights: ['unknown' as any, 0, 0],
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.lights' invalid color. Expected an AndroidColor or hexadecimal string value.",
       );
     });
@@ -369,7 +369,7 @@ describe('Validate Android Notification', () => {
         lights: ['blue', -1, 0],
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         `'notification.android.lights' invalid "on" millisecond value, expected a number greater than 0.`,
       );
     });
@@ -380,7 +380,7 @@ describe('Validate Android Notification', () => {
         lights: ['blue', 1, -1],
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         `notification.android.lights' invalid "off" millisecond value, expected a number greater than 0.`,
       );
     });
@@ -391,7 +391,7 @@ describe('Validate Android Notification', () => {
         localOnly: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.localOnly' expected a boolean value.",
       );
     });
@@ -402,7 +402,7 @@ describe('Validate Android Notification', () => {
         ongoing: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.ongoing' expected a boolean value.",
       );
     });
@@ -413,7 +413,7 @@ describe('Validate Android Notification', () => {
         onlyAlertOnce: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.onlyAlertOnce' expected a boolean value.",
       );
     });
@@ -424,7 +424,7 @@ describe('Validate Android Notification', () => {
         pressAction: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.pressAction' 'pressAction' expected an object value.",
       );
     });
@@ -435,7 +435,7 @@ describe('Validate Android Notification', () => {
         importance: '' as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.importance' expected a valid Importance.",
       );
     });
@@ -446,7 +446,7 @@ describe('Validate Android Notification', () => {
         progress: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress' expected an object value.",
       );
     });
@@ -457,7 +457,7 @@ describe('Validate Android Notification', () => {
         progress: { indeterminate: [] as any },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.indeterminate' expected a boolean value.",
       );
     });
@@ -468,7 +468,7 @@ describe('Validate Android Notification', () => {
         progress: { max: -1 },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.max' expected a positive number value.",
       );
     });
@@ -479,7 +479,7 @@ describe('Validate Android Notification', () => {
         progress: { current: -1 },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.current' expected a positive number value.",
       );
     });
@@ -490,7 +490,7 @@ describe('Validate Android Notification', () => {
         progress: { current: 1, max: undefined as any },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.current' when providing a current value, you must also specify a `max` value.",
       );
     });
@@ -501,7 +501,7 @@ describe('Validate Android Notification', () => {
         progress: { current: 3, max: 2 },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress' the current value cannot be greater than the max value.",
       );
     });
@@ -512,7 +512,7 @@ describe('Validate Android Notification', () => {
         showTimestamp: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.showTimestamp' expected a boolean value.",
       );
     });
@@ -523,7 +523,7 @@ describe('Validate Android Notification', () => {
         smallIcon: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.smallIcon' expected value to be a string.",
       );
     });
@@ -534,7 +534,7 @@ describe('Validate Android Notification', () => {
         sortKey: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.sortKey' expected a string value.",
       );
     });
@@ -545,7 +545,7 @@ describe('Validate Android Notification', () => {
         style: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.style' expected an object value.",
       );
     });
@@ -555,7 +555,7 @@ describe('Validate Android Notification', () => {
         channelId: {} as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.channelId' expected a string value.",
       );
     });
@@ -566,7 +566,7 @@ describe('Validate Android Notification', () => {
         tag: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.tag' expected a string value.",
       );
     });
@@ -577,7 +577,7 @@ describe('Validate Android Notification', () => {
         tag: '|',
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         `'notification.android.tag' tag cannot contain the "|" (pipe) character.`,
       );
     });
@@ -588,7 +588,7 @@ describe('Validate Android Notification', () => {
         ticker: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.ticker' expected a string value.",
       );
     });
@@ -599,7 +599,7 @@ describe('Validate Android Notification', () => {
         timeoutAfter: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.timeoutAfter' expected a number value.",
       );
     });
@@ -610,7 +610,7 @@ describe('Validate Android Notification', () => {
         timeoutAfter: -1,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.timeoutAfter' invalid millisecond timestamp.",
       );
     });
@@ -621,7 +621,7 @@ describe('Validate Android Notification', () => {
         showChronometer: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.showChronometer' expected a boolean value.",
       );
     });
@@ -632,7 +632,7 @@ describe('Validate Android Notification', () => {
         vibrationPattern: {} as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.vibrationPattern' expected an array containing an even number of positive values.",
       );
     });
@@ -643,7 +643,7 @@ describe('Validate Android Notification', () => {
         vibrationPattern: ['test', -1, -1] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.vibrationPattern' expected an array containing an even number of positive values.",
       );
     });
@@ -654,7 +654,7 @@ describe('Validate Android Notification', () => {
         visibility: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.visibility' expected a valid AndroidVisibility value.",
       );
     });
@@ -665,7 +665,7 @@ describe('Validate Android Notification', () => {
         timestamp: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.timestamp' expected a number value.",
       );
     });
@@ -676,7 +676,7 @@ describe('Validate Android Notification', () => {
         timestamp: -1,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.timestamp' invalid millisecond timestamp, date must be a positive number",
       );
     });
@@ -687,7 +687,7 @@ describe('Validate Android Notification', () => {
         sound: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.sound' expected a valid sound string.",
       );
     });
@@ -698,7 +698,7 @@ describe('Validate Android Notification', () => {
         defaults: ['' as any],
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.defaults' invalid array value, expected an AndroidDefaults value.",
       );
     });
@@ -715,7 +715,7 @@ describe('Validate Android Notification', () => {
         progress,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.max' when providing a max value, you must also specify a current value.",
       );
     });
@@ -727,7 +727,7 @@ describe('Validate Android Notification', () => {
         smallIcon: 'smallIcon',
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.smallIconLevel' expected value to be a number.",
       );
     });

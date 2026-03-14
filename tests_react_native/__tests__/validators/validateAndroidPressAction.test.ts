@@ -1,5 +1,5 @@
-import validateAndroidPressAction from '@notifee/react-native/src/validators/validateAndroidPressAction';
-import { NotificationPressAction } from '@notifee/react-native/src/types/Notification';
+import validateAndroidPressAction from '../../../packages/react-native/src/validators/validateAndroidPressAction';
+import { NotificationPressAction } from '../../../packages/react-native/src/types/Notification';
 
 describe('Validate Android Press Action', () => {
   describe('validateAndroidPressAction()', () => {
@@ -17,7 +17,7 @@ describe('Validate Android Press Action', () => {
     });
 
     test('throws an error with an invalid param', () => {
-      expect(() => validateAndroidPressAction([] as any)).toThrowError(
+      expect(() => validateAndroidPressAction([] as any)).toThrow(
         "'pressAction' expected an object value.",
       );
     });
@@ -27,7 +27,7 @@ describe('Validate Android Press Action', () => {
         id: [] as any,
       };
 
-      expect(() => validateAndroidPressAction(pressAction)).toThrowError(
+      expect(() => validateAndroidPressAction(pressAction)).toThrow(
         "'id' expected a non-empty string value.",
       );
     });
@@ -38,7 +38,7 @@ describe('Validate Android Press Action', () => {
         launchActivity: {} as any,
       };
 
-      expect(() => validateAndroidPressAction(pressAction)).toThrowError(
+      expect(() => validateAndroidPressAction(pressAction)).toThrow(
         "'launchActivity' expected a string value.",
       );
     });
@@ -49,7 +49,7 @@ describe('Validate Android Press Action', () => {
         mainComponent: {} as any,
       };
 
-      expect(() => validateAndroidPressAction(pressAction)).toThrowError(
+      expect(() => validateAndroidPressAction(pressAction)).toThrow(
         "'mainComponent' expected a string value.",
       );
     });

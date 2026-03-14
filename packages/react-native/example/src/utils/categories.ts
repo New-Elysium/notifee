@@ -1,4 +1,4 @@
-import {IOSNotificationCategory} from '@notifee/react-native';
+import {IOSNotificationCategory} from '@psync/notifee';
 
 export const categories: IOSNotificationCategory[] = [
   {

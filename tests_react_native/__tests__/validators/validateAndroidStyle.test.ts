@@ -5,7 +5,7 @@ import {
   validateAndroidMessagingStyle,
   validateAndroidMessagingStyleMessage,
   validateAndroidPerson,
-} from '@notifee/react-native/src/validators/validateAndroidStyle';
+} from '../../../packages/react-native/src/validators/validateAndroidStyle';
 import {
   AndroidBigPictureStyle,
   AndroidBigTextStyle,
@@ -14,7 +14,7 @@ import {
   AndroidMessagingStyleMessage,
   AndroidPerson,
   AndroidStyle,
-} from '@notifee/react-native/src/types/NotificationAndroid';
+} from '../../../packages/react-native/src/types/NotificationAndroid';
 
 const testText = 'test-text';
 const testTitle = 'test-title';
@@ -83,7 +83,7 @@ describe('Validate Android Style', () => {
         largeIcon: [] as any,
       };
 
-      expect(() => validateAndroidBigPictureStyle(pictureStyle)).toThrowError(
+      expect(() => validateAndroidBigPictureStyle(pictureStyle)).toThrow(
         "'notification.android.style' BigPictureStyle: 'largeIcon' expected a React Native ImageResource value or a valid string URL.",
       );
     });
@@ -95,7 +95,7 @@ describe('Validate Android Style', () => {
         title: [] as any,
       };
 
-      expect(() => validateAndroidBigPictureStyle(pictureStyle)).toThrowError(
+      expect(() => validateAndroidBigPictureStyle(pictureStyle)).toThrow(
         "'notification.android.style' BigPictureStyle: 'title' expected a string value.",
       );
     });
@@ -107,7 +107,7 @@ describe('Validate Android Style', () => {
         summary: [] as any,
       };
 
-      expect(() => validateAndroidBigPictureStyle(pictureStyle)).toThrowError(
+      expect(() => validateAndroidBigPictureStyle(pictureStyle)).toThrow(
         "'notification.android.style' BigPictureStyle: 'summary' expected a string value.",
       );
     });
@@ -135,7 +135,7 @@ describe('Validate Android Style', () => {
         text: [] as any,
       };
 
-      expect(() => validateAndroidBigTextStyle(style)).toThrowError(
+      expect(() => validateAndroidBigTextStyle(style)).toThrow(
         "'notification.android.style' BigTextStyle: 'text' expected a valid string value.",
       );
     });
@@ -147,7 +147,7 @@ describe('Validate Android Style', () => {
         title: [] as any,
       };
 
-      expect(() => validateAndroidBigTextStyle(style)).toThrowError(
+      expect(() => validateAndroidBigTextStyle(style)).toThrow(
         "'notification.android.style' BigTextStyle: 'title' expected a string value.",
       );
     });
@@ -160,7 +160,7 @@ describe('Validate Android Style', () => {
         summary: [] as any,
       };
 
-      expect(() => validateAndroidBigTextStyle(style)).toThrowError(
+      expect(() => validateAndroidBigTextStyle(style)).toThrow(
         "'notification.android.style' BigTextStyle: 'summary' expected a string value.",
       );
     });
@@ -188,7 +188,7 @@ describe('Validate Android Style', () => {
         lines: '' as any,
       };
 
-      expect(() => validateAndroidInboxStyle(style)).toThrowError(
+      expect(() => validateAndroidInboxStyle(style)).toThrow(
         "'notification.android.style' InboxStyle: 'lines' expected an array.",
       );
     });
@@ -199,7 +199,7 @@ describe('Validate Android Style', () => {
         lines: [1 as any],
       };
 
-      expect(() => validateAndroidInboxStyle(style)).toThrowError(
+      expect(() => validateAndroidInboxStyle(style)).toThrow(
         `'notification.android.style' InboxStyle: 'lines' expected a string value at array index 0.`,
       );
     });
@@ -211,7 +211,7 @@ describe('Validate Android Style', () => {
         title: [] as any,
       };
 
-      expect(() => validateAndroidInboxStyle(style)).toThrowError(
+      expect(() => validateAndroidInboxStyle(style)).toThrow(
         "'notification.android.style' InboxStyle: 'title' expected a string value.",
       );
     });
@@ -224,7 +224,7 @@ describe('Validate Android Style', () => {
         summary: [] as any,
       };
 
-      expect(() => validateAndroidInboxStyle(style)).toThrowError(
+      expect(() => validateAndroidInboxStyle(style)).toThrow(
         "'notification.android.style' InboxStyle: 'summary' expected a string value.",
       );
     });
@@ -255,7 +255,7 @@ describe('Validate Android Style', () => {
         name: [] as any,
       };
 
-      expect(() => validateAndroidPerson(person)).toThrowError(
+      expect(() => validateAndroidPerson(person)).toThrow(
         "'person.name' expected a string value.",
       );
     });
@@ -266,7 +266,7 @@ describe('Validate Android Style', () => {
         id: null as any,
       };
 
-      expect(() => validateAndroidPerson(person)).toThrowError(
+      expect(() => validateAndroidPerson(person)).toThrow(
         "'person.id' expected a string value.",
       );
     });
@@ -278,7 +278,7 @@ describe('Validate Android Style', () => {
         bot: 2 as any,
       };
 
-      expect(() => validateAndroidPerson(person)).toThrowError(
+      expect(() => validateAndroidPerson(person)).toThrow(
         "'person.bot' expected a boolean value.",
       );
     });
@@ -291,7 +291,7 @@ describe('Validate Android Style', () => {
         important: 2 as any,
       };
 
-      expect(() => validateAndroidPerson(person)).toThrowError(
+      expect(() => validateAndroidPerson(person)).toThrow(
         "'person.important' expected a boolean value.",
       );
     });
@@ -305,7 +305,7 @@ describe('Validate Android Style', () => {
         icon: 2 as any,
       };
 
-      expect(() => validateAndroidPerson(person)).toThrowError(
+      expect(() => validateAndroidPerson(person)).toThrow(
         "'person.icon' expected a string value.",
       );
     });
@@ -320,7 +320,7 @@ describe('Validate Android Style', () => {
         uri: 2 as any,
       };
 
-      expect(() => validateAndroidPerson(person)).toThrowError(
+      expect(() => validateAndroidPerson(person)).toThrow(
         "'person.uri' expected a string value.",
       );
     });
@@ -346,7 +346,7 @@ describe('Validate Android Style', () => {
         timestamp: testTimestamp,
       };
 
-      expect(() => validateAndroidMessagingStyleMessage(message)).toThrowError(
+      expect(() => validateAndroidMessagingStyleMessage(message)).toThrow(
         "'message.text' expected a string value.",
       );
     });
@@ -357,7 +357,7 @@ describe('Validate Android Style', () => {
         timestamp: [] as any,
       };
 
-      expect(() => validateAndroidMessagingStyleMessage(message)).toThrowError(
+      expect(() => validateAndroidMessagingStyleMessage(message)).toThrow(
         "'message.timestamp' expected a number value.",
       );
     });
@@ -369,7 +369,7 @@ describe('Validate Android Style', () => {
         person: [] as any,
       };
 
-      expect(() => validateAndroidMessagingStyleMessage(message)).toThrowError(
+      expect(() => validateAndroidMessagingStyleMessage(message)).toThrow(
         `'message.person' is invalid.`,
       );
     });
@@ -401,7 +401,7 @@ describe('Validate Android Style', () => {
         messages: testMessages,
       };
 
-      expect(() => validateAndroidMessagingStyle(style)).toThrowError(
+      expect(() => validateAndroidMessagingStyle(style)).toThrow(
         "'notification.android.style' MessagingStyle: 'person' an object value.",
       );
     });
@@ -413,7 +413,7 @@ describe('Validate Android Style', () => {
         messages: '' as any,
       };
 
-      expect(() => validateAndroidMessagingStyle(style)).toThrowError(
+      expect(() => validateAndroidMessagingStyle(style)).toThrow(
         "'notification.android.style' MessagingStyle: 'messages' expected an array value.",
       );
     });
@@ -425,7 +425,7 @@ describe('Validate Android Style', () => {
         messages: ['1' as any],
       };
 
-      expect(() => validateAndroidMessagingStyle(style)).toThrowError(
+      expect(() => validateAndroidMessagingStyle(style)).toThrow(
         `'notification.android.style' MessagingStyle: invalid message at index 0`,
       );
     });
@@ -438,7 +438,7 @@ describe('Validate Android Style', () => {
         title: [] as any,
       };
 
-      expect(() => validateAndroidMessagingStyle(style)).toThrowError(
+      expect(() => validateAndroidMessagingStyle(style)).toThrow(
         "'notification.android.style' MessagingStyle: 'title' expected a string value.",
       );
     });
@@ -452,7 +452,7 @@ describe('Validate Android Style', () => {
         group: 'true' as any,
       };
 
-      expect(() => validateAndroidMessagingStyle(style)).toThrowError(
+      expect(() => validateAndroidMessagingStyle(style)).toThrow(
         "'notification.android.style' MessagingStyle: 'group' expected a boolean value.",
       );
     });

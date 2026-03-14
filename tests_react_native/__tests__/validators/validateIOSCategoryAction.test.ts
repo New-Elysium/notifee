@@ -1,5 +1,5 @@
-import validateIOSCategoryAction from '@notifee/react-native/src/validators/validateIOSCategoryAction';
-import { IOSNotificationCategoryAction } from '@notifee/react-native/src/types/NotificationIOS';
+import validateIOSCategoryAction from '../../../packages/react-native/src/validators/validateIOSCategoryAction';
+import { IOSNotificationCategoryAction } from '../../../packages/react-native/src/types/NotificationIOS';
 
 describe('Validate IOS Catgeory Action', () => {
   describe('validateIOSCategoryAction()', () => {
@@ -23,7 +23,7 @@ describe('Validate IOS Catgeory Action', () => {
         input: [] as any,
       };
 
-      expect(() => validateIOSCategoryAction(categoryAction)).toThrowError(
+      expect(() => validateIOSCategoryAction(categoryAction)).toThrow(
         "'action' expected an object value..",
       );
     });
@@ -35,7 +35,7 @@ describe('Validate IOS Catgeory Action', () => {
         destructive: [] as any,
       };
 
-      expect(() => validateIOSCategoryAction(categoryAction)).toThrowError(
+      expect(() => validateIOSCategoryAction(categoryAction)).toThrow(
         "'destructive' expected a boolean value.",
       );
     });
@@ -47,7 +47,7 @@ describe('Validate IOS Catgeory Action', () => {
         foreground: [] as any,
       };
 
-      expect(() => validateIOSCategoryAction(categoryAction)).toThrowError(
+      expect(() => validateIOSCategoryAction(categoryAction)).toThrow(
         "'foreground' expected a boolean value.",
       );
     });
@@ -59,7 +59,7 @@ describe('Validate IOS Catgeory Action', () => {
         authenticationRequired: [] as any,
       };
 
-      expect(() => validateIOSCategoryAction(categoryAction)).toThrowError(
+      expect(() => validateIOSCategoryAction(categoryAction)).toThrow(
         "'authenticationRequired' expected a boolean value.",
       );
     });

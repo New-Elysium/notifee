@@ -1,5 +1,5 @@
-import validateIOSInput from '@notifee/react-native/src/validators/validateIOSInput';
-import { IOSInput } from '@notifee/react-native/src/types/NotificationIOS';
+import validateIOSInput from '../../../packages/react-native/src/validators/validateIOSInput';
+import { IOSInput } from '../../../packages/react-native/src/types/NotificationIOS';
 
 describe('Validate IOS Input', () => {
   describe('validateIOSInput()', () => {
@@ -30,7 +30,7 @@ describe('Validate IOS Input', () => {
         placeholderText: 'placeholderText',
       };
 
-      expect(() => validateIOSInput(input)).toThrowError("'buttonText' expected a string value.");
+      expect(() => validateIOSInput(input)).toThrow("'buttonText' expected a string value.");
     });
 
     test('throws an error with an invalid placeholderText param', () => {
@@ -39,7 +39,7 @@ describe('Validate IOS Input', () => {
         placeholderText: [] as any,
       };
 
-      expect(() => validateIOSInput(input)).toThrowError(
+      expect(() => validateIOSInput(input)).toThrow(
         "'placeholderText' expected a string value.",
       );
     });

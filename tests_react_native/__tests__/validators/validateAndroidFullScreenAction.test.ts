@@ -1,4 +1,4 @@
-import { NotificationFullScreenAction } from '@notifee/react-native/src/types/Notification';
+import { NotificationFullScreenAction } from '../../../packages/react-native/src/types/Notification';
 import validateAndroidFullScreenAction from '../../../packages/react-native/src/validators/validateAndroidFullScreenAction';
 
 describe('Validate Android Full-screen Action', () => {
@@ -17,7 +17,7 @@ describe('Validate Android Full-screen Action', () => {
     });
 
     test('throws an error with an invalid param', () => {
-      expect(() => validateAndroidFullScreenAction([] as any)).toThrowError(
+      expect(() => validateAndroidFullScreenAction([] as any)).toThrow(
         "'fullScreenAction' expected an object value.",
       );
     });
@@ -27,7 +27,7 @@ describe('Validate Android Full-screen Action', () => {
         id: [] as any,
       };
 
-      expect(() => validateAndroidFullScreenAction(action)).toThrowError(
+      expect(() => validateAndroidFullScreenAction(action)).toThrow(
         "'id' expected a non-empty string value.",
       );
     });
@@ -38,7 +38,7 @@ describe('Validate Android Full-screen Action', () => {
         launchActivity: {} as any,
       };
 
-      expect(() => validateAndroidFullScreenAction(action)).toThrowError(
+      expect(() => validateAndroidFullScreenAction(action)).toThrow(
         "'launchActivity' expected a string value.",
       );
     });
@@ -50,7 +50,7 @@ describe('Validate Android Full-screen Action', () => {
         launchActivityFlags: '' as any,
       };
 
-      expect(() => validateAndroidFullScreenAction(action)).toThrowError(
+      expect(() => validateAndroidFullScreenAction(action)).toThrow(
         "'launchActivityFlags' must be an array of `AndroidLaunchActivityFlag` values.",
       );
     });
@@ -61,7 +61,7 @@ describe('Validate Android Full-screen Action', () => {
         mainComponent: {} as any,
       };
 
-      expect(() => validateAndroidFullScreenAction(action)).toThrowError(
+      expect(() => validateAndroidFullScreenAction(action)).toThrow(
         "'mainComponent' expected a string value.",
       );
     });

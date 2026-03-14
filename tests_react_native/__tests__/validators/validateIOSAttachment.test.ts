@@ -1,10 +1,10 @@
 import validateIOSAttachment, {
   validateThumbnailClippingRect,
-} from '@notifee/react-native/src/validators/validateIOSAttachment';
+} from '../../../packages/react-native/src/validators/validateIOSAttachment';
 import {
   IOSAttachmentThumbnailClippingRect,
   IOSNotificationAttachment,
-} from '@notifee/react-native/src/types/NotificationIOS';
+} from '../../../packages/react-native/src/types/NotificationIOS';
 
 const testUrl = 'test-url';
 const testId = 'test-id';
@@ -41,7 +41,7 @@ describe('Validate IOS Attachment', () => {
     });
 
     test('returns invalid when no value is provided', () => {
-      expect(() => validateIOSAttachment(null as any)).toThrowError(
+      expect(() => validateIOSAttachment(null as any)).toThrow(
         "'attachment' expected an object value.",
       );
     });
@@ -51,7 +51,7 @@ describe('Validate IOS Attachment', () => {
         url: '',
       };
 
-      expect(() => validateIOSAttachment(notification)).toThrowError(
+      expect(() => validateIOSAttachment(notification)).toThrow(
         "'attachment.url' expected a React Native ImageResource value or a valid string URL.",
       );
     });
@@ -62,7 +62,7 @@ describe('Validate IOS Attachment', () => {
         id: null as any,
       };
 
-      expect(() => validateIOSAttachment(notification)).toThrowError(
+      expect(() => validateIOSAttachment(notification)).toThrow(
         "'attachment.id' expected a string value.",
       );
     });
@@ -74,7 +74,7 @@ describe('Validate IOS Attachment', () => {
         typeHint: 1 as any,
       };
 
-      expect(() => validateIOSAttachment(notification)).toThrowError(
+      expect(() => validateIOSAttachment(notification)).toThrow(
         "'attachment.typeHint' expected a string value.",
       );
     });
@@ -87,7 +87,7 @@ describe('Validate IOS Attachment', () => {
         thumbnailHidden: '' as any,
       };
 
-      expect(() => validateIOSAttachment(notification)).toThrowError(
+      expect(() => validateIOSAttachment(notification)).toThrow(
         "'attachment.thumbnailHidden' must be a boolean value if specified.",
       );
     });
@@ -101,7 +101,7 @@ describe('Validate IOS Attachment', () => {
         thumbnailTime: '11' as any,
       };
 
-      expect(() => validateIOSAttachment(notification)).toThrowError(
+      expect(() => validateIOSAttachment(notification)).toThrow(
         "'attachment.thumbnailTime' must be a number value if specified.",
       );
     });
@@ -133,7 +133,7 @@ describe('Validate IOS Attachment', () => {
           height: testHeight,
         };
 
-        expect(() => validateThumbnailClippingRect($)).toThrowError(
+        expect(() => validateThumbnailClippingRect($)).toThrow(
           "'thumbnailClippingRect.x' expected a number value.",
         );
       });
@@ -146,7 +146,7 @@ describe('Validate IOS Attachment', () => {
           height: testHeight,
         };
 
-        expect(() => validateThumbnailClippingRect($)).toThrowError(
+        expect(() => validateThumbnailClippingRect($)).toThrow(
           "'thumbnailClippingRect.y' expected a number value.",
         );
       });
@@ -159,7 +159,7 @@ describe('Validate IOS Attachment', () => {
           height: testHeight,
         };
 
-        expect(() => validateThumbnailClippingRect($)).toThrowError(
+        expect(() => validateThumbnailClippingRect($)).toThrow(
           "'thumbnailClippingRect.width' expected a number value.",
         );
       });
@@ -172,7 +172,7 @@ describe('Validate IOS Attachment', () => {
           height: '1' as any,
         };
 
-        expect(() => validateThumbnailClippingRect($)).toThrowError(
+        expect(() => validateThumbnailClippingRect($)).toThrow(
           "'thumbnailClippingRect.height' expected a number value.",
         );
       });

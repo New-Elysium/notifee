@@ -4,7 +4,7 @@
  * Example:
  *
  * ```js
- * jest.mock('@notifee/react-native', () => require('@notifee/react-native/jest-mock'));
+ * jest.mock('@psync/notifee', () => require('@psync/notifee/jest-mock'));
  * ```
  */
 

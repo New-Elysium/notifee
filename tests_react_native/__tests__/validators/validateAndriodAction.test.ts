@@ -1,5 +1,5 @@
-import validateAndroidAction from '@notifee/react-native/src/validators/validateAndroidAction';
-import { AndroidAction } from '@notifee/react-native/src/types/NotificationAndroid';
+import validateAndroidAction from '../../../packages/react-native/src/validators/validateAndroidAction';
+import { AndroidAction } from '../../../packages/react-native/src/types/NotificationAndroid';
 
 describe('Validate Android Action', () => {
   describe('validateAndroidAction()', () => {
@@ -15,7 +15,7 @@ describe('Validate Android Action', () => {
     });
 
     test.concurrent('returns invalid if not a valid object ', async () => {
-      expect(() => validateAndroidAction([] as any)).toThrowError(
+      expect(() => validateAndroidAction([] as any)).toThrow(
         "'action' expected an object value.",
       );
     });
@@ -26,7 +26,7 @@ describe('Validate Android Action', () => {
         title: 'title',
       };
 
-      expect(() => validateAndroidAction(action)).toThrowError(
+      expect(() => validateAndroidAction(action)).toThrow(
         "'action' 'pressAction' expected an object value..",
       );
     });
@@ -37,7 +37,7 @@ describe('Validate Android Action', () => {
         title: 'title',
       };
 
-      expect(() => validateAndroidAction(action)).toThrowError(
+      expect(() => validateAndroidAction(action)).toThrow(
         "'action' 'id' expected a non-empty string value..",
       );
     });
@@ -59,7 +59,7 @@ describe('Validate Android Action', () => {
         title: 'title',
       };
 
-      expect(() => validateAndroidAction(action)).toThrowError(
+      expect(() => validateAndroidAction(action)).toThrow(
         "'launchActivity' expected a string value.",
       );
     });
@@ -81,7 +81,7 @@ describe('Validate Android Action', () => {
         title: 'title',
       };
 
-      expect(() => validateAndroidAction(action)).toThrowError(
+      expect(() => validateAndroidAction(action)).toThrow(
         "'mainComponent' expected a string value.",
       );
     });
@@ -106,7 +106,7 @@ describe('Validate Android Action', () => {
         icon: 0 as any,
       };
 
-      expect(() => validateAndroidAction(action)).toThrowError(
+      expect(() => validateAndroidAction(action)).toThrow(
         "'action.icon' expected a string value.",
       );
     });
@@ -129,7 +129,7 @@ describe('Validate Android Action', () => {
         title: [] as any,
       };
 
-      expect(() => validateAndroidAction(action)).toThrowError(
+      expect(() => validateAndroidAction(action)).toThrow(
         "'action.title' expected a string value.",
       );
     });
@@ -141,7 +141,7 @@ describe('Validate Android Action', () => {
         input: { allowFreeFormInput: [] } as any,
       };
 
-      expect(() => validateAndroidAction(action)).toThrowError(
+      expect(() => validateAndroidAction(action)).toThrow(
         "'action.input' 'input.allowFreeFormInput' expected a boolean value..",
       );
     });

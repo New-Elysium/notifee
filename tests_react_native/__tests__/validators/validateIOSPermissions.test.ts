@@ -1,5 +1,5 @@
-import validateIOSPermissions from '@notifee/react-native/src/validators/validateIOSPermissions';
-import { IOSNotificationPermissions } from '@notifee/react-native/src/types/NotificationIOS';
+import validateIOSPermissions from '../../../packages/react-native/src/validators/validateIOSPermissions';
+import { IOSNotificationPermissions } from '../../../packages/react-native/src/types/NotificationIOS';
 
 describe('Validate IOS Input', () => {
   describe('validateIOSInput()', () => {
@@ -42,7 +42,7 @@ describe('Validate IOS Input', () => {
         alert: [] as any,
       };
 
-      expect(() => validateIOSPermissions(notification)).toThrowError(
+      expect(() => validateIOSPermissions(notification)).toThrow(
         "'alert' expected a boolean value.",
       );
     });
@@ -52,7 +52,7 @@ describe('Validate IOS Input', () => {
         alert: [] as any,
       };
 
-      expect(() => validateIOSPermissions(notification)).toThrowError(
+      expect(() => validateIOSPermissions(notification)).toThrow(
         "'alert' expected a boolean value.",
       );
     });
@@ -62,7 +62,7 @@ describe('Validate IOS Input', () => {
         sound: [] as any,
       };
 
-      expect(() => validateIOSPermissions(notification)).toThrowError(
+      expect(() => validateIOSPermissions(notification)).toThrow(
         "'sound' expected a boolean value.",
       );
     });
@@ -72,7 +72,7 @@ describe('Validate IOS Input', () => {
         carPlay: [] as any,
       };
 
-      expect(() => validateIOSPermissions(notification)).toThrowError(
+      expect(() => validateIOSPermissions(notification)).toThrow(
         "'carPlay' expected a boolean value.",
       );
     });
@@ -82,7 +82,7 @@ describe('Validate IOS Input', () => {
         provisional: [] as any,
       };
 
-      expect(() => validateIOSPermissions(notification)).toThrowError(
+      expect(() => validateIOSPermissions(notification)).toThrow(
         "'provisional' expected a boolean value.",
       );
     });
@@ -92,7 +92,7 @@ describe('Validate IOS Input', () => {
         announcement: [] as any,
       };
 
-      expect(() => validateIOSPermissions(notification)).toThrowError(
+      expect(() => validateIOSPermissions(notification)).toThrow(
         "'announcement' expected a boolean value.",
       );
     });
@@ -102,7 +102,7 @@ describe('Validate IOS Input', () => {
         criticalAlert: [] as any,
       };
 
-      expect(() => validateIOSPermissions(notification)).toThrowError(
+      expect(() => validateIOSPermissions(notification)).toThrow(
         "'criticalAlert' expected a boolean value.",
       );
     });

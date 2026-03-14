@@ -1,4 +1,4 @@
-import Notifee from '@notifee/react-native';
+import Notifee from '../../packages/react-native/src/index';
 
 describe('Notifee App Module', () => {
   test('Module is defined on import', () => {
@@ -6,7 +6,7 @@ describe('Notifee App Module', () => {
   });
   test('Version from module package.json matches SDK_VERSION', () => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const notifeePackageJSON = require('@notifee/react-native/package.json');
+    const notifeePackageJSON = require('../../packages/react-native/package.json');
     expect(Notifee.SDK_VERSION).toEqual(notifeePackageJSON.version);
   });
 });
