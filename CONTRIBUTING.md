@@ -1,10 +1,15 @@
 # Getting Started
 
+> ⚠️ **New Architecture Only**: This project is built **exclusively for React Native New Architecture**. All contributions must be compatible with React Native 0.81+ and the New Architecture.
+
 ## Prerequisites
 
 Ensure you have the following software installed:
 
-- Java 11 (the default in Android Studio 2020.3.1 and higher)
+- Java 17 or 21 (the default in Android Studio 2022.3.1 and higher)
+- Xcode 16.2+ (for iOS development)
+- Node.js 24+ (required for Firebase JS SDK v12+)
+- React Native 0.81+ with New Architecture enabled
 
 ## Step 1: Clone the repository
 

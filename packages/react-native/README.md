@@ -7,9 +7,20 @@
 
 ---
 
+> ⚠️ **New Architecture Only**: This version of Notifee is built **exclusively for React Native New Architecture**. It requires React Native 0.76+ with the New Architecture enabled. For the legacy architecture, use the stable release branch.
+
 A feature rich Android & iOS notifications library for React Native.
 
 [> Learn More](https://notifee.app/)
+
+## Platform Requirements
+
+| Requirement | Minimum Version |
+|-------------|-----------------|
+| React Native | 0.76+ (New Architecture enabled) |
+| iOS Deployment Target | 15.0+ |
+| Android minSdk | 23+ |
+| Xcode | 16.2+ (for iOS development) |
 
 ## Installation
 
