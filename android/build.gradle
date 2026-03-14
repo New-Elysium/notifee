@@ -23,7 +23,7 @@ buildscript {
 }
 
 allprojects {
-  task downloadDependencies() {
+  task notifeeDownloadDependencies() {
     description 'Download all dependencies to Gradle cache'
   }
 
