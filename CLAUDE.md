@@ -38,9 +38,9 @@ bunx <binary>
 ## Development Setup
 
 **Prerequisites:**
-- Bun 1.3.9+
-- Node.js 20+
-- Java 17 (for Android)
+- Bun 1.3.10+
+- Node.js 24+
+- Java 21 (for Android)
 - Xcode (for iOS, macOS only)
 
 **Install dependencies:**
@@ -133,15 +133,10 @@ The published package requires:
 
 | Package | Minimum Version |
 |---------|----------------|
-| `react` | `>=19.0.0` |
-| `react-native` | `>=0.81.0` |
-| `scheduler` | `0.25.0` |
+| `react` | `>=19.2.4` |
+| `react-native` | `>=0.83.2` |
+| `scheduler` | `>=0.25.0` |
 
-## Dependency Notes
-
-- **`@types/react-native`** is **not** used — React Native 0.73+ ships its own TypeScript types.
-- **`typedoc`** is pinned to `^0.28.0` to support TypeScript 5.8+/5.9.
-- **`typedoc-plugin-markdown`** `^4.6.2` and **`typedoc-plugin-remark`** `^2.0.1` are required for typedoc 0.28 compatibility.
 
 ## Code Style
 

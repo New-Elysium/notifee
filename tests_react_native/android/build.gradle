@@ -2,19 +2,12 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 buildscript {
   ext {
-    buildToolsVersion = '31.0.0'
-    minSdkVersion = 21
+    buildToolsVersion = "34.0.0"
+    minSdkVersion = 28
     compileSdkVersion = 34
-    targetSdkVersion = 33
-
-        if (System.properties['os.arch'] == "aarch64") {
-            // For M1 Users we need to use the NDK 24 which added support for aarch64
-            ndkVersion = "24.0.8215888"
-        } else {
-            // Otherwise we default to the side-by-side NDK version from AGP.
-            ndkVersion = "21.4.7075529"
-        }
-
+    targetSdkVersion = 34
+    ndkVersion = "25.1.8937393"
+    kotlinVersion = "1.8.22"
     enableHermes = true
   }
 
@@ -25,10 +18,11 @@ buildscript {
   dependencies {
     classpath("com.android.tools.build:gradle:8.2.2")
     classpath("com.facebook.react:react-native-gradle-plugin")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     classpath("de.undercouch:gradle-download-task:5.0.1")
 
     // Still needed for react-native-firebase integration part of tests
-    classpath 'com.google.gms:google-services:4.3.10'
+    classpath("com.google.gms:google-services:4.3.10")
   }
 }
 
@@ -76,11 +70,11 @@ subprojects {
   afterEvaluate { project ->
     if (!project.name.equalsIgnoreCase('app') && project.hasProperty('android')) {
       android {
-        compileSdkVersion compileSdk
-        buildToolsVersion buildTools
+        compileSdk rootProject.ext.compileSdkVersion
+        buildToolsVersion rootProject.ext.buildToolsVersion
         defaultConfig {
-          minSdkVersion minSdk
-          targetSdkVersion targetSdk
+          minSdkVersion rootProject.ext.minSdkVersion
+          targetSdkVersion rootProject.ext.targetSdkVersion
         }
       }
     }
