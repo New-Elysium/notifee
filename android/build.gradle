@@ -1,12 +1,60 @@
 import org.gradle.internal.jvm.Jvm
 
 buildscript {
+  ext {
+    minSdkVersion = 28
+    compileSdkVersion = 36
+    targetSdkVersion = 36
+    ndkVersion = "27.2.12479018"
+    kotlinVersion = "1.9.25"
+    enableHermes = true
+  }
+
   repositories {
     google()
     mavenCentral()
   }
   dependencies {
     classpath 'com.android.tools.build:gradle:8.7.3'
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+    classpath("de.undercouch:gradle-download-task:5.0.1")
+    classpath("com.google.gms:google-services:4.4.2")
+  }
+}
+
+allprojects {
+  task downloadDependencies() {
+    description 'Download all dependencies to Gradle cache'
+  }
+
+  repositories {
+    mavenLocal()
+    maven {
+      url("$rootDir/../node_modules/react-native/android")
+    }
+    maven {
+      url("$rootDir/../node_modules/jsc-android/dist")
+    }
+    maven {
+      url "$rootDir/../node_modules/detox/Detox-android"
+    }
+    mavenCentral {
+      content {
+        excludeGroup "com.facebook.react"
+      }
+    }
+    google()
+    maven { url 'https://www.jitpack.io' }
+  }
+}
+
+subprojects { subproject ->
+  task listAllDependencies(type: DependencyReportTask) {}
+
+  afterEvaluate {
+    if (subproject.hasProperty('android') && subproject.name != 'app') {
+      subproject.android.compileSdkVersion rootProject.ext.compileSdkVersion
+    }
   }
 }
 
@@ -96,6 +144,22 @@ android {
     systemProperties['junit.jupiter.execution.parallel.mode.default'] = "concurrent"
   }
 }
+
+apply plugin: "com.facebook.react"
+
+repositories {
+  mavenLocal()
+  maven {
+    url("$rootDir/../node_modules/react-native/android")
+  }
+  maven {
+    url("$rootDir/../node_modules/jsc-android/dist")
+  }
+  google()
+  mavenCentral()
+}
+
+apply plugin: 'com.google.gms.google-services'
 
 repositories {
   google()
