@@ -1,7 +1,31 @@
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    google()
+    mavenCentral()
+  }
+  
+  // Find the gradle plugin path dynamically (works with bun/yarn/npm)
+  def bunDir = new File(settingsDir, '../../node_modules/.bun')
+  if (bunDir.exists()) {
+    def pluginDir = bunDir.listFiles()?.find { it.name.startsWith('@react-native+gradle-plugin@') }
+    if (pluginDir != null) {
+      includeBuild("${pluginDir}/node_modules/@react-native/gradle-plugin")
+    }
+  }
+}
+
+plugins {
+  id("com.facebook.react.settings")
+}
+
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
+  ex.autolinkLibrariesFromCommand()
+}
+
 rootProject.name = '@notifee_tests'
 
 include ':notifee_core'
 project(':notifee_core').projectDir = new File(rootProject.projectDir, '../../android')
 
 include ':app'
-includeBuild('../../node_modules/.bun/@react-native+gradle-plugin@0.83.4/node_modules/@react-native/gradle-plugin')

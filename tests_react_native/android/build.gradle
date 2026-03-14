@@ -6,7 +6,7 @@ buildscript {
     minSdkVersion = 28
     compileSdkVersion = 34
     targetSdkVersion = 34
-    ndkVersion = "25.1.8937393"
+    ndkVersion = "27.1.12297006"
     kotlinVersion = "1.8.22"
     enableHermes = true
   }
@@ -17,12 +17,11 @@ buildscript {
   }
   dependencies {
     classpath("com.android.tools.build:gradle:8.2.2")
-    classpath("com.facebook.react:react-native-gradle-plugin")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     classpath("de.undercouch:gradle-download-task:5.0.1")
 
     // Still needed for react-native-firebase integration part of tests
-    classpath("com.google.gms:google-services:4.3.10")
+    classpath("com.google.gms:google-services:4.4.2")
   }
 }
 
@@ -57,26 +56,13 @@ allprojects {
 
 }
 
-subprojects {
+subprojects { subproject ->
   task listAllDependencies(type: DependencyReportTask) {}
-  ext {
-    compileSdk = rootProject.ext.compileSdkVersion
-    buildTools = rootProject.ext.buildToolsVersion
-    minSdk = rootProject.ext.minSdkVersion
-    targetSdk = rootProject.ext.targetSdkVersion
-  }
 
-  // Set up all other sub-projects - from other react-native modules, to use our versions
-  afterEvaluate { project ->
-    if (!project.name.equalsIgnoreCase('app') && project.hasProperty('android')) {
-      android {
-        compileSdkVersion compileSdk
-        buildToolsVersion buildTools
-        defaultConfig {
-          minSdkVersion minSdk
-          targetSdkVersion targetSdk
-        }
-      }
+  // Override compileSdk for third-party libraries with outdated values (needed for AGP 8.x)
+  afterEvaluate {
+    if (subproject.hasProperty('android') && subproject.name != 'app') {
+      subproject.android.compileSdkVersion rootProject.ext.compileSdkVersion
     }
   }
 }

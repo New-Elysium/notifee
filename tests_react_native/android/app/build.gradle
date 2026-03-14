@@ -1,6 +1,8 @@
-apply plugin: "com.android.application"
-apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: "com.facebook.react"
+plugins {
+  id("com.android.application")
+  id("org.jetbrains.kotlin.android")
+  id("com.facebook.react")
+}
 
 import com.android.build.OutputFile
 
@@ -87,6 +89,7 @@ android {
 react {
   entryFile = file("../../index.js")
   reactNativeDir = file("../../node_modules/react-native")
+  autolinkLibrariesWithApp()
 }
 
 dependencies {
