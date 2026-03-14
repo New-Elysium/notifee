@@ -6,7 +6,9 @@
 
 const { resolve, join } = require('path');
 
-const exclusionList = require('metro-config/src/defaults/exclusionList');
+function escape(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 const rootDir = resolve(__dirname, '..');
 
@@ -14,7 +16,7 @@ const config = {
   projectRoot: __dirname,
   resolver: {
     useWatchman: !process.env.TEAMCITY_VERSION,
-    blocklist: exclusionList([
+    blocklist: [
       /.*\/__fixtures__\/.*/,
       /.*\/template\/project\/node_modules\/react-native\/.*/,
       new RegExp(`^${escape(resolve(rootDir, 'docs'))}\\/.*$`),
@@ -22,7 +24,7 @@ const config = {
       new RegExp(`^${escape(resolve(rootDir, 'tests_react_native/e2e'))}\\/.*$`),
       new RegExp(`^${escape(resolve(rootDir, 'tests_react_native/android'))}\\/.*$`),
       new RegExp(`^${escape(resolve(rootDir, 'tests_react_native/functions'))}\\/.*$`),
-    ]),
+    ],
     extraNodeModules: new Proxy(
       {},
       {

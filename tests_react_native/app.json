@@ -1,0 +1,8 @@
+{
+  "android": {
+    "package": "com.xchikux.notifeetestsreactnative"
+  },
+  "ios": {
+    "bundleIdentifier": "com.xchikux.notifeetestsreactnative"
+  }
+}
