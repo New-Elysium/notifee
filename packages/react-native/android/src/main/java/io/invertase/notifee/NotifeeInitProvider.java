@@ -7,6 +7,7 @@ package io.invertase.notifee;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import app.notifee.core.InitProvider;
 import app.notifee.core.Notifee;
 import com.facebook.react.modules.systeminfo.ReactNativeVersion;
@@ -14,11 +15,9 @@ import java.util.Map;
 
 public class NotifeeInitProvider extends InitProvider {
   @Override
-  public boolean onCreate() {
-    boolean onCreate = super.onCreate();
-
+  public void attachInfo(Context context, ProviderInfo info) {
+    super.attachInfo(context, info);
     Notifee.initialize(new NotifeeEventSubscriber());
-    return onCreate;
   }
 
   private String getApplicationVersionString() {
