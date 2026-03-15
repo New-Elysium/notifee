@@ -27,9 +27,17 @@ public class NotifeeApiModule extends ReactContextBaseJavaModule implements Perm
   private static final int NOTIFICATION_TYPE_DISPLAYED = 1;
   private static final int NOTIFICATION_TYPE_TRIGGER = 2;
   private static final int NOTIFICATION_TYPE_ALL = 0;
+  private static boolean mInitialized = false;
 
   public NotifeeApiModule(@NonNull ReactApplicationContext reactContext) {
     super(reactContext);
+    // Lazy initialization - works with R8 since we can't override final methods in ContentProvider
+    synchronized (NotifeeApiModule.class) {
+      if (!mInitialized) {
+        Notifee.initialize(new NotifeeEventSubscriber());
+        mInitialized = true;
+      }
+    }
   }
 
   public static String getMainComponent(@NonNull String defaultComponent) {
