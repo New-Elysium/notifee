@@ -38,6 +38,9 @@ def findNodeModulePath(baseDir, packageName) {
 def notifeeDir = findNodeModulePath(projectDir, "@psync/notifee") ?: "$rootDir/../node_modules/@psync/notifee"
 println ":${project.name} @psync/notifee found at $notifeeDir"
 
+def notifeeLibsDir = new File("$notifeeDir/android/libs")
+def hasNotifeeCore = notifeeLibsDir.exists() && notifeeLibsDir.isDirectory()
+
 if (project.hasProperty('reactNativeProjects')) {
   reactNativeProjects.each { dependent ->
     project.evaluationDependsOn(dependent)
@@ -92,7 +95,7 @@ repositories {
 dependencies {
   if (findProject(':notifee_core')) {
     implementation findProject(':notifee_core')
-  } else {
+  } else if (hasNotifeeCore) {
     implementation(group: 'app.notifee', name:'core', version: '+')
   }
 
@@ -109,8 +112,10 @@ ReactNative.module.applyAndroidVersions()
 ReactNative.module.applyReactNativeDependency("api")
 rootProject.allprojects {
   repositories {
-    maven {
-      url "$notifeeDir/android/libs"
+    if (hasNotifeeCore) {
+      maven {
+        url "$notifeeDir/android/libs"
+      }
     }
   }
 }
