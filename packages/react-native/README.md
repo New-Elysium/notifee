@@ -1,37 +1,49 @@
 <p align="center">
+  <a href="https://psync.club">
+    <img width="150px" src="https://psync.club/favicon.ico"><br/>
+  </a>
   <a href="https://notifee.app">
-    <img width="160px" src="https://notifee.app/logo-icon.png"><br/>
+    <img width="50px" src="https://notifee.app/logo-icon.png"><br/>
   </a>
   <h2 align="center">Notifee - React Native</h2>
 </p>
 
 ---
 
-> ⚠️ **New Architecture Only**: This version of Notifee is built **exclusively for React Native New Architecture**. It requires React Native 0.76+ with the New Architecture enabled. For the legacy architecture, use the stable release branch.
+> ⚠️ **New Architecture Only**: This version of Notifee is built **exclusively for React Native New Architecture**. It requires React Native 0.83+ with the New Architecture enabled. For the legacy architecture, use the @invertase/notifee package.
 
 A feature rich Android & iOS notifications library for React Native.
 
 [> Learn More](https://notifee.app/)
+[> Get Started](https://notifee.app/react-native/docs/overview)
+[> GitHub](https://github.com/New-Elysium/notifee)
+[> Join the Club](https://psync.club)
 
 ## Platform Requirements
 
 | Requirement | Minimum Version |
 |-------------|-----------------|
-| React Native | 0.76+ (New Architecture enabled) |
-| iOS Deployment Target | 15.0+ |
-| Android minSdk | 23+ |
+| React Native | 0.83+ (New Architecture only!) |
+| iOS Deployment Target | 15.1+ |
+| Android minSdk | 28+ |
 | Xcode | 16.2+ (for iOS development) |
 
 ## Installation
 
 ```bash
+npm install @psync/notifee
+```
+
+```bash
 yarn add @psync/notifee
 ```
 
+```bash
+bun add @psync/notifee
+```
 ## Documentation
 
 - [Overview](https://notifee.app/react-native/docs/overview)
-- [Licensing](https://notifee.app/react-native/docs/license-keys)
 - [Reference](https://notifee.app/react-native/reference)
 
 ### Android
@@ -133,9 +145,9 @@ The important part is to make sure you have a `__notifee_notification` object un
 ---
 
 <p>
-  <img align="left" width="50px" src="https://static.invertase.io/assets/invertase/invertase-rounded.png">
+  <img align="left" width="50px" src="https://psync.club/favicon.ico">
   <p align="left">
-    Built and maintained with 💛 by <a href="https://invertase.io">Invertase</a>.
+    Built by <a href="https://invertase.io">Invertase</a> and maintained with 💖 by <a href="https://psync.club">Psync</a>.
   </p>
 </p>
 
