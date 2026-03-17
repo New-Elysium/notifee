@@ -14,7 +14,8 @@ notifee/
 ├── ios/                        # Core iOS native implementation (Obj-C/C++)
 ├── packages/
 │   ├── react-native/           # Main React Native package (@psync/notifee)
-│   └── flutter/                # Flutter bindings
+│   │   └── example/            # An example folder to see if the app works (HAS MAJOR ISSUES WITH GRADLE 9.0.0)
+│   └── flutter/                # Flutter bindings (ignore for now)
 ├── tests_react_native/         # E2E test suite
 ├── docs/                       # TypeDoc-generated documentation
 └── .github/workflows/          # CI/CD pipelines
@@ -124,7 +125,7 @@ env:
 
 `packages/react-native/package.json`:
 - **name:** `@psync/notifee`
-- **peerDependencies:** `react >=19.0.0`, `react-native >=0.81.0`, `scheduler 0.25.0`
+- **peerDependencies:** `react >=19.0.0`, `react-native >=0.81.0`, `scheduler >= 0.25.0`
 - **publishConfig:** `access: public`
 
 ## Peer Dependency Requirements
