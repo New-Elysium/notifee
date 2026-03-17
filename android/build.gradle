@@ -1,4 +1,3 @@
-import org.gradle.internal.jvm.Jvm
 
 buildscript {
   ext {
@@ -6,7 +5,7 @@ buildscript {
     compileSdkVersion = 36
     targetSdkVersion = 35
     ndkVersion = "27.2.12479018"
-    kotlinVersion = "1.9.25"
+    kotlinVersion = "2.2.0"
     enableHermes = true
   }
 
@@ -15,7 +14,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:8.7.3'
+    classpath 'com.android.tools.build:gradle:8.8.2'
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     classpath("de.undercouch:gradle-download-task:5.0.1")
     classpath("com.google.gms:google-services:4.4.2")
@@ -63,7 +62,7 @@ apply plugin: 'com.android.library'
 
 ext {
 
-  jvmVersion = Jvm.current().javaVersion.majorVersion
+  def jvmVersion = JavaVersion.current().majorVersion
   if (jvmVersion != "17" && jvmVersion != "21" && jvmVersion != "23") {
     println "\n\n\n"
     println "**************************************************************************************************************"
@@ -87,13 +86,13 @@ ext {
 
 android {
   namespace 'app.notifee.core'
-  compileSdkVersion 36
+  compileSdk 36
   testOptions {
     unitTests.returnDefaultValues = true
   }
   defaultConfig {
-    minSdkVersion 28
-    targetSdkVersion 35
+    minSdk 28
+    targetSdk 35
     versionCode 1
     versionName "1.0"
 

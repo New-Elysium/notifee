@@ -11,25 +11,35 @@ This guide provides a complete migration path from React Native 0.69.12 to 0.83.
 
 | Platform | Status | Build Result | Latest Updates |
 |----------|----------|--------------|----------------|
-| **Android** | ✅ SUCCESS | BUILD SUCCESSFUL in 2m 46s | Gradle 8.13 + AGP 8.7.3 |
+| **Android** | ✅ SUCCESS | BUILD SUCCESSFUL in 2m 46s | Gradle 9.0.0 + AGP 8.8.2 |
 | **iOS** | ✅ SUCCESS | Pods install OK, Xcode project ready | Swift 6.0, Privacy manifest |
 | **Metro** | ✅ SUCCESS | Configuration updated for RN 0.83 | New Architecture compatible |
 | **Dependencies** | ✅ SUCCESS | All resolved correctly | Latest compatible versions |
 
 ---
 
-## 2. Updated System Requirements
+## 2. React Native 0.83.4 / Expo SDK 55 Compatibility
+
+For the React Native 0.83.4 / Expo SDK 55 setup, the following version matrix is required:
+
+| AGP | GRADLE | KOTLIN |
+|---|---|---|
+| 8.8.2 | 9.0.0 | 2.2.0 |
+
+---
+
+## 3. Updated System Requirements
 
 ### Minimum Platform Versions (Latest)
 | Package | Minimum Version | Current Target | Status |
 |---------|----------------|----------------|---------|
-| `react` | `>=19.2.4` | `^19.0.0` | ✅ |
-| `react-native` | `>=0.83.2` | `~0.83.2` | ✅ |
-| `gradle` | `8.13` | `8.13` | ✅ |
-| `android gradle plugin` | `8.7.3` | `8.7.3` | ✅ |
+| `react` | `>=19.2.4` | `~19.2.4` | ✅ |
+| `react-native` | `>=0.83.2` | `~0.83.4` | ✅ |
+| `gradle` | `9.0.0` | `9.0.0` | ✅ |
+| `android gradle plugin` | `8.8.2` | `8.8.2` | ✅ |
 | `ios deployment target` | `15.1` | `15.1` | ✅ |
 | `swift` | `6.0` | `6.0` | ✅ |
-| `java` | `17+` | `21+` | ✅ |
+| `kotlin` | `2.2.0` | `2.2.0` | ✅ |
 
 ---
 
@@ -75,7 +85,7 @@ This guide provides a complete migration path from React Native 0.69.12 to 0.83.
 ```properties
 distributionBase=GRADLE_USER_HOME
 distributionPath=wrapper/dists
-distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip
+distributionUrl=https\://services.gradle.org/distributions/gradle-9.0.0-bin.zip
 zipStoreBase=GRADLE_USER_HOME
 zipStorePath=wrapper/dists
 ```
@@ -94,7 +104,7 @@ See actual file for complete configuration.
 - **Namespace**: com.notifee.testing
 - **Compile SDK**: 36
 - **Min/Target SDK**: 28/35
-- **Java**: VERSION_21 (source), VERSION_17 (target)
+- **Java**: VERSION_17 (source), VERSION_17 (target)
 - **New Architecture**: Enabled
 
 ### 4.4 Package Build Configuration
@@ -222,14 +232,14 @@ git checkout -b rn-83-migration
 
 # 2. Update dependencies
 echo "📦 Updating dependencies..."
-bun add react@^19.0.0 react-native@~0.83.2 @babel/runtime@^7.28.6
+bun add react@~19.2.4 react-native@~0.83.4 @babel/runtime@^7.28.6
 bun add -D @react-native-community/cli@^20.1.2
 
 # 3. Update Gradle
 echo "🔧 Updating Gradle..."
 cd tests_react_native/android
-sed -i '' 's/gradle-.*-bin\.zip/gradle-8.13-bin.zip/' gradle/wrapper/gradle-wrapper.properties
-sed -i '' 's/com\.android\.tools\.build:gradle:.*$/com.android.tools.build:gradle:8.7.3/' build.gradle
+sed -i '' 's/gradle-.*-bin\.zip/gradle-9.0.0-bin.zip/' gradle/wrapper/gradle-wrapper.properties
+sed -i '' 's/com\.android\.tools\.build:gradle:.*$/com.android.tools.build:gradle:8.8.2/' build.gradle
 
 # 4. Update iOS
 echo "🍎 Updating iOS..."

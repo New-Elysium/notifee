@@ -1,12 +1,10 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
 buildscript {
   ext {
     minSdkVersion = 28
-    compileSdkVersion = 36
-    targetSdkVersion = 35
+    compileSdk = 36
+    targetSdkVersion = 36 // Changed from 35 to 36
     ndkVersion = "27.2.12479018"
-    kotlinVersion = "1.9.25"
+    kotlinVersion = "2.2.0"
     enableHermes = true
   }
 
@@ -15,7 +13,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath("com.android.tools.build:gradle:8.7.3")
+    classpath("com.android.tools.build:gradle:8.8.2")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     classpath("de.undercouch:gradle-download-task:5.0.1")
 
@@ -57,7 +55,7 @@ subprojects { subproject ->
   // Override compileSdk for third-party libraries with outdated values (needed for AGP 8.x)
   afterEvaluate {
     if (subproject.hasProperty('android') && subproject.name != 'app') {
-      subproject.android.compileSdkVersion rootProject.ext.compileSdkVersion
+      subproject.android.compileSdk rootProject.ext.compileSdk
     }
   }
 }

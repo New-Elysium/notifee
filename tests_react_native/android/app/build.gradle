@@ -27,10 +27,10 @@ def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 android {
   namespace "com.notifee.testing"
   ndkVersion rootProject.ext.ndkVersion
-  compileSdkVersion rootProject.ext.compileSdkVersion
+  compileSdk rootProject.ext.compileSdk
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_21
+    sourceCompatibility JavaVersion.VERSION_17
     targetCompatibility JavaVersion.VERSION_17
   }
 

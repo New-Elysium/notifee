@@ -1,4 +1,4 @@
-import java.nio.file.Paths
+ import java.nio.file.Paths
 
 buildscript {
   // The Android Gradle plugin is only required when opening the android folder stand-alone.
@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-      classpath("com.android.tools.build:gradle:8.7.3")
+      classpath("com.android.tools.build:gradle:8.8.2")
     }
   }
 }
