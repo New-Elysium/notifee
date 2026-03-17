@@ -84,7 +84,7 @@ android {
       consumerProguardFiles 'proguard-rules.pro'
     }
   }
-  compileSdkVersion = 36
+  compileSdk = 36
 }
 
 repositories {

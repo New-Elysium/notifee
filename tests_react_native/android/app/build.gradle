@@ -44,8 +44,8 @@ android {
 
   defaultConfig {
     applicationId "com.notifee.testing"
-    minSdkVersion rootProject.ext.minSdkVersion
-    targetSdkVersion rootProject.ext.targetSdkVersion
+    minSdk rootProject.ext.minSdk
+    targetSdk rootProject.ext.targetSdk
     versionCode 1
     versionName "1.0"
 

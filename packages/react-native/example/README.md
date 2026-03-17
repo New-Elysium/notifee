@@ -1,158 +1,97 @@
-# Notifee example project
+This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-> ⚠️ **New Architecture Only**: This example project is built **exclusively for React Native New Architecture** with React Native 0.81+.
+# Getting Started
 
-## Platform Requirements
+> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
 
-| Requirement | Minimum Version |
-|-------------|-----------------|
-| React Native | 0.81+ (New Architecture enabled) |
-| iOS Deployment Target | 15.0+ |
-| Android minSdk | 28+ |
-| Xcode | 16.2+ (for iOS development) |
+## Step 1: Start Metro
 
-## Installation
+First, you will need to run **Metro**, the JavaScript build tool for React Native.
 
-* `git clone https://github.com/invertase/notifee.git`
-* `cd packages/react-native/example`
-* `bun`
+To start the Metro dev server, run the following command from the root of your React Native project:
 
-## Running Android
+```sh
+# Using npm
+npm start
 
-* Make sure you have no other packagers running!
-* `react-native start`
-* Start an emulator (e.g., using Android Studio -> Tools -> AVD Manager -> start one)
-* `react-native run-android`
-
-## Running iOS
-
-* Make sure you have no other packagers running!
-* `react-native start`
-* `cd ios && pod install && cd ..`
-* `react-native run-ios`
-
-## Troubleshooting
-
-* If things don't work, clean up your build and node_modules folders, `bun install` and rebuild.
-
-## How to use
-
-The app consists of 3 buttons:
-- One to display a notification
-- One to create a trigger notification
-- One to test out other APIs
-
-<img width="368" alt="Screenshot 2021-05-21 at 17 56 54" src="https://user-images.githubusercontent.com/14185925/119172482-ef08fa80-ba5d-11eb-97b3-52a6f61a005e.png">
-
-### Notifications
-
-You can customise which notification is displayed by choosing from the [example notification payloads](https://github.com/invertase/notifee/blob/main/packages/react-native/example/src/utils/notifications.ts) in `src/utils/notifications` and setting it in [src/content](https://github.com/invertase/notifee/blob/main/packages/react-native/example/src/content.tsx)
-
-```js
-// const notification = notifications.basic;
-const notification = notifications.image;
+# OR using Yarn
+yarn start
 ```
 
-### Basic
+## Step 2: Build and run your app
 
-https://user-images.githubusercontent.com/14185925/119176405-faaaf000-ba62-11eb-9d78-22b132396d53.mov
+With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
 
-### Image
+### Android
 
-<img width="910" alt="Screenshot 2021-05-21 at 18 37 04" src="https://user-images.githubusercontent.com/14185925/119176913-8c1a6200-ba63-11eb-9e51-44e316a9fb3c.png">
+```sh
+# Using npm
+npm run android
 
-### Quick Actions
-
-<img width="930" alt="Screenshot 2021-05-21 at 18 50 34" src="https://user-images.githubusercontent.com/14185925/119178307-6ee69300-ba65-11eb-89e7-43ab205b2ea7.png">
-
-### Full-screen action
-
-https://user-images.githubusercontent.com/14185925/119170236-e19e4100-ba5a-11eb-8e10-6f1e804ef8f3.mov
-
-## Triggers
-
-You can customise which trigger is displayed by choosing from the [example trigger payloads](https://github.com/invertase/notifee/blob/main/packages/react-native/example/src/utils/triggers.ts) in `src/utils/triggers` and setting it in [src/content](https://github.com/invertase/notifee/blob/9625612a5740744d64ac1b2fba4e2d8a8fbe04e5/example/src/content.tsx#L18)
-
-```js
-// const triggerType = triggers.timestamp;
-const triggerType = triggers.interval;
+# OR using Yarn
+yarn android
 ```
 
-### Timestamp
+### iOS
 
-The timestamp trigger is set to trigger 5 seconds from now, to customise the timestamp date you can update the function `getTimestamp` in [src/utils/triggers](https://github.com/invertase/notifee/blob/main/packages/react-native/example/src/utils/triggers.ts#L14):
+For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
 
-```js
-/* Timestamp Date */
-const getTimestamp = () => {
-  const timestampDate = new Date(Date.now());
-  timestampDate.setSeconds(timestampDate.getSeconds() + 5);
-  return timestampDate.getTime();
-};
+The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
 
-/* Trigger */
-const trigger = {
-    timestamp: timestampDate,
-    type: TriggerType.TIMESTAMP,
-}
+```sh
+bundle install
 ```
 
-### Interval
+Then, and every time you update your native dependencies, run:
 
-The interval trigger is set to trigger every 60 seconds, to customise the interval you can update the code in [src/utils/triggers](https://github.com/invertase/notifee/blob/main/packages/react-native/example/src/utils/triggers.ts#L28):
-```js
-/* Interval */
-const interval = 60;
-
-/* Trigger */
-const trigger = {
-    timeUnit: TimeUnit.SECONDS,
-    type: TriggerType.INTERVAL,
-    interval: interval,
-  }
+```sh
+bundle exec pod install
 ```
 
-## Other APIs
+For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
 
-You can customise which API is called when pressing the button labelled 'Test Notifee API Action' by editing the code in [src/content](https://github.com/invertase/notifee/blob/main/packages/react-native/example/src/content.tsx#L63)
+```sh
+# Using npm
+npm run ios
 
-```js
-const onAPIPress = async () => {
-  /* Change the API function to test */
-  const result = await notifee.cancelAllNotifications();
-
-  console.log('onAPIPress -> ', result != null ? result : 'API Call Success');
-};
+# OR using Yarn
+yarn ios
 ```
 
-## Requesting Permissions
+If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
 
-On iOS, it's required to request permissions to be able to display a notification, this is called in [App.tsx](https://github.com/invertase/notifee/blob/main/packages/react-native/example/App.tsx):
+This is one way to run your app — you can also build it directly from Android Studio or Xcode.
 
-```js
-  useEffect(() => {
-    (async () => {
-      await requestUserPermission();
-    })();
-  }, []);
-```
+## Step 3: Modify your app
 
-## Subscribing to events
+Now that you have successfully run the app, let's make changes!
 
-In [App.tsx](https://github.com/invertase/notifee/blob/main/packages/react-native/example/App.tsx), `onBackgroundEvent` and `onForegroundEvent` are registered to receive events:
+Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
 
-```js
-notifee.onBackgroundEvent(async ({type, detail}) => {
-  // ...
-})
+When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
 
-function App() {
+- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
+- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
 
-  useEffect(() => {
-    // ...
-    return notifee.onForegroundEvent(async ({type, detail}) => {
-    // ...
-    }))
-  }, [)
-}
-```
+## Congratulations! :tada:
+
+You've successfully run and modified your React Native App. :partying_face:
+
+### Now what?
+
+- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
+- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+
+# Troubleshooting
+
+If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+
+# Learn More
+
+To learn more about React Native, take a look at the following resources:
+
+- [React Native Website](https://reactnative.dev) - learn more about React Native.
+- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
+- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
+- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
+- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.

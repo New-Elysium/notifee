@@ -37,8 +37,8 @@ npx json -I -f package.json -e 'this.scripts.postinstall = "cd node_modules/@psy
 
 # Update SDK Versions (React Native 0.83+ / Android 16 targets API 36)
 echo "Updating android/build.gradle"
-sed -i "" -e 's/compileSdkVersion = [0-9]*/compileSdkVersion = 36/' android/build.gradle
-sed -i "" -e 's/targetSdkVersion = [0-9]*/targetSdkVersion = 36/' android/build.gradle
+sed -i "" -e 's/compileSdk = [0-9]*/compileSdk = 36/' android/build.gradle
+sed -i "" -e 's/targetSdk = [0-9]*/targetSdk = 36/' android/build.gradle
 
 echo "Updating AndroidManifest.xml"
 sed -i "" -e $'s/android:name=".MainActivity"/android:name=".MainActivity"\\\n      android:showWhenLocked="true"\\\n        android:turnScreenOn="true"/;s/\<\/activity\>/\<\/activity\>\\\n      \<activity\\\n        android:name="com.example.CustomActivity"\\\n      android:showWhenLocked="true"\\\n      android:turnScreenOn="true"\\\n    \/\>/' android/app/src/main/AndroidManifest.xml
