@@ -25,7 +25,7 @@ fi
 
 # Make the new example using the modern Community CLI and bun
 echo "Creating example app"
-npx @react-native-community/cli@latest init example --pm bun
+npx @react-native-community/cli@~0.83.2 init example --pm bun
 pushd example
 
 # Update package.json
