@@ -59,6 +59,10 @@ To create a small icon, you must add the resource directly from Android studio, 
 5. Once finished, Android Studio will inject multiple icon files into your projects resource (`res`) directory.
    ![android-small-icon-2](https://user-images.githubusercontent.com/14185925/86519517-67a99d00-be33-11ea-9ecb-c0b413d5acd0.png)
 
+`smallIcon` must be the name of a native Android resource that already exists in `mipmap` or `drawable`. Runtime JS assets, `require(...)`, or Expo asset references are not valid values for `smallIcon`.
+
+If you are using Expo, prefer keeping the generated `android/` project and copying/generating these resources during `expo prebuild`. A config plugin is only useful here for build-time resource generation or copying.
+
 To set a small icon, add a `smallIcon` property to the notification body:
 
 ```js
@@ -95,6 +99,8 @@ There are a number of different ways to display a large icon:
 
 The image will be automatically scaled to fit inside of the notification. It is
 recommended you use images a minimum size of 192x192 pixels to handle all device resolutions.
+
+Unlike `smallIcon`, `largeIcon` can be provided from runtime assets or remote URLs, so most Expo apps do not need any special plugin support for `largeIcon`.
 
 To set a large icon, add a `largeIcon` property to the notification body:
 

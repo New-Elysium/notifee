@@ -64,7 +64,7 @@ If, however, you're currently compiling your app for SDK version lower than 33, 
 
 `npx expo install expo-build-properties`
 
-Then, add `@psync/notifee` to the list of plugins in your app's Expo config (`app.json` or `app.config.js`):
+Then, add `expo-build-properties` to the list of plugins in your app's Expo config (`app.json` or `app.config.js`):
 ```js
 {
   "name": "my app",
@@ -85,6 +85,20 @@ Then, add `@psync/notifee` to the list of plugins in your app's Expo config (`ap
 Finally, ensure you run `npx expo prebuild` and rebuild your app as described in the ["Adding custom native code"](https://docs.expo.io/workflow/customizing/) guide.
 
 Please note that Notifee needs Java JDK 11+ to build on Android. If you are building the app with EAS, you need to change the image used for the build. You will have to use `image` as `ubuntu-18.04-jdk-11-ndk-r19c` or another image that has jdk 11 as in the following configuration. ([EAS Build Server Configuration](https://docs.expo.dev/build-reference/infrastructure/#image--ubuntu-1804-jdk-8-ndk-r19c--alias--default))
+
+Notifee currently does **not** ship an official Expo config plugin. If you use Expo with `expo prebuild`, the recommended approach is:
+
+- use native `ios/` and `android/` project changes directly whenever possible,
+- keep using `expo-build-properties` for SDK/build version changes, and
+- only add a config plugin for build-time tasks that cannot be expressed at runtime.
+
+In practice, the Expo-specific tasks that may still need plugin automation are:
+
+- creating and maintaining an iOS Notification Service Extension,
+- copying custom iOS notification sound files into the native targets, and
+- generating or copying Android notification small-icon resources.
+
+If you only need standard local notifications and standard remote-notification payloads, native project changes are usually enough after `expo prebuild`.
 
 ```json title="eas.json"
 {

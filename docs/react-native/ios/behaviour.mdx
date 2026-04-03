@@ -26,6 +26,12 @@ To use the users default sound, set the value as `default`. For no sound, do not
 
 If you are using a custom sound file, it must be less than 30 seconds in length, otherwise the system will play the default sound.
 
+Custom iOS notification sounds must be bundled as native iOS resources. In practice, use `.wav`, `.aiff`, or `.caf` files and ensure they are copied into your app target during the native build.
+
+If you are using Expo, importing a sound through `expo-assets` or `expo-notifications` does not automatically make it available to `UNNotificationSound`. If you currently store notification sounds as `.mp3`, convert them to a supported notification-sound format first and then copy them into the native iOS target during `expo prebuild` or native project setup.
+
+If you use a Notification Service Extension to modify remote notifications, make sure any custom sound file referenced by the notification is available to the extension flow as well.
+
 ## Interruption Levels
 
 With iOS 15’s new Focus Mode, users are more in control over when app notifications can “interrupt” them with a sound or vibration. We can make use of the new `interruptionLevel` [API]([url](https://developer.apple.com/documentation/usernotifications/unnotificationcontent/3747256-interruptionlevel)) to control the notification’s importance and required delivery timing.
