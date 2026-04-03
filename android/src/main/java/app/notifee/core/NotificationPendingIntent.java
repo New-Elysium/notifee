@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import app.notifee.core.event.MainComponentEvent;
+import app.notifee.core.event.NotificationEvent;
 import app.notifee.core.model.NotificationAndroidPressActionModel;
 import app.notifee.core.utility.IntentUtils;
 import java.util.UUID;
@@ -64,31 +65,48 @@ public class NotificationPendingIntent {
     setIntentExtras(launchActivityIntent, eventType, notificationId, extraKeys, extraBundles);
     setIntentExtras(receiverIntent, eventType, notificationId, extraKeys, extraBundles);
 
-    // Create pending intent with activities
+    // Create pending intent
     int uniqueInt = UUID.randomUUID().hashCode();
-    Intent[] intents;
 
     if (launchActivityIntent != null) {
-      intents = new Intent[2];
+      // Full notification press or action that needs to open the app UI
+      Intent[] intents = new Intent[2];
       intents[0] = launchActivityIntent;
 
       receiverIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
       intents[1] = receiverIntent;
+
+      return PendingIntent.getActivities(
+          context,
+          uniqueInt,
+          intents,
+          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+    } else if (eventType == NotificationEvent.TYPE_ACTION_PRESS) {
+      // Background-only action press: use a broadcast PendingIntent to avoid requiring
+      // device unlock on Android 12+ (#877)
+      Intent broadcastIntent = new Intent(context, NotificationActionReceiver.class);
+      setIntentExtras(broadcastIntent, eventType, notificationId, extraKeys, extraBundles);
+      return PendingIntent.getBroadcast(
+          context,
+          uniqueInt,
+          broadcastIntent,
+          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
     } else {
-      intents = new Intent[1];
+      // Default notification press without explicit launch activity
+      Intent[] intents = new Intent[1];
       receiverIntent.setFlags(
           Intent.FLAG_ACTIVITY_NEW_TASK
               | Intent.FLAG_ACTIVITY_MULTIPLE_TASK
               | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 
       intents[0] = receiverIntent;
-    }
 
-    return PendingIntent.getActivities(
-        context,
-        uniqueInt,
-        intents,
-        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+      return PendingIntent.getActivities(
+          context,
+          uniqueInt,
+          intents,
+          PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+    }
   }
 
   static void setIntentExtras(

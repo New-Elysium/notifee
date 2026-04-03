@@ -96,7 +96,7 @@ dependencies {
   if (findProject(':notifee_core')) {
     implementation findProject(':notifee_core')
   } else if (hasNotifeeCore) {
-    implementation(group: 'app.notifee', name:'core', version: '+')
+    implementation(group: 'app.notifee', name:'core', version: '202108261754')
   }
 
   implementation("com.google.guava:guava:33.3.1-android") // https://github.com/google/guava

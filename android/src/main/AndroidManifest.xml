@@ -71,5 +71,20 @@
         <action android:name="android.app.action.NOTIFICATION_CHANNEL_GROUP_BLOCK_STATE_CHANGED" />
       </intent-filter>
     </receiver>
+
+    <!-- Broadcast receiver for background-only notification actions (#877) -->
+    <receiver
+      android:name=".NotificationActionReceiver"
+      android:exported="false" />
+
+    <!-- Reschedule alarm-based triggers on timezone/DST/time changes (#875) -->
+    <receiver
+      android:name=".TimeChangeBroadcastReceiver"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+        <action android:name="android.intent.action.TIME_SET" />
+      </intent-filter>
+    </receiver>
   </application>
 </manifest>

@@ -49,11 +49,23 @@ public class ForegroundService extends Service {
     intent.putExtra("notification", notification);
     intent.putExtra("notificationBundle", notificationBundle);
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      ContextHolder.getApplicationContext().startForegroundService(intent);
-    } else {
-      // TODO test this on older device
-      ContextHolder.getApplicationContext().startService(intent);
+    try {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        ContextHolder.getApplicationContext().startForegroundService(intent);
+      } else {
+        ContextHolder.getApplicationContext().startService(intent);
+      }
+    } catch (android.app.ForegroundServiceStartNotAllowedException e) {
+      // Android 12+ restricts starting foreground services from the background (#470).
+      // Log an actionable message instead of crashing.
+      Logger.e(
+          TAG,
+          "Cannot start foreground service: background start not allowed on Android 12+. "
+              + "See https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start",
+          e);
+    } catch (IllegalStateException e) {
+      // Pre-Android 12 equivalent: app is in the background and cannot start a service
+      Logger.e(TAG, "Cannot start foreground service: app is in background state", e);
     }
   }
 

@@ -165,6 +165,12 @@ struct {
     [_originalDelegate userNotificationCenter:center
                       willPresentNotification:notification
                         withCompletionHandler:completionHandler];
+  } else {
+    // For non-notifee notifications (e.g. plain APNS/FCM) when there is no original delegate,
+    // call the completion handler with default presentation options so the notification is
+    // still displayed (#1041, #912).
+    completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionBadge |
+                      UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionList);
   }
 }
 
@@ -186,10 +192,17 @@ struct {
       [_originalDelegate userNotificationCenter:center
                  didReceiveNotificationResponse:response
                           withCompletionHandler:completionHandler];
+      return;
     } else {
       notifeeNotification =
           [NotifeeCoreUtil parseUNNotificationRequest:response.notification.request];
     }
+  }
+
+  if (notifeeNotification == nil) {
+    // No notifee data and no original delegate — still must call completionHandler
+    completionHandler();
+    return;
   }
 
   if (notifeeNotification != nil) {
@@ -201,6 +214,7 @@ struct {
           @"notification" : notifeeNotification,
         }
       }];
+      completionHandler();
       return;
     }
 
@@ -248,11 +262,7 @@ struct {
 
     [[NotifeeCoreDelegateHolder instance] didReceiveNotifeeCoreEvent:event];
 
-    // TODO figure out if this is needed or if we can just complete immediately
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15 * NSEC_PER_SEC)),
-                   dispatch_get_main_queue(), ^{
-                     completionHandler();
-                   });
+    completionHandler();
   }
 }
 

@@ -461,6 +461,18 @@ public class Notifee {
         if (intent != null && intent.getExtras() != null && intent.hasExtra("notification")) {
           initialNotificationBundle.putBundle(
               "notification", intent.getBundleExtra("notification"));
+
+          // Also include pressAction if available (#1128 - canonical payload shape)
+          if (intent.hasExtra("pressAction")) {
+            initialNotificationBundle.putBundle(
+                "pressAction", intent.getBundleExtra("pressAction"));
+          }
+
+          // Consume the notification extras so they are not returned again (#880)
+          intent.removeExtra("notification");
+          intent.removeExtra("pressAction");
+          intent.removeExtra(NotificationPendingIntent.EVENT_TYPE_INTENT_KEY);
+
           result.onComplete(null, initialNotificationBundle);
           return;
         }
