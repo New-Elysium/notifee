@@ -44,6 +44,7 @@ These upstream issues still appear relevant to this fork:
 - `#1285` maintenance status: this fork is maintained and says so in `README.md`.
 - `#1284` JitPack timeout: this fork is set up to use local core artifacts / source integration rather than only relying on remote JitPack resolution.
 - `#1277` release notes missing: this fork includes `docs/react-native/release-notes.mdx`.
+- `#799` package does not contain a valid Expo config plugin: keep this folded into `#1121` so Expo plugin work is tracked in one place instead of duplicated.
 - `#1266` Expo gap analysis: useful discussion, but it is not an actionable defect by itself.
 
 ---
