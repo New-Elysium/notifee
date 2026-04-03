@@ -5,7 +5,6 @@ on:
   pull_request:
     paths:
       - '.github/workflows/*.yml'
-      - 'docs/**'
       - 'android/**'
   push:
     branches:
@@ -32,7 +31,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Gradle Cache
         uses: actions/cache@v4
@@ -40,13 +39,25 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('android/build.gradle*') }}-v1
 
-      - name: Resolve Gradle Dependencies
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Android Core
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 10
           retry_wait_seconds: 60
           max_attempts: 3
-          command: yarn build:core:android
+          command: bun run build:core:android
 
       - name: Run JUnit Tests
-        run: yarn test:core:android
+        run: bun run test:core:android

@@ -87,7 +87,6 @@ export default [
       'android/build/**',
       'ios/build/**',
       'packages/react-native/example/**',
-      'packages/flutter/**',
       'tests_react_native/**',
       'docs/**',
     ],
