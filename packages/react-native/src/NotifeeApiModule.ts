@@ -454,7 +454,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       throw new Error("notifee.getChannelGroup(*) 'channelGroupId' expected a string value.");
     }
 
-    if (isAndroid || this.native.ANDROID_API_LEVEL >= 26) {
+    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
       return this.native.getChannelGroup(channelGroupId);
     }
 
@@ -462,7 +462,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
   };
 
   public getChannelGroups = (): Promise<NativeAndroidChannelGroup[]> => {
-    if (isAndroid || this.native.ANDROID_API_LEVEL >= 26) {
+    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
       return this.native.getChannelGroups();
     }
 
@@ -689,6 +689,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
               android: {
                 alarm: AndroidNotificationSetting.ENABLED,
               },
+              web: {},
             };
           },
         );

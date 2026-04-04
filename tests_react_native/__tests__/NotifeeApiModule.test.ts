@@ -148,6 +148,57 @@ describe('Notifee Api Module', () => {
     expect(mockNotifeeNativeModule.cancelTriggerNotification).toHaveBeenCalledWith(notificationId);
   });
 
+  test('cancelAllNotifications(ids) - Android', async () => {
+    setPlatform('android');
+    const res = await apiModule.cancelAllNotifications(['id']);
+
+    expect(res).toBe(undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(1, ['id'], 0, undefined);
+  });
+
+  test('cancelDisplayedNotifications(ids) - Android', async () => {
+    setPlatform('android');
+    const res = await apiModule.cancelDisplayedNotifications(['id']);
+
+    expect(res).toBe(undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(1, ['id'], 1, undefined);
+  });
+
+  test('cancelTriggerNotifications(ids) - Android', async () => {
+    setPlatform('android');
+    const res = await apiModule.cancelTriggerNotifications(['id']);
+
+    expect(res).toBe(undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(1, ['id'], 2, null);
+  });
+
+  test('cancelNotification - Android', async () => {
+    setPlatform('android');
+    const notificationId = 'id';
+    const res = await apiModule.cancelNotification(notificationId);
+
+    expect(res).toBe(undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith([notificationId], 0, undefined);
+  });
+
+  test('cancelDisplayedNotification - Android', async () => {
+    setPlatform('android');
+    const notificationId = 'id';
+    const res = await apiModule.cancelDisplayedNotification(notificationId);
+
+    expect(res).toBe(undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith([notificationId], 1, undefined);
+  });
+
+  test('cancelTriggerNotification - Android', async () => {
+    setPlatform('android');
+    const notificationId = 'id';
+    const res = await apiModule.cancelTriggerNotification(notificationId);
+
+    expect(res).toBe(undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith([notificationId], 2, null);
+  });
+
   describe('createChannel', () => {
     test('return empty string for iOS', async () => {
       setPlatform('ios');
