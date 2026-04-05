@@ -56,6 +56,14 @@
   "publishConfig": {
     "access": "public"
   },
+  "codegenConfig": {
+    "name": "NotifeeSpec",
+    "type": "modules",
+    "jsSrcsDir": "src/specs",
+    "android": {
+      "javaPackageName": "io.invertase.notifee"
+    }
+  },
   "files": [
     "README.md",
     "LICENSE",

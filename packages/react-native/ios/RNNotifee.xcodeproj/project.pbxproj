@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		27E8C37823E48C66007568A4 /* NotifeeApiModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 27E8C37723E48C66007568A4 /* NotifeeApiModule.m */; };
+		27E8C37823E48C66007568A4 /* NotifeeApiModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27E8C37723E48C66007568A4 /* NotifeeApiModule.mm */; };
 		27E8C37923E48C66007568A4 /* NotifeeApiModule.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 27E8C37623E48C66007568A4 /* NotifeeApiModule.h */; };
 		79A3978325FD5D4B00CBBAAB /* NotifeeExtensionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 79A3978225FD5D4B00CBBAAB /* NotifeeExtensionHelper.m */; };
 		79AEF7D62701295A00BE87B5 /* NotifeeExtensionHelper.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 79A3978125FD5D4B00CBBAAB /* NotifeeExtensionHelper.h */; };
@@ -30,7 +30,7 @@
 /* Begin PBXFileReference section */
 		27E8C37323E48C66007568A4 /* libRNNotifee.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNNotifee.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E8C37623E48C66007568A4 /* NotifeeApiModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotifeeApiModule.h; sourceTree = "<group>"; };
-		27E8C37723E48C66007568A4 /* NotifeeApiModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotifeeApiModule.m; sourceTree = "<group>"; };
+		27E8C37723E48C66007568A4 /* NotifeeApiModule.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NotifeeApiModule.mm; sourceTree = "<group>"; };
 		79A3978125FD5D4B00CBBAAB /* NotifeeExtensionHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotifeeExtensionHelper.h; sourceTree = "<group>"; };
 		79A3978225FD5D4B00CBBAAB /* NotifeeExtensionHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotifeeExtensionHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -68,7 +68,7 @@
 				79A3978125FD5D4B00CBBAAB /* NotifeeExtensionHelper.h */,
 				79A3978225FD5D4B00CBBAAB /* NotifeeExtensionHelper.m */,
 				27E8C37623E48C66007568A4 /* NotifeeApiModule.h */,
-				27E8C37723E48C66007568A4 /* NotifeeApiModule.m */,
+				27E8C37723E48C66007568A4 /* NotifeeApiModule.mm */,
 			);
 			path = RNNotifee;
 			sourceTree = "<group>";
@@ -131,7 +131,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				79A3978325FD5D4B00CBBAAB /* NotifeeExtensionHelper.m in Sources */,
-				27E8C37823E48C66007568A4 /* NotifeeApiModule.m in Sources */,
+				27E8C37823E48C66007568A4 /* NotifeeApiModule.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

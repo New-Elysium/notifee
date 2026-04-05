@@ -5,6 +5,7 @@
 import NotifeeJSEventEmitter from '../NotifeeJSEventEmitter';
 
 export const mockNotifeeNativeModule = {
+  ANDROID_API_LEVEL: 33,
   getTriggerNotificationIds: jest.fn(),
   getDisplayedNotifications: jest.fn(),
   getTriggerNotifications: jest.fn(),

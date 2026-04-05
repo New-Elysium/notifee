@@ -11,11 +11,17 @@ jest.mock('react-native/Libraries/vendor/emitter/EventEmitter', () => {
 
 // Mock react-native
 jest.mock('react-native', () => {
+  const mockModule = {
+    addListener: () => jest.fn(),
+    getConstants: () => ({ ANDROID_API_LEVEL: 33 }),
+    ANDROID_API_LEVEL: 33,
+  };
   return {
     NativeModules: {
-      NotifeeApiModule: {
-        addListener: () => jest.fn(),
-      },
+      NotifeeApiModule: mockModule,
+    },
+    TurboModuleRegistry: {
+      getEnforcing: jest.fn(() => mockModule),
     },
     NativeEventEmitter: jest.fn().mockImplementation(() => ({
       addListener: jest.fn(),
