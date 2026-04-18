@@ -22,16 +22,16 @@
 
 + (NSString *)downloadItemAtURL:(NSURL *)url toFile:(NSString *)localPath error:(NSError **)error {
   NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+  request.timeoutInterval = 25.0;
 
   NotifeeCoreDownloadDelegate *delegate =
       [[NotifeeCoreDownloadDelegate alloc] initWithFilePath:localPath];
 
-  // The session is created with the defaultSessionConfiguration
-  // default timeoutIntervalForRequest is 60 seconds.
+  NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+  configuration.timeoutIntervalForRequest = 25.0;
+  configuration.timeoutIntervalForResource = 25.0;
   NSURLSession *session =
-      [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
-                                    delegate:delegate
-                               delegateQueue:nil];
+      [NSURLSession sessionWithConfiguration:configuration delegate:delegate delegateQueue:nil];
 
   NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
 

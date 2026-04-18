@@ -21,6 +21,7 @@ import static app.notifee.core.ContextHolder.getApplicationContext;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -42,21 +43,72 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 class NotifeeAlarmManager {
   private static final String TAG = "NotifeeAlarmManager";
   private static final String NOTIFICATION_ID_INTENT_KEY = "notificationId";
+  private static final long RECEIVER_WRITE_TIMEOUT_SECONDS = 8;
   private static final ExecutorService alarmManagerExecutor = Executors.newCachedThreadPool();
+  private static final ScheduledExecutorService timeoutExecutor =
+      Executors.newSingleThreadScheduledExecutor();
   private static final ListeningExecutorService alarmManagerListeningExecutor =
       MoreExecutors.listeningDecorator(alarmManagerExecutor);
 
-  static void displayScheduledNotification(Bundle alarmManagerNotification) {
+  private static void finishReceiverWhenDone(
+      ListenableFuture<?> future,
+      BroadcastReceiver.PendingResult pendingResult,
+      String logContext) {
+    ListenableFuture<?> bounded =
+        Futures.withTimeout(
+            future, RECEIVER_WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS, timeoutExecutor);
+    Futures.addCallback(
+        bounded,
+        new FutureCallback<Object>() {
+          @Override
+          public void onSuccess(Object result) {
+            if (pendingResult != null) {
+              pendingResult.finish();
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable t) {
+            if (t instanceof TimeoutException) {
+              Logger.w(
+                  TAG,
+                  "Async work for "
+                      + logContext
+                      + " did not complete within "
+                      + RECEIVER_WRITE_TIMEOUT_SECONDS
+                      + "s; finishing receiver anyway to avoid ANR");
+            } else {
+              Logger.e(TAG, "Failure in " + logContext, new Exception(t));
+            }
+            if (pendingResult != null) {
+              pendingResult.finish();
+            }
+          }
+        },
+        alarmManagerListeningExecutor);
+  }
+
+  static void displayScheduledNotification(
+      Bundle alarmManagerNotification, BroadcastReceiver.PendingResult pendingResult) {
     if (alarmManagerNotification == null) {
+      if (pendingResult != null) {
+        pendingResult.finish();
+      }
       return;
     }
     String id = alarmManagerNotification.getString(NOTIFICATION_ID_INTENT_KEY);
 
     if (id == null) {
+      if (pendingResult != null) {
+        pendingResult.finish();
+      }
       return;
     }
 
@@ -95,35 +147,24 @@ class NotifeeAlarmManager {
                                 && ObjectUtils.getInt(triggerBundle.get("repeatFrequency")) != -1) {
                               TimestampTriggerModel trigger =
                                   TimestampTriggerModel.fromBundle(triggerBundle);
-                              // Ensure trigger is in the future and the latest timestamp is updated
-                              // in
-                              // the database
-                              trigger.setNextTimestamp();
                               scheduleTimestampTriggerNotification(notificationModel, trigger);
-                              WorkDataRepository.getInstance(getApplicationContext())
+                              return WorkDataRepository.getInstance(getApplicationContext())
                                   .update(
                                       new WorkDataEntity(
                                           id,
                                           workDataEntity.getNotification(),
-                                          ObjectUtils.bundleToBytes(triggerBundle),
+                                          ObjectUtils.bundleToBytes(trigger.toBundle()),
                                           true));
                             } else {
-                              // not repeating, delete database entry if work is a one-time request
-                              WorkDataRepository.getInstance(getApplicationContext())
+                              return WorkDataRepository.getInstance(getApplicationContext())
                                   .deleteById(id);
                             }
-                            return Futures.immediateFuture(null);
                           },
                           alarmManagerExecutor);
                 },
                 alarmManagerExecutor)
-            .addOnCompleteListener(
-                (e, result) -> {
-                  if (e != null) {
-                    Logger.e(TAG, "Failed to display notification", e);
-                  }
-                },
-                alarmManagerExecutor);
+            .addOnCompleteListener((e, result) -> {}, alarmManagerExecutor);
+    finishReceiverWhenDone(displayFuture, pendingResult, "displayScheduledNotification[" + id + "]");
   }
 
   public static PendingIntent getAlarmManagerIntentForNotification(String notificationId) {
@@ -164,10 +205,15 @@ class NotifeeAlarmManager {
                   TimestampTriggerModel.AlarmType.SET_ALARM_CLOCK)
               .contains(alarmType);
       if (isExactAlarm && !alarmManager.canScheduleExactAlarms()) {
-        System.err.println(
-            "Missing SCHEDULE_EXACT_ALARM permission. Trigger not scheduled. See:"
-                + " https://notifee.app/react-native/docs/triggers#android-12-limitations");
-        return;
+        Logger.w(
+            TAG,
+            "Missing SCHEDULE_EXACT_ALARM permission; falling back to inexact alarm scheduling.");
+        if (alarmType == TimestampTriggerModel.AlarmType.SET_EXACT) {
+          alarmType = TimestampTriggerModel.AlarmType.SET_AND_ALLOW_WHILE_IDLE;
+        } else if (alarmType == TimestampTriggerModel.AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE
+            || alarmType == TimestampTriggerModel.AlarmType.SET_ALARM_CLOCK) {
+          alarmType = TimestampTriggerModel.AlarmType.SET_AND_ALLOW_WHILE_IDLE;
+        }
       }
     }
 
@@ -176,7 +222,7 @@ class NotifeeAlarmManager {
 
     switch (alarmType) {
       case SET:
-        alarmManager.set(AlarmManager.RTC, timestampTrigger.getTimestamp(), pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timestampTrigger.getTimestamp(), pendingIntent);
         break;
       case SET_AND_ALLOW_WHILE_IDLE:
         AlarmManagerCompat.setAndAllowWhileIdle(
@@ -244,9 +290,9 @@ class NotifeeAlarmManager {
   }
 
   /* On reboot, reschedule trigger notifications created via alarm manager  */
-  void rescheduleNotification(WorkDataEntity workDataEntity) {
+  ListenableFuture<Void> rescheduleNotification(WorkDataEntity workDataEntity) {
     if (workDataEntity.getNotification() == null || workDataEntity.getTrigger() == null) {
-      return;
+      return Futures.immediateFuture(null);
     }
 
     byte[] notificationBytes = workDataEntity.getNotification();
@@ -262,32 +308,45 @@ class NotifeeAlarmManager {
       case 0:
         TimestampTriggerModel trigger = TimestampTriggerModel.fromBundle(triggerBundle);
         if (!trigger.getWithAlarmManager()) {
-          return;
+          return Futures.immediateFuture(null);
         }
 
         scheduleTimestampTriggerNotification(notificationModel, trigger);
-        break;
+        return Futures.immediateFuture(null);
       case 1:
         // TODO: support interval triggers with alarm manager
-        break;
+        return Futures.immediateFuture(null);
     }
+    return Futures.immediateFuture(null);
   }
 
-  void rescheduleNotifications() {
+  void rescheduleNotifications(BroadcastReceiver.PendingResult pendingResult) {
     Logger.d(TAG, "Reschedule Notifications on reboot");
     Futures.addCallback(
         getScheduledNotifications(),
         new FutureCallback<List<WorkDataEntity>>() {
           @Override
           public void onSuccess(List<WorkDataEntity> workDataEntities) {
-            for (WorkDataEntity workDataEntity : workDataEntities) {
-              rescheduleNotification(workDataEntity);
+            if (workDataEntities == null || workDataEntities.isEmpty()) {
+              if (pendingResult != null) {
+                pendingResult.finish();
+              }
+              return;
             }
+            List<ListenableFuture<Void>> futures = new java.util.ArrayList<>(workDataEntities.size());
+            for (WorkDataEntity workDataEntity : workDataEntities) {
+              futures.add(rescheduleNotification(workDataEntity));
+            }
+            finishReceiverWhenDone(
+                Futures.allAsList(futures), pendingResult, "rescheduleNotifications");
           }
 
           @Override
           public void onFailure(Throwable t) {
-            // silently fail
+            Logger.e(TAG, "Failed to reschedule notifications", new Exception(t));
+            if (pendingResult != null) {
+              pendingResult.finish();
+            }
           }
         },
         alarmManagerListeningExecutor);

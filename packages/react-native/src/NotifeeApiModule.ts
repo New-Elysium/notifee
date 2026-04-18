@@ -484,7 +484,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       ios: config.ios ? { ...config.ios } : undefined,
     };
 
-    return Promise.resolve();
+    return this.native.setNotificationConfig(notificationConfig);
   };
 
   public openAlarmPermissionSettings = (): Promise<void> => {

@@ -46,6 +46,8 @@ import validateAndroidPressAction from './validateAndroidPressAction';
 import validateAndroidFullScreenAction from './validateAndroidFullScreenAction';
 import validateAndroidAction from './validateAndroidAction';
 
+export const ANDROID_PRESS_ACTION_OPT_OUT_ID = '__NOTIFEE_OPT_OUT__';
+
 export default function validateAndroidNotification(
   android?: NotificationAndroid,
 ): NotificationAndroid {
@@ -459,12 +461,20 @@ export default function validateAndroidNotification(
   /**
    * pressAction
    */
-  if (objectHasProperty(android, 'pressAction') && !isUndefined(android.pressAction)) {
+  if (
+    objectHasProperty(android, 'pressAction') &&
+    android.pressAction !== null &&
+    !isUndefined(android.pressAction)
+  ) {
     try {
       out.pressAction = validateAndroidPressAction(android.pressAction);
     } catch (e: any) {
       throw new Error(`'notification.android.pressAction' ${e.message}`);
     }
+  } else if (android.pressAction === null) {
+    out.pressAction = { id: ANDROID_PRESS_ACTION_OPT_OUT_ID };
+  } else {
+    out.pressAction = { id: 'default', launchActivity: 'default' };
   }
 
   /**

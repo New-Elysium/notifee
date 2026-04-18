@@ -362,7 +362,16 @@ public class NotificationAndroidModel {
    * @return Boolean
    */
   public Boolean getOngoing() {
-    return mNotificationAndroidBundle.getBoolean("ongoing", false);
+    if (mNotificationAndroidBundle.containsKey("ongoing")) {
+      return mNotificationAndroidBundle.getBoolean("ongoing", false);
+    }
+
+    return getAsForegroundService();
+  }
+
+  public int getForegroundServiceBehavior() {
+    return mNotificationAndroidBundle.getInt(
+        "foregroundServiceBehavior", NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE);
   }
 
   /**
@@ -512,9 +521,11 @@ public class NotificationAndroidModel {
     int smallIconId = ResourceUtils.getImageResourceId(rawIcon);
 
     if (smallIconId == 0) {
-      Logger.d(
+      Logger.w(
           "NotificationAndroidModel",
-          String.format("Notification small icon '%s' could not be found", rawIcon));
+          String.format(
+              "Notification small icon '%s' could not be resolved; falling back to the app launcher icon.",
+              rawIcon));
       return null;
     }
 

@@ -11,6 +11,7 @@ import type {
   TriggerNotification,
 } from '../types/Notification';
 import type { NativeAndroidChannel, NativeAndroidChannelGroup } from '../types/NotificationAndroid';
+import type { NotificationConfig } from '../types/NotificationConfig';
 import type { IOSNotificationCategory } from '../types/NotificationIOS';
 import type { PowerManagerInfo } from '../types/PowerManagerInfo';
 
@@ -38,6 +39,7 @@ export interface Spec extends TurboModule {
   requestPermission(permissions?: object): Promise<NotificationSettings>;
   getNotificationSettings(): Promise<NotificationSettings>;
   getInitialNotification(): Promise<InitialNotification | null>;
+  setNotificationConfig(config: NotificationConfig): Promise<void>;
 
   // ─── Android-only ─────────────────────────────────────────────────────────
 
