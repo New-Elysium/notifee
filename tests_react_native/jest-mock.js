@@ -38,5 +38,8 @@ jest.mock('react-native', () => {
     AppRegistry: {
       registerHeadlessTask: jest.fn(),
     },
+    AppState: {
+      currentState: 'active',
+    },
   };
 });

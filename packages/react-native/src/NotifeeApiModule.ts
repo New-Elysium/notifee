@@ -2,7 +2,7 @@
  * Copyright (c) 2016-present Invertase Limited
  */
 
-import { AppRegistry, Platform } from 'react-native';
+import { AppRegistry, AppState, Platform } from 'react-native';
 import { Module } from './types/Module';
 import {
   AndroidChannel,
@@ -44,8 +44,12 @@ import validateAndroidChannelGroup from './validators/validateAndroidChannelGrou
 import { IOSNotificationCategory, IOSNotificationPermissions } from './types/NotificationIOS';
 import validateIOSCategory from './validators/validateIOSCategory';
 import validateIOSPermissions from './validators/validateIOSPermissions';
+import type { FcmConfig, FcmRemoteMessage } from './fcm/types';
+import { parseFcmPayload } from './fcm/parseFcmPayload';
+import { reconstructNotification } from './fcm/reconstructNotification';
 
 let backgroundEventHandler: (event: Event) => Promise<void>;
+let fcmConfig: FcmConfig = {};
 
 let registeredForegroundServiceTask: (notification: Notification) => Promise<void>;
 
@@ -391,6 +395,63 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     }
 
     return Promise.resolve('');
+  };
+
+  public handleFcmMessage = async (remoteMessage: FcmRemoteMessage): Promise<string | null> => {
+    if (remoteMessage == null || typeof remoteMessage !== 'object') {
+      throw new Error("notifee.handleFcmMessage(*) 'remoteMessage' expected an object.");
+    }
+
+    const config: FcmConfig = {
+      ...fcmConfig,
+      ios: fcmConfig.ios ? { ...fcmConfig.ios } : undefined,
+    };
+
+    const parsed = parseFcmPayload(remoteMessage.data);
+
+    if (parsed === null && config.fallbackBehavior === 'ignore') {
+      return null;
+    }
+
+    const notification = reconstructNotification(parsed, remoteMessage, config);
+
+    if (isIOS) {
+      if (AppState.currentState !== 'active') {
+        return null;
+      }
+
+      if (config.ios?.suppressForegroundBanner === true) {
+        return null;
+      }
+    }
+
+    if (!notification.title && !notification.body) {
+      console.warn(
+        '[notifee] handleFcmMessage: displaying notification with empty title and body. Check your FCM payload.',
+      );
+    }
+
+    if (isAndroid && !notification.android?.channelId) {
+      console.warn(
+        '[notifee] handleFcmMessage: Android fallback path has no channelId (no payload channelId, no defaultChannelId configured). Notification may be dropped by the OS.',
+      );
+    }
+
+    return this.displayNotification(notification);
+  };
+
+  public setFcmConfig = (config: FcmConfig): Promise<void> => {
+    if (config == null || typeof config !== 'object' || Array.isArray(config)) {
+      const got = config === null ? 'null' : Array.isArray(config) ? 'array' : typeof config;
+      throw new Error(`notifee.setFcmConfig(*) config must be a plain object. Got: ${got}`);
+    }
+
+    fcmConfig = {
+      ...config,
+      ios: config.ios ? { ...config.ios } : undefined,
+    };
+
+    return Promise.resolve();
   };
 
   public openAlarmPermissionSettings = (): Promise<void> => {

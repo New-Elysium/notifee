@@ -13,6 +13,7 @@ import {
 import { IOSNotificationCategory, IOSNotificationPermissions } from './NotificationIOS';
 import { PowerManagerInfo } from './PowerManagerInfo';
 import { DisplayedNotification, NotificationSettings, TriggerNotification } from '..';
+import type { FcmConfig, FcmRemoteMessage } from '../fcm/types';
 
 export interface Module {
   /**
@@ -187,6 +188,11 @@ export interface Module {
    * to create a notification for both Android & iOS.
    */
   displayNotification(notification: Notification): Promise<string>;
+
+  /**
+   * Displays a notification from an FCM remote message using notifee-compatible payload fields.
+   */
+  handleFcmMessage(remoteMessage: FcmRemoteMessage): Promise<string | null>;
 
   /**
    * API used to open the Android Alarm special access settings for the application.
@@ -444,6 +450,11 @@ export interface Module {
    * @param permissions
    */
   requestPermission(permissions?: IOSNotificationPermissions): Promise<NotificationSettings>;
+
+  /**
+   * Configures defaults used by `handleFcmMessage`.
+   */
+  setFcmConfig(config: FcmConfig): Promise<void>;
 
   /**
    * Set the notification categories to be used on this Apple device.
