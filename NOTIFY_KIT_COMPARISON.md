@@ -120,7 +120,7 @@ The `react-native-notify-kit` fork claims 35+ upstream bug fixes. Below tracks w
 | `didReceiveNotificationResponse:` delayed 15 seconds | Pre-existing | 9.4.0 | ⚠️ Verify | `dispatch_after` blocking subsequent taps |
 | `requestPermission:` swallows `NSError` | Pre-existing | 9.4.0 | ⚠️ Verify | MDM/parental-control failures invisible |
 | `contentByUpdatingWithProvider:` errors suppressed | Pre-existing | 9.4.0 | ⚠️ Verify | SiriKit intents silently fail |
-| `getBadgeCount:` never calls completion in app extension | Pre-existing | 9.4.0 | ⚠️ Verify | JS promises hang in NSE |
+| `getBadgeCount:` never calls completion in app extension | Pre-existing | 9.4.0 | ✅ Fixed | Returns `0` in app-extension context instead of hanging |
 | NSE attachment downloads no timeout cap | Pre-existing | 9.4.0 | ⚠️ Verify | 60s default exceeds iOS 30s budget |
 
 ### Android Fixes

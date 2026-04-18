@@ -57,6 +57,7 @@ class NotifeeAlarmManager {
   private static final ListeningExecutorService alarmManagerListeningExecutor =
       MoreExecutors.listeningDecorator(alarmManagerExecutor);
 
+  /** Awaits async receiver work and always finishes the PendingResult, with an ANR safety timeout. */
   private static void finishReceiverWhenDone(
       ListenableFuture<?> future,
       BroadcastReceiver.PendingResult pendingResult,

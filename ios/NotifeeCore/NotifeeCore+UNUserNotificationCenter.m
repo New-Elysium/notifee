@@ -148,6 +148,8 @@ struct {
       presentationOptions |= UNNotificationPresentationOptionAlert;
     }
 
+    // Emit DELIVERED for every Notifee-owned foreground notification. Upstream only emitted this
+    // for trigger notifications, which made iOS diverge from Android for displayNotification().
     [[NotifeeCoreDelegateHolder instance] didReceiveNotifeeCoreEvent:@{
       @"type" : @(NotifeeCoreEventTypeDelivered),
       @"detail" : @{

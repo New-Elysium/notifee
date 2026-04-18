@@ -169,11 +169,16 @@ public class NotificationPendingIntent {
       // to handle a custom launchActivity
       Boolean shouldOverwriteDefaultLaunchActivityIntent = launchActivityIntent == null;
       if (launchActivityIntent != null) {
+        String existingComponentClassName =
+            launchActivityIntent.getComponent() != null
+                ? launchActivityIntent.getComponent().getClassName()
+                : null;
         // overwrite if custom launch activity set (launch activity in payload does not equal
         // current activity)
         shouldOverwriteDefaultLaunchActivityIntent =
             !"default".equals(launchActivity)
-                && !launchActivityIntent.getComponent().getClassName().equals(launchActivity);
+                && (existingComponentClassName == null
+                    || !existingComponentClassName.equals(launchActivity));
       }
 
       // Set new launch activity intent

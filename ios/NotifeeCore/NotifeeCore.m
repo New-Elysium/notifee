@@ -651,6 +651,7 @@
 
   id handler = ^(BOOL granted, NSError *_Nullable error) {
     if (error != nil) {
+      NSLog(@"NotifeeCore: requestPermission failed: %@", error);
       block(error, nil);
       return;
     }

@@ -57,6 +57,8 @@ RCT_EXPORT_MODULE();
   NSArray *eventsToFlush;
   @synchronized(self) {
     hasListeners = YES;
+    // Copy under lock but flush outside it to keep the critical section tiny and avoid
+    // re-entrancy issues if a consumer synchronously triggers more work while handling an event.
     eventsToFlush = [pendingCoreEvents copy];
     [pendingCoreEvents removeAllObjects];
   }
@@ -107,6 +109,8 @@ RCT_EXPORT_MODULE();
         return;
       }
     }
+    // Intentionally treat UIApplicationStateInactive as background-like: notification taps arrive
+    // during the inactive transition before the app becomes active again.
     BOOL isBackground =
         RCTRunningInAppExtension() ||
         [UIApplication sharedApplication].applicationState != UIApplicationStateActive;

@@ -111,6 +111,9 @@ class NotificationManager {
                   ReceiverService.DELETE_INTENT,
                   new String[] {"notification"},
                   notificationModel.toBundle()));
+          // Keep launch-intent creation and event payload separate:
+          // - pressActionForIntent may be synthesized to restore tap-to-open defaults
+          // - pressActionForExtras preserves the original event payload shape sent to JS
           Bundle pressActionForIntent = androidModel.getPressAction();
           Bundle pressActionForExtras = pressActionForIntent;
           if (pressActionForIntent == null) {

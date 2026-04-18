@@ -461,17 +461,14 @@ export default function validateAndroidNotification(
   /**
    * pressAction
    */
-  if (
-    objectHasProperty(android, 'pressAction') &&
-    android.pressAction !== null &&
-    !isUndefined(android.pressAction)
-  ) {
+  if (objectHasProperty(android, 'pressAction') && android.pressAction != null) {
     try {
       out.pressAction = validateAndroidPressAction(android.pressAction);
     } catch (e: any) {
       throw new Error(`'notification.android.pressAction' ${e.message}`);
     }
   } else if (android.pressAction === null) {
+    // Reserved sentinel understood by the native layer: explicit opt-out from tap-to-open.
     out.pressAction = { id: ANDROID_PRESS_ACTION_OPT_OUT_ID };
   } else {
     out.pressAction = { id: 'default', launchActivity: 'default' };

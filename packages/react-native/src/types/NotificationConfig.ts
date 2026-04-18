@@ -15,6 +15,8 @@ export interface NotificationConfigIOS {
    * Local notifications created via `displayNotification()` or `createTriggerNotification()`
    * are always handled by Notifee regardless of this setting.
    *
+   * When omitted, the native implementation defaults this to `true` for backward compatibility.
+   *
    * @default true
    */
   interceptRemoteNotifications?: boolean;
