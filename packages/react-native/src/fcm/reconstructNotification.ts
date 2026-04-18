@@ -63,8 +63,8 @@ function rebuildData(rawData: Record<string, string> | undefined): Record<string
   const notifeeDataRaw = rawData.notifee_data;
   if (typeof notifeeDataRaw === 'string') {
     try {
-      const notifeeData = JSON.parse(notifeeDataRaw) as Record<string, string>;
-      if (notifeeData && typeof notifeeData === 'object') {
+      const notifeeData = JSON.parse(notifeeDataRaw) as Record<string, string> | null;
+      if (notifeeData && typeof notifeeData === 'object' && !Array.isArray(notifeeData)) {
         Object.assign(result, notifeeData);
       }
     } catch {

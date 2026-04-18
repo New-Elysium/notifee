@@ -24,10 +24,11 @@ export interface Spec extends TurboModule {
   cancelAllNotifications(): Promise<void>;
   cancelDisplayedNotifications(): Promise<void>;
   cancelTriggerNotifications(): Promise<void>;
+  cancelAllNotificationsWithIds(ids: Array<string>): Promise<void>;
   cancelAllNotificationsWithIds(
     ids: Array<string>,
-    notificationType?: number,
-    tag?: string | null,
+    notificationType: number,
+    tag: string | null,
   ): Promise<void>;
   getDisplayedNotifications(): Promise<DisplayedNotification[]>;
   getTriggerNotifications(): Promise<TriggerNotification[]>;

@@ -164,7 +164,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
           return this.native.cancelAllNotificationsWithIds(
             notificationIds,
             NotificationType.ALL,
-            tag,
+            tag ?? null,
           );
         }
         return this.native.cancelAllNotificationsWithIds(notificationIds);
@@ -185,7 +185,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
           return this.native.cancelAllNotificationsWithIds(
             notificationIds,
             NotificationType.DISPLAYED,
-            tag,
+            tag ?? null,
           );
         }
 
@@ -222,7 +222,11 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     }
 
     if (isAndroid) {
-      return this.native.cancelAllNotificationsWithIds([notificationId], NotificationType.ALL, tag);
+      return this.native.cancelAllNotificationsWithIds(
+        [notificationId],
+        NotificationType.ALL,
+        tag ?? null,
+      );
     }
 
     if (isIOS) {
@@ -243,7 +247,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       return this.native.cancelAllNotificationsWithIds(
         [notificationId],
         NotificationType.DISPLAYED,
-        tag,
+        tag ?? null,
       );
     }
 
