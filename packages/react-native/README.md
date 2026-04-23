@@ -41,6 +41,60 @@ yarn add @psync/notifee
 ```bash
 bun add @psync/notifee
 ```
+
+### Expo config plugin
+
+`@psync/notifee` now ships an official Expo config plugin for `expo prebuild`.
+
+Add it to your Expo config:
+
+```js
+export default {
+  expo: {
+    plugins: [
+      [
+        '@psync/notifee',
+        {
+          apsEnvMode: 'development',
+          backgroundModes: ['remote-notification'],
+          androidIcons: [
+            {
+              name: 'ic_stat_notify',
+              path: './assets/notifications/ic_stat_notify.png',
+              type: 'small',
+            },
+          ],
+          enableNotificationServiceExtension: true,
+          iosDeploymentTarget: '15.1',
+        },
+      ],
+    ],
+  },
+};
+```
+
+Supported plugin options:
+
+- `apsEnvMode?: 'development' | 'production'`
+- `backgroundModes?: string[]`
+- `enableCommunicationNotifications?: boolean`
+- `androidIcons?: Array<{ name: string; path: string; type: 'small' | 'large' }>`
+- `enableNotificationServiceExtension?: boolean`
+- `iosDeploymentTarget?: string`
+- `notificationServiceExtensionName?: string`
+- `customNotificationServiceFilePath?: string`
+- `appleDevTeamId?: string`
+- `appGroupName?: string`
+- `verbose?: boolean`
+
+When `enableNotificationServiceExtension` is enabled, the plugin will:
+
+- create an iOS Notification Service Extension target,
+- add the required `RNNotifeeCore` Podfile target with `$NotifeeExtension = true`,
+- generate a default `NotificationService.m` that calls `NotifeeExtensionHelper`,
+- add application-group entitlements for the app and extension, and
+- register the extension in `expo.extra.eas.build.experimental.ios.appExtensions`.
+
 ## Documentation
 
 - [Overview](https://notifee.app/react-native/docs/overview)

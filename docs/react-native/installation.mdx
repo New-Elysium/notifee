@@ -86,19 +86,33 @@ Finally, ensure you run `npx expo prebuild` and rebuild your app as described in
 
 Please note that Notifee needs Java JDK 11+ to build on Android. If you are building the app with EAS, you need to change the image used for the build. You will have to use `image` as `ubuntu-18.04-jdk-11-ndk-r19c` or another image that has jdk 11 as in the following configuration. ([EAS Build Server Configuration](https://docs.expo.dev/build-reference/infrastructure/#image--ubuntu-1804-jdk-8-ndk-r19c--alias--default))
 
-Notifee currently does **not** ship an official Expo config plugin. If you use Expo with `expo prebuild`, the recommended approach is:
-
-- use native `ios/` and `android/` project changes directly whenever possible,
-- keep using `expo-build-properties` for SDK/build version changes, and
-- only add a config plugin for build-time tasks that cannot be expressed at runtime.
-
-In practice, the Expo-specific tasks that may still need plugin automation are:
+Notifee now ships an official Expo config plugin. If you use Expo with `expo prebuild`, prefer the plugin for native build-time tasks such as:
 
 - creating and maintaining an iOS Notification Service Extension,
-- copying custom iOS notification sound files into the native targets, and
-- generating or copying Android notification small-icon resources.
+- adding APNs entitlements and iOS background modes,
+- enabling communication-notification capabilities,
+- generating or copying Android notification icon resources, and
+- wiring the iOS extension target into EAS app extension config.
 
-If you only need standard local notifications and standard remote-notification payloads, native project changes are usually enough after `expo prebuild`.
+If you only need standard local notifications and standard remote-notification payloads, the plugin can still be minimal — for example, just setting `apsEnvMode` and Android icons.
+
+```json title="app.json"
+{
+  "expo": {
+    "plugins": [
+      [
+        "@psync/notifee",
+        {
+          "apsEnvMode": "development",
+          "backgroundModes": ["remote-notification"],
+          "enableNotificationServiceExtension": true,
+          "iosDeploymentTarget": "15.1"
+        }
+      ]
+    ]
+  }
+}
+```
 
 ```json title="eas.json"
 {
