@@ -22,7 +22,15 @@ import notifee, {
   AndroidVisibility,
   AndroidCategory,
   IOSNotificationInterruptionLevel,
+  AndroidBadgeIconType,
+  AndroidGroupAlertBehavior,
+  AndroidColor,
+  AndroidDefaults,
+  RepeatFrequency,
+  AlarmType,
+  TimeUnit,
 } from '@psync/notifee';
+import type { FcmRemoteMessage } from '@psync/notifee';
 
 // ============================================================================
 // COLORS
@@ -189,6 +197,10 @@ export default function NotificationDemo() {
   const [permissionGranted, setPermissionGranted] = useState<boolean | null>(
     null,
   );
+  const [fcmConfigSet, setFcmConfigSet] = useState(false);
+  const [notificationConfigSet, setNotificationConfigSet] = useState(false);
+  const [settingsText, setSettingsText] = useState('');
+  const [lastGroupId, setLastGroupId] = useState<string | null>(null);
 
   const colors = isDarkMode ? Colors.dark : Colors.light;
 
@@ -569,22 +581,46 @@ export default function NotificationDemo() {
     });
   };
 
+  // ============================================================================
+  // BADGE COUNT HELPERS
+  // ============================================================================
+
   const incrementBadge = async () => {
-    if (!(await ensurePermission())) return;
     if (Platform.OS === 'android') {
-      Alert.alert('Android', 'Badge count is iOS-only');
+      Alert.alert('iOS Only', 'Badge increment is iOS-only');
       return;
     }
-    const nextCount = badgeCount + 1;
-    await notifee.setBadgeCount(nextCount);
-    setBadgeCount(nextCount);
+    try {
+      await notifee.incrementBadgeCount(1);
+      const count = await notifee.getBadgeCount();
+      setBadgeCount(count);
+    } catch (error) {
+      console.error('[App] incrementBadgeCount error:', error);
+    }
   };
 
   const decrementBadge = async () => {
+    if (Platform.OS === 'android') {
+      Alert.alert('iOS Only', 'Badge decrement is iOS-only');
+      return;
+    }
+    try {
+      await notifee.decrementBadgeCount(1);
+      const count = await notifee.getBadgeCount();
+      setBadgeCount(count);
+    } catch (error) {
+      console.error('[App] decrementBadgeCount error:', error);
+    }
+  };
+
+  const resetBadge = async () => {
     if (Platform.OS === 'android') return;
-    const nextCount = Math.max(0, badgeCount - 1);
-    await notifee.setBadgeCount(nextCount);
-    setBadgeCount(nextCount);
+    try {
+      await notifee.setBadgeCount(0);
+      setBadgeCount(0);
+    } catch (error) {
+      console.error('[App] setBadgeCount error:', error);
+    }
   };
 
   const startForegroundServiceDemo = async () => {
@@ -716,6 +752,527 @@ export default function NotificationDemo() {
   };
 
   // ============================================================================
+  // CONFIGURATION & SETTINGS
+  // ============================================================================
+
+  const fetchNotificationSettings = async () => {
+    try {
+      const settings = await notifee.getNotificationSettings();
+      setSettingsText(JSON.stringify(settings, null, 2));
+      Alert.alert('Notification Settings', JSON.stringify(settings, null, 2).slice(0, 800));
+    } catch (error) {
+      console.error('[App] getNotificationSettings error:', error);
+      Alert.alert('Error', 'Failed to get notification settings');
+    }
+  };
+
+  const configureNotificationConfig = async () => {
+    try {
+      await notifee.setNotificationConfig({
+        ios: { interceptRemoteNotifications: false },
+      });
+      setNotificationConfigSet(true);
+      Alert.alert('Notification Config', 'Set interceptRemoteNotifications to false\n(Firebase Messaging will handle remote taps)');
+    } catch (error) {
+      console.error('[App] setNotificationConfig error:', error);
+      Alert.alert('Error', 'Failed to set notification config');
+    }
+  };
+
+  const checkInitialNotification = async () => {
+    try {
+      const initial = await notifee.getInitialNotification();
+      if (initial) {
+        Alert.alert('Initial Notification', JSON.stringify(initial, null, 2).slice(0, 800));
+      } else {
+        Alert.alert('Initial Notification', 'App was not opened by a notification');
+      }
+    } catch (error) {
+      console.error('[App] getInitialNotification error:', error);
+    }
+  };
+
+  // ============================================================================
+  // FCM / REMOTE MESSAGE HELPERS
+  // ============================================================================
+
+  const configureFcmDefaults = async () => {
+    try {
+      await notifee.setFcmConfig({
+        defaultChannelId: 'default',
+        defaultPressAction: { id: 'default', launchActivity: 'default' },
+        fallbackBehavior: 'display',
+      });
+      setFcmConfigSet(true);
+      Alert.alert('FCM Config', 'Default FCM config applied');
+    } catch (error) {
+      console.error('[App] setFcmConfig error:', error);
+      Alert.alert('Error', 'Failed to set FCM config');
+    }
+  };
+
+  const simulateFcmMessage = async () => {
+    if (!(await ensurePermission())) return;
+    try {
+      const remoteMessage: FcmRemoteMessage = {
+        messageId: `fcm-${Date.now()}`,
+        data: {
+          title: 'FCM Message Title',
+          body: 'This was handled via handleFcmMessage()',
+          channelId: 'default',
+        },
+        notification: {
+          title: 'FCM Message Title',
+          body: 'This was handled via handleFcmMessage()',
+        },
+      };
+      const id = await notifee.handleFcmMessage(remoteMessage);
+      Alert.alert('FCM Simulated', `Notification created with id: ${id}`);
+    } catch (error) {
+      console.error('[App] handleFcmMessage error:', error);
+      Alert.alert('Error', 'Failed to handle FCM message');
+    }
+  };
+
+  // ============================================================================
+  // CHANNEL MANAGEMENT
+  // ============================================================================
+
+  const createTestChannelGroup = async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Channel groups are Android-only');
+      return;
+    }
+    try {
+      const groupId = await notifee.createChannelGroup({
+        id: 'test-group',
+        name: 'Test Group',
+      });
+      setLastGroupId(groupId);
+      Alert.alert('Channel Group', `Created: ${groupId}`);
+    } catch (error) {
+      console.error('[App] createChannelGroup error:', error);
+    }
+  };
+
+  const listChannelGroups = async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Channel groups are Android-only');
+      return;
+    }
+    try {
+      const groups = await notifee.getChannelGroups();
+      Alert.alert(
+        'Channel Groups',
+        groups.length > 0 ? groups.map(g => `${g.id}: ${g.name}`).join('\n') : 'No channel groups found',
+      );
+    } catch (error) {
+      console.error('[App] getChannelGroups error:', error);
+    }
+  };
+
+  const checkChannelStatus = async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Channel status is Android-only');
+      return;
+    }
+    try {
+      const created = await notifee.isChannelCreated('default');
+      const blocked = await notifee.isChannelBlocked('default');
+      Alert.alert('Channel: default', `Created: ${created}\nBlocked: ${blocked}`);
+    } catch (error) {
+      console.error('[App] channel status error:', error);
+    }
+  };
+
+  const deleteTestChannelGroup = async () => {
+    if (Platform.OS !== 'android') return;
+    try {
+      await notifee.deleteChannelGroup('test-group');
+      setLastGroupId(null);
+      Alert.alert('Deleted', 'Channel group "test-group" deleted');
+    } catch (error) {
+      console.error('[App] deleteChannelGroup error:', error);
+    }
+  };
+
+  const deleteTestChannel = async () => {
+    if (Platform.OS !== 'android') return;
+    try {
+      await notifee.deleteChannel('high-priority');
+      Alert.alert('Deleted', 'Channel "high-priority" deleted');
+    } catch (error) {
+      console.error('[App] deleteChannel error:', error);
+    }
+  };
+
+  // ============================================================================
+  // POWER MANAGER & BATTERY OPTIMIZATION
+  // ============================================================================
+
+  const checkPowerManager = async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Power manager is Android-only');
+      return;
+    }
+    try {
+      const info = await notifee.getPowerManagerInfo();
+      Alert.alert(
+        'Power Manager Info',
+        `Manufacturer: ${info.manufacturer}\nModel: ${info.model || 'N/A'}\nVersion: ${info.version || 'N/A'}\nActivity: ${info.activity || 'N/A (none)'}`,
+      );
+    } catch (error) {
+      console.error('[App] getPowerManagerInfo error:', error);
+    }
+  };
+
+  const openPowerManager = async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Power manager is Android-only');
+      return;
+    }
+    try {
+      await notifee.openPowerManagerSettings();
+      Alert.alert('Settings', 'Opened power manager settings');
+    } catch (error) {
+      console.error('[App] openPowerManagerSettings error:', error);
+    }
+  };
+
+  const checkBatteryOptimization = async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Battery optimization is Android-only');
+      return;
+    }
+    try {
+      const enabled = await notifee.isBatteryOptimizationEnabled();
+      Alert.alert('Battery Optimization', enabled ? 'Enabled - app may be restricted' : 'Disabled - no restrictions');
+    } catch (error) {
+      console.error('[App] isBatteryOptimizationEnabled error:', error);
+    }
+  };
+
+  const openBatteryOptimization = async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Battery optimization is Android-only');
+      return;
+    }
+    try {
+      await notifee.openBatteryOptimizationSettings();
+    } catch (error) {
+      console.error('[App] openBatteryOptimizationSettings error:', error);
+    }
+  };
+
+  const openAlarmSettings = async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Alarm permission settings are Android-only');
+      return;
+    }
+    try {
+      await notifee.openAlarmPermissionSettings();
+      Alert.alert('Settings', 'Opened alarm permission settings');
+    } catch (error) {
+      console.error('[App] openAlarmPermissionSettings error:', error);
+    }
+  };
+
+  // ============================================================================
+  // QUERY APIs
+  // ============================================================================
+
+  const listDisplayedNotifications = async () => {
+    try {
+      const notifications = await notifee.getDisplayedNotifications();
+      Alert.alert(
+        `Displayed (${notifications.length})`,
+        notifications.length > 0
+          ? notifications.map(n => `${n.id}: ${n.notification.title}`).slice(0, 10).join('\n')
+          : 'No displayed notifications',
+      );
+    } catch (error) {
+      console.error('[App] getDisplayedNotifications error:', error);
+    }
+  };
+
+  const listTriggerNotifications = async () => {
+    try {
+      const triggers = await notifee.getTriggerNotifications();
+      Alert.alert(
+        `Triggers (${triggers.length})`,
+        triggers.length > 0
+          ? triggers.map(t => `${t.notification.id}: ${t.notification.title}`).slice(0, 10).join('\n')
+          : 'No trigger notifications',
+      );
+    } catch (error) {
+      console.error('[App] getTriggerNotifications error:', error);
+    }
+  };
+
+  const cancelDisplayedAll = async () => {
+    try {
+      await notifee.cancelDisplayedNotifications();
+      Alert.alert('Cancelled', 'All displayed notifications cancelled');
+    } catch (error) {
+      console.error('[App] cancelDisplayedNotifications error:', error);
+    }
+  };
+
+  const cancelTriggersAll = async () => {
+    try {
+      await notifee.cancelTriggerNotifications();
+      Alert.alert('Cancelled', 'All trigger notifications cancelled');
+    } catch (error) {
+      console.error('[App] cancelTriggerNotifications error:', error);
+    }
+  };
+
+  // ============================================================================
+  // ADVANCED TRIGGERS
+  // ============================================================================
+
+  const scheduleIntervalNotification = async () => {
+    if (!(await ensurePermission())) return;
+    const triggerId = `interval-${Date.now()}`;
+
+    await notifee.createTriggerNotification(
+      {
+        id: triggerId,
+        title: 'Interval Notification',
+        body: 'This repeats every 15 minutes',
+        android: {
+          channelId: 'default',
+          smallIcon: 'ic_launcher',
+          pressAction: { id: 'default' },
+        },
+        ios: { sound: 'default' },
+      },
+      {
+        type: TriggerType.INTERVAL,
+        interval: 15,
+        timeUnit: TimeUnit.MINUTES,
+      },
+    );
+
+    Alert.alert('Scheduled', 'Interval trigger set for every 15 minutes');
+  };
+
+  const scheduleAlarmManagerTrigger = async () => {
+    if (!(await ensurePermission())) return;
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'AlarmManager triggers are Android-only');
+      return;
+    }
+    const triggerId = `alarm-${Date.now()}`;
+
+    await notifee.createTriggerNotification(
+      {
+        id: triggerId,
+        title: 'AlarmManager Trigger',
+        body: 'Scheduled with SET_EXACT_AND_ALLOW_WHILE_IDLE',
+        android: {
+          channelId: 'default',
+          smallIcon: 'ic_launcher',
+          pressAction: { id: 'default' },
+        },
+      },
+      {
+        type: TriggerType.TIMESTAMP,
+        timestamp: Date.now() + 60000,
+        alarmManager: {
+          type: AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE,
+        },
+      },
+    );
+
+    Alert.alert('Scheduled', 'AlarmManager trigger set for 60 seconds');
+  };
+
+  // ============================================================================
+  // ANDROID ADVANCED STYLES
+  // ============================================================================
+
+  const sendMessagingStyle = async () => {
+    if (!(await ensurePermission())) return;
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Messaging style is Android-only');
+      return;
+    }
+    await notifee.displayNotification({
+      id: `messaging-${Date.now()}`,
+      title: 'New Messages',
+      body: 'You have new messages',
+      android: {
+        channelId: 'high-priority',
+        smallIcon: 'ic_launcher',
+        style: {
+          type: AndroidStyle.MESSAGING,
+          person: {
+            name: 'Sarah',
+            icon: 'https://i.pravatar.cc/150?u=sarah',
+          },
+          messages: [
+            { text: 'Hey! Are you free?', timestamp: Date.now() - 60000 },
+            { text: 'Want to grab coffee?', timestamp: Date.now() - 30000 },
+          ],
+        },
+        pressAction: { id: 'default' },
+      },
+    });
+  };
+
+  const sendGroupedNotification = async () => {
+    if (!(await ensurePermission())) return;
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Grouped notifications are Android-only');
+      return;
+    }
+    const groupId = 'group-social';
+
+    await notifee.displayNotification({
+      id: `group-child-1`,
+      title: 'Sarah liked your photo',
+      body: 'Sarah liked your photo',
+      android: {
+        channelId: 'default',
+        smallIcon: 'ic_launcher',
+        groupId,
+        groupAlertBehavior: AndroidGroupAlertBehavior.CHILDREN,
+        pressAction: { id: 'default' },
+      },
+    });
+
+    await notifee.displayNotification({
+      id: `group-child-2`,
+      title: 'Mike commented',
+      body: 'Mike: "Nice shot!"',
+      android: {
+        channelId: 'default',
+        smallIcon: 'ic_launcher',
+        groupId,
+        groupAlertBehavior: AndroidGroupAlertBehavior.CHILDREN,
+        pressAction: { id: 'default' },
+      },
+    });
+
+    await notifee.displayNotification({
+      id: `group-summary`,
+      title: '2 new interactions',
+      body: 'Sarah and Mike',
+      android: {
+        channelId: 'default',
+        smallIcon: 'ic_launcher',
+        groupId,
+        groupAlertBehavior: AndroidGroupAlertBehavior.ALL,
+        style: { type: AndroidStyle.INBOX, title: 'Social Updates', lines: ['Sarah liked your photo', 'Mike commented'] },
+      },
+    });
+
+    Alert.alert('Grouped', 'Created 2 children + 1 summary notification');
+  };
+
+  const sendStyledNotification = async () => {
+    if (!(await ensurePermission())) return;
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Styled notifications are Android-only');
+      return;
+    }
+    await notifee.displayNotification({
+      id: `styled-${Date.now()}`,
+      title: 'Styled Notification',
+      body: 'Custom color, large icon, lights, vibration',
+      android: {
+        channelId: 'high-priority',
+        smallIcon: 'ic_launcher',
+        color: AndroidColor.BLUE,
+        largeIcon: 'https://i.pravatar.cc/150?u=styled',
+        badgeIconType: AndroidBadgeIconType.SMALL,
+        defaults: [AndroidDefaults.SOUND, AndroidDefaults.VIBRATE],
+        vibrationPattern: [300, 500, 300, 500],
+        showTimestamp: true,
+        onlyAlertOnce: true,
+        pressAction: { id: 'default' },
+      },
+    });
+  };
+
+  const sendLocalOnlyNotification = async () => {
+    if (!(await ensurePermission())) return;
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'Local only is Android-only');
+      return;
+    }
+    await notifee.displayNotification({
+      id: `local-${Date.now()}`,
+      title: 'Local Only',
+      body: 'This notification will not show on other devices',
+      android: {
+        channelId: 'default',
+        smallIcon: 'ic_launcher',
+        localOnly: true,
+        pressAction: { id: 'default' },
+      },
+    });
+  };
+
+  const hideDrawer = () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert('Android Only', 'hideNotificationDrawer is Android-only');
+      return;
+    }
+    notifee.hideNotificationDrawer();
+    Alert.alert('Drawer', 'Notification drawer hidden');
+  };
+
+  // ============================================================================
+  // iOS CATEGORIES
+  // ============================================================================
+
+  const setupIOSCategories = async () => {
+    if (Platform.OS !== 'ios') {
+      Alert.alert('iOS Only', 'Notification categories are iOS-only');
+      return;
+    }
+    try {
+      await notifee.setNotificationCategories([
+        {
+          id: 'message',
+          actions: [
+            { id: 'reply', title: 'Reply', input: true },
+            { id: 'like', title: 'Like', foreground: true },
+          ],
+        },
+        {
+          id: 'call',
+          actions: [
+            { id: 'answer_call', title: 'Answer', foreground: true },
+            { id: 'decline_call', title: 'Decline', destructive: true },
+          ],
+        },
+      ]);
+      Alert.alert('Categories', 'Set message and call categories');
+    } catch (error) {
+      console.error('[App] setNotificationCategories error:', error);
+    }
+  };
+
+  const getIOSCategories = async () => {
+    if (Platform.OS !== 'ios') {
+      Alert.alert('iOS Only', 'Notification categories are iOS-only');
+      return;
+    }
+    try {
+      const categories = await notifee.getNotificationCategories();
+      Alert.alert(
+        `Categories (${categories.length})`,
+        categories.length > 0 ? categories.map(c => c.id).join('\n') : 'No categories set',
+      );
+    } catch (error) {
+      console.error('[App] getNotificationCategories error:', error);
+    }
+  };
+
+  // ============================================================================
   // RENDER
   // ============================================================================
 
@@ -791,6 +1348,12 @@ export default function NotificationDemo() {
               </Text>
             </View>
             <View style={styles.badgeButtons}>
+              <TouchableOpacity
+                onPress={resetBadge}
+                style={[styles.badgeButton, { backgroundColor: colors.textMuted }]}
+              >
+                <Text style={styles.badgeButtonText}>0</Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={decrementBadge}
                 style={[styles.badgeButton, { backgroundColor: colors.danger }]}
@@ -958,6 +1521,270 @@ export default function NotificationDemo() {
           icon="🗑️"
           title="Cancel All Scheduled"
           subTitle="Remove all pending triggers"
+          colors={colors}
+        />
+
+        <SectionHeader title="Configuration & Settings" colors={colors} />
+        <TestButton
+          onPress={fetchNotificationSettings}
+          icon="⚙️"
+          title="Get Notification Settings"
+          subTitle="Fetch current permission & settings"
+          colors={colors}
+        />
+        <TestButton
+          onPress={configureNotificationConfig}
+          icon="🔧"
+          title="Set Notification Config"
+          subTitle="Disable iOS remote notification interception"
+          disabled={notificationConfigSet}
+          colors={colors}
+        />
+        <TestButton
+          onPress={checkInitialNotification}
+          icon="🚀"
+          title="Get Initial Notification"
+          subTitle="Check if app was opened by a notification"
+          colors={colors}
+        />
+
+        <SectionHeader
+          title="FCM / Remote Messages"
+          colors={colors}
+        />
+        <TestButton
+          onPress={configureFcmDefaults}
+          icon="📡"
+          title="Set FCM Config"
+          subTitle="Configure default channel and fallback behavior"
+          disabled={fcmConfigSet}
+          colors={colors}
+        />
+        <TestButton
+          onPress={simulateFcmMessage}
+          icon="📨"
+          title="Simulate FCM Message"
+          subTitle="Test handleFcmMessage with a mock payload"
+          colors={colors}
+        />
+
+        <SectionHeader
+          title="Channel Management"
+          subtitle={
+            Platform.OS === 'ios' ? '(Not available on iOS)' : undefined
+          }
+          colors={colors}
+        />
+        <TestButton
+          onPress={createTestChannelGroup}
+          icon="📁"
+          title="Create Channel Group"
+          subTitle="Create a test channel group"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={listChannelGroups}
+          icon="📂"
+          title="List Channel Groups"
+          subTitle="View all channel groups"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={checkChannelStatus}
+          icon="🔍"
+          title="Check Channel Status"
+          subTitle="Is default channel created / blocked?"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={deleteTestChannelGroup}
+          icon="🗑️"
+          title="Delete Channel Group"
+          subTitle="Remove the test-group channel group"
+          disabled={Platform.OS === 'ios'}
+          variant="danger"
+          colors={colors}
+        />
+        <TestButton
+          onPress={deleteTestChannel}
+          icon="🗑️"
+          title="Delete High-Priority Channel"
+          subTitle="Remove the high-priority channel"
+          disabled={Platform.OS === 'ios'}
+          variant="danger"
+          colors={colors}
+        />
+
+        <SectionHeader
+          title="Power Manager & Battery"
+          subtitle={
+            Platform.OS === 'ios' ? '(Not available on iOS)' : undefined
+          }
+          colors={colors}
+        />
+        <TestButton
+          onPress={checkPowerManager}
+          icon="🔋"
+          title="Power Manager Info"
+          subTitle="Get device manufacturer & power settings"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={openPowerManager}
+          icon="⚡"
+          title="Open Power Manager Settings"
+          subTitle="Navigate to device-specific power settings"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={checkBatteryOptimization}
+          icon="🔋"
+          title="Check Battery Optimization"
+          subTitle="See if the app is battery-optimized"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={openBatteryOptimization}
+          icon="🔌"
+          title="Open Battery Optimization Settings"
+          subTitle="Navigate to battery optimization settings"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={openAlarmSettings}
+          icon="⏰"
+          title="Open Alarm Permission Settings"
+          subTitle="Android 12+ alarm special access"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+
+        <SectionHeader title="Query & Cancel APIs" colors={colors} />
+        <TestButton
+          onPress={listDisplayedNotifications}
+          icon="📋"
+          title="List Displayed Notifications"
+          subTitle="Get all currently displayed notifications"
+          colors={colors}
+        />
+        <TestButton
+          onPress={listTriggerNotifications}
+          icon="📋"
+          title="List Trigger Notifications"
+          subTitle="Get all pending scheduled notifications"
+          colors={colors}
+        />
+        <TestButton
+          onPress={cancelDisplayedAll}
+          icon="❌"
+          title="Cancel Displayed Notifications"
+          subTitle="Cancel all currently displayed notifications"
+          variant="danger"
+          colors={colors}
+        />
+        <TestButton
+          onPress={cancelTriggersAll}
+          icon="❌"
+          title="Cancel Trigger Notifications"
+          subTitle="Cancel all pending trigger notifications"
+          variant="danger"
+          colors={colors}
+        />
+        {Platform.OS === 'android' && (
+          <TestButton
+            onPress={hideDrawer}
+            icon="🙈"
+            title="Hide Notification Drawer"
+            subTitle="Programmatically hide the notification shade"
+            colors={colors}
+          />
+        )}
+
+        <SectionHeader title="Advanced Triggers" colors={colors} />
+        <TestButton
+          onPress={scheduleIntervalNotification}
+          icon="🔁"
+          title="Schedule Interval Trigger"
+          subTitle="Repeats every 15 minutes"
+          colors={colors}
+        />
+        <TestButton
+          onPress={scheduleAlarmManagerTrigger}
+          icon="⏰"
+          title="Schedule AlarmManager Trigger"
+          subTitle="Exact alarm in 60 seconds (Android)"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+
+        <SectionHeader
+          title="Android Advanced Styles"
+          subtitle={
+            Platform.OS === 'ios' ? '(Not available on iOS)' : undefined
+          }
+          colors={colors}
+        />
+        <TestButton
+          onPress={sendMessagingStyle}
+          icon="💬"
+          title="Messaging Style"
+          subTitle="Conversation-style notification with messages"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={sendGroupedNotification}
+          icon="🗂️"
+          title="Grouped Notifications"
+          subTitle="Summary + child notifications with groupAlertBehavior"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={sendStyledNotification}
+          icon="🎨"
+          title="Styled Notification"
+          subTitle="Color, largeIcon, vibration, lights, badgeIconType"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={sendLocalOnlyNotification}
+          icon="📍"
+          title="Local Only Notification"
+          subTitle="Won't show on linked devices"
+          disabled={Platform.OS === 'ios'}
+          colors={colors}
+        />
+
+        <SectionHeader
+          title="iOS Categories"
+          subtitle={
+            Platform.OS === 'android' ? '(Not available on Android)' : undefined
+          }
+          colors={colors}
+        />
+        <TestButton
+          onPress={setupIOSCategories}
+          icon="🏷️"
+          title="Set Categories"
+          subTitle="Register message & call action categories"
+          disabled={Platform.OS === 'android'}
+          colors={colors}
+        />
+        <TestButton
+          onPress={getIOSCategories}
+          icon="📋"
+          title="Get Categories"
+          subTitle="List registered iOS notification categories"
+          disabled={Platform.OS === 'android'}
           colors={colors}
         />
 
