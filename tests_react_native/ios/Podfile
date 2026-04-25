@@ -12,6 +12,7 @@ $NotifeeExtension = true
 
 platform :ios, '15.1'
 install! 'cocoapods', :deterministic_uuids => false
+use_modular_headers!
 
 project 'testing.xcodeproj'
 
