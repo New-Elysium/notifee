@@ -101,7 +101,7 @@ function validateProps(normalizedProps, rawProps = {}) {
 
     if (!isValidIOSSoundFileExtension(soundPath)) {
       throwPluginError(
-        `'iosSoundFiles' entries must use one of: ${VALID_IOS_SOUND_EXTENSIONS.join(', ')}.`,
+        `'iosSoundFiles' entry '${soundPath}' must use one of: ${VALID_IOS_SOUND_EXTENSIONS.join(', ')}.`,
       );
     }
   }

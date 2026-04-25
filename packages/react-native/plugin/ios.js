@@ -115,7 +115,7 @@ function createExtensionEntitlements(appGroupName) {
 function createPodfileTargetBlock(extensionName) {
   return `
 package_json = \`node --print "require.resolve('@psync/notifee/package.json')"\`.strip
-raise '[Notifee] Failed to resolve @psync/notifee/package.json via Node. Ensure Node is available and @psync/notifee is installed before running pod install.' if package_json.nil? || package_json.empty?
+raise '[Notifee] Failed to resolve @psync/notifee/package.json via Node during pod install. Ensure Node is available, run bun install or npm install, and then retry pod install.' if package_json.nil? || package_json.empty?
 podspec = File.join(File.dirname(package_json), 'RNNotifeeCore.podspec')
 $NotifeeExtension = true
 target '${extensionName}' do

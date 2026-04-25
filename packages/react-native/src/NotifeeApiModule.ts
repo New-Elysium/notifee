@@ -115,10 +115,10 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
 
           try {
             void backgroundEventHandler(event).catch(error => {
-              console.error('[notifee] background event handler rejected.', error);
+              console.error('[notifee] background event handler rejected asynchronously.', error);
             });
           } catch (error) {
-            console.error('[notifee] background event handler threw an error.', error);
+            console.error('[notifee] background event handler threw synchronously.', error);
           }
         },
       );

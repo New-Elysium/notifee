@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const imageSize = require('image-size');
+const { imageSize: getImageSize } = require('image-size');
 const { generateImageAsync } = require('@expo/image-utils');
 const { withDangerousMod } = require('@expo/config-plugins');
 const { LARGE_ICON_SIZES, RES_PATH, SMALL_ICON_SIZES } = require('./constants');
@@ -33,7 +33,7 @@ function validateIconSource(projectRoot, icon) {
 
   let dimensions;
   try {
-    dimensions = imageSize.imageSize(resolvedPath);
+    dimensions = getImageSize(resolvedPath);
   } catch (error) {
     throwPluginError(
       `Android icon '${icon.name}' could not be read as an image at '${icon.path}'.`,
