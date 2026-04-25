@@ -5,6 +5,18 @@
 import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
 
+/**
+ * TurboModule spec for NotifeeApiModule.
+ *
+ * NOTE: Complex types use `any` for return types and `Object` for parameters
+ * because React Native's Codegen parser only analyzes this single file and
+ * cannot resolve type imports. Codegen supports only primitives, `Object`,
+ * `Array<T>`, and types defined inline in this file.
+ *
+ *
+ * Type safety is preserved in the public API layer (NotifeeApiModule).
+ */
+
 export interface Spec extends TurboModule {
   // Constants (Android only; iOS returns 0)
   getConstants(): { ANDROID_API_LEVEL: number };
