@@ -111,6 +111,22 @@ class NotificationManager {
                   ReceiverService.DELETE_INTENT,
                   new String[] {"notification"},
                   notificationModel.toBundle()));
+          // Keep launch-intent creation and event payload separate:
+          // - pressActionForIntent may be synthesized to restore tap-to-open defaults
+          // - pressActionForExtras preserves the original event payload shape sent to JS
+          Bundle pressActionForIntent = androidModel.getPressAction();
+          Bundle pressActionForExtras = pressActionForIntent;
+          if (pressActionForIntent == null) {
+            pressActionForIntent = new Bundle();
+            pressActionForIntent.putString("id", "default");
+            pressActionForIntent.putString("launchActivity", "default");
+            pressActionForExtras = null;
+          } else if (NotificationPendingIntent.PRESS_ACTION_OPT_OUT_ID.equals(
+              pressActionForIntent.getString("id"))) {
+            pressActionForIntent = null;
+            pressActionForExtras = null;
+          }
+
           int targetSdkVersion =
               ContextHolder.getApplicationContext().getApplicationInfo().targetSdkVersion;
           if (targetSdkVersion >= Build.VERSION_CODES.S
@@ -118,18 +134,18 @@ class NotificationManager {
             builder.setContentIntent(
                 NotificationPendingIntent.createIntent(
                     notificationModel.getHashCode(),
-                    androidModel.getPressAction(),
+                    pressActionForIntent,
                     TYPE_PRESS,
                     new String[] {"notification", "pressAction"},
                     notificationModel.toBundle(),
-                    androidModel.getPressAction()));
+                    pressActionForExtras));
           } else {
             builder.setContentIntent(
                 ReceiverService.createIntent(
                     ReceiverService.PRESS_INTENT,
                     new String[] {"notification", "pressAction"},
                     notificationModel.toBundle(),
-                    androidModel.getPressAction()));
+                    pressActionForIntent));
           }
 
           if (notificationModel.getTitle() != null) {
@@ -201,6 +217,10 @@ class NotificationManager {
           builder.setOngoing(androidModel.getOngoing());
           builder.setOnlyAlertOnce(androidModel.getOnlyAlertOnce());
           builder.setPriority(androidModel.getPriority());
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+              && androidModel.getAsForegroundService()) {
+            builder.setForegroundServiceBehavior(androidModel.getForegroundServiceBehavior());
+          }
 
           NotificationAndroidModel.AndroidProgress progress = androidModel.getProgress();
           if (progress != null) {
@@ -221,6 +241,11 @@ class NotificationManager {
               builder.setSmallIcon(smallIconId, smallIconLevel);
             } else {
               builder.setSmallIcon(smallIconId);
+            }
+          } else {
+            int fallbackSmallIconId = getApplicationContext().getApplicationInfo().icon;
+            if (fallbackSmallIconId != 0) {
+              builder.setSmallIcon(fallbackSmallIconId);
             }
           }
 

@@ -153,7 +153,12 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelAllNotifications(['id']);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(1, ['id'], 0, undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(
+      1,
+      ['id'],
+      0,
+      null,
+    );
   });
 
   test('cancelDisplayedNotifications(ids) - Android', async () => {
@@ -161,7 +166,12 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelDisplayedNotifications(['id']);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(1, ['id'], 1, undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(
+      1,
+      ['id'],
+      1,
+      null,
+    );
   });
 
   test('cancelTriggerNotifications(ids) - Android', async () => {
@@ -178,7 +188,11 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelNotification(notificationId);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith([notificationId], 0, undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith(
+      [notificationId],
+      0,
+      null,
+    );
   });
 
   test('cancelDisplayedNotification - Android', async () => {
@@ -187,7 +201,11 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelDisplayedNotification(notificationId);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith([notificationId], 1, undefined);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith(
+      [notificationId],
+      1,
+      null,
+    );
   });
 
   test('cancelTriggerNotification - Android', async () => {

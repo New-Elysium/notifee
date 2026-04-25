@@ -52,6 +52,11 @@
     "packages/react-native": {
       "name": "@psync/notifee",
       "version": "9.2.7",
+      "dependencies": {
+        "@expo/config-plugins": "^55.0.8",
+        "@expo/image-utils": "^0.8.13",
+        "image-size": "^1.2.1",
+      },
       "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^8.57.0",
         "@typescript-eslint/parser": "^8.57.0",

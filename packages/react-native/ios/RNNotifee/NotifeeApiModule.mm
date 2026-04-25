@@ -28,6 +28,7 @@ static NSInteger kReactNativeNotifeeNotificationTypeTrigger = 2;
 static NSInteger kReactNativeNotifeeNotificationTypeAll = 0;
 
 @implementation NotifeeApiModule {
+  // Guarded by @synchronized(self): native notification callbacks can arrive off-main-thread.
   bool hasListeners;
   NSMutableArray *pendingCoreEvents;
 }
@@ -53,15 +54,23 @@ RCT_EXPORT_MODULE();
 }
 
 - (void)startObserving {
-  hasListeners = YES;
-  for (NSDictionary *eventBody in pendingCoreEvents) {
+  NSArray *eventsToFlush;
+  @synchronized(self) {
+    hasListeners = YES;
+    // Copy under lock but flush outside it to keep the critical section tiny and avoid
+    // re-entrancy issues if a consumer synchronously triggers more work while handling an event.
+    eventsToFlush = [pendingCoreEvents copy];
+    [pendingCoreEvents removeAllObjects];
+  }
+  for (NSDictionary *eventBody in eventsToFlush) {
     [self sendNotifeeCoreEvent:eventBody];
   }
-  [pendingCoreEvents removeAllObjects];
 }
 
 - (void)stopObserving {
-  hasListeners = NO;
+  @synchronized(self) {
+    hasListeners = NO;
+  }
 }
 
 + (BOOL)requiresMainQueueSetup {
@@ -80,23 +89,37 @@ RCT_EXPORT_MODULE();
 #pragma mark - Events
 
 - (void)didReceiveNotifeeCoreEvent:(NSDictionary *_Nonnull)event {
-  if (hasListeners) {
+  BOOL shouldSend;
+  @synchronized(self) {
+    shouldSend = hasListeners;
+    if (!shouldSend) {
+      [pendingCoreEvents addObject:event];
+    }
+  }
+  if (shouldSend) {
     [self sendNotifeeCoreEvent:event];
-  } else {
-    [pendingCoreEvents addObject:event];
   }
 }
 
 - (void)sendNotifeeCoreEvent:(NSDictionary *_Nonnull)eventBody {
-  dispatch_after(
-      dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (RCTRunningInAppExtension() ||
-            [UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
-          [self sendEventWithName:kReactNativeNotifeeNotificationBackgroundEvent body:eventBody];
-        } else {
-          [self sendEventWithName:kReactNativeNotifeeNotificationEvent body:eventBody];
-        }
-      });
+  dispatch_async(dispatch_get_main_queue(), ^{
+    @synchronized(self) {
+      if (!hasListeners) {
+        [pendingCoreEvents addObject:eventBody];
+        return;
+      }
+    }
+    // Intentionally treat UIApplicationStateInactive as background-like: notification taps arrive
+    // during the inactive transition before the app becomes active again.
+    BOOL isBackground =
+        RCTRunningInAppExtension() ||
+        [UIApplication sharedApplication].applicationState != UIApplicationStateActive;
+    if (isBackground) {
+      [self sendEventWithName:kReactNativeNotifeeNotificationBackgroundEvent body:eventBody];
+    } else {
+      [self sendEventWithName:kReactNativeNotifeeNotificationEvent body:eventBody];
+    }
+  });
 }
 
 // clang-format off
@@ -279,6 +302,14 @@ RCT_EXPORT_MODULE();
                     resolve:(RCTPromiseResolveBlock)resolve
                      reject:(RCTPromiseRejectBlock)reject {
   [NotifeeCore decrementBadgeCount:(NSInteger)decrementBy withBlock:^(NSError *_Nullable error) {
+    [self resolve:resolve orReject:reject promiseWithError:error orResult:nil];
+  }];
+}
+
+- (void)setNotificationConfig:(NSDictionary *)config
+                      resolve:(RCTPromiseResolveBlock)resolve
+                       reject:(RCTPromiseRejectBlock)reject {
+  [NotifeeCore setNotificationConfig:config withBlock:^(NSError *_Nullable error) {
     [self resolve:resolve orReject:reject promiseWithError:error orResult:nil];
   }];
 }

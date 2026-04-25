@@ -113,6 +113,7 @@ export default {
   ...NotificationIOS,
   TriggerType,
   displayNotification: jest.fn(async notification => notification?.id || testNotification.id),
+  handleFcmMessage: jest.fn(async remoteMessage => remoteMessage?.messageId || testNotification.id),
   createTriggerNotification: jest.fn(
     async (notification, _) => notification?.id || testNotification.id,
   ),
@@ -144,6 +145,8 @@ export default {
   onForegroundEvent: jest.fn(() => jest.fn()),
   openNotificationSettings: jest.fn(),
   requestPermission: jest.fn(async () => testNotificationSettings),
+  setFcmConfig: jest.fn(async () => {}),
+  setNotificationConfig: jest.fn(async () => {}),
   registerForegroundService: jest.fn(() => jest.fn()),
   setNotificationCategories: jest.fn(async () => {}),
   getNotificationCategories: jest.fn(async () => [testCategory]),

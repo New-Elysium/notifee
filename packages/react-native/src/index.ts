@@ -31,3 +31,6 @@ export * from './types/Notification';
 export * from './types/Trigger';
 export * from './types/NotificationIOS';
 export * from './types/NotificationAndroid';
+export * from './types/PowerManagerInfo';
+export * from './types/NotificationConfig';
+export type { FcmConfig, FcmRemoteMessage } from './fcm/types';

@@ -30,6 +30,7 @@ import java.util.UUID;
 public class NotificationPendingIntent {
   public static final String EVENT_TYPE_INTENT_KEY = "notifee_event_type";
   public static final String NOTIFICATION_ID_INTENT_KEY = "notification_id";
+  public static final String PRESS_ACTION_OPT_OUT_ID = "__NOTIFEE_OPT_OUT__";
   private static final String TAG = "NotificationPendingIntent";
 
   /**
@@ -168,11 +169,16 @@ public class NotificationPendingIntent {
       // to handle a custom launchActivity
       Boolean shouldOverwriteDefaultLaunchActivityIntent = launchActivityIntent == null;
       if (launchActivityIntent != null) {
+        String existingComponentClassName =
+            launchActivityIntent.getComponent() != null
+                ? launchActivityIntent.getComponent().getClassName()
+                : null;
         // overwrite if custom launch activity set (launch activity in payload does not equal
         // current activity)
         shouldOverwriteDefaultLaunchActivityIntent =
-            launchActivity != "default"
-                && launchActivityIntent.getComponent().getClassName() != launchActivity;
+            !"default".equals(launchActivity)
+                && (existingComponentClassName == null
+                    || !existingComponentClassName.equals(launchActivity));
       }
 
       // Set new launch activity intent

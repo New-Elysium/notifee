@@ -41,7 +41,28 @@ By adding a custom key `notifee_options` in the message payload, the notificatio
 
 To get started, you will need to implement a [Notification Service Extension](https://developer.apple.com/documentation/usernotifications/unnotificationserviceextension) for your iOS app, the following steps will guide you through how to set it up.
 
-If you are using Expo, there is currently no official Notifee config plugin that performs this setup for you. The preferred option is to keep the generated native iOS project and make these changes directly after `expo prebuild`. A config plugin is only useful here as build-time automation for the extension target, entitlements, and any sound-file copying.
+If you are using Expo, `@psync/notifee` now ships an official config plugin that can automate this setup during `expo prebuild`, including the extension target, Podfile wiring, entitlements, and EAS app-extension metadata.
+
+Example:
+
+```json title="app.json"
+{
+  "expo": {
+    "plugins": [
+      [
+        "@psync/notifee",
+        {
+          "apsEnvMode": "development",
+          "enableNotificationServiceExtension": true,
+          "iosDeploymentTarget": "15.1"
+        }
+      ]
+    ]
+  }
+}
+```
+
+If you prefer to manage the native iOS project manually, the steps below still work.
 
 ### Add the notification service extension
 

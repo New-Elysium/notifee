@@ -52,6 +52,7 @@ export const mockNotifeeNativeModule = {
   openPowerManagerSettings: jest.fn(),
   stopForegroundService: jest.fn(),
   hideNotificationDrawer: jest.fn(),
+  setNotificationConfig: jest.fn(),
 };
 
 const mock = jest.fn().mockImplementation(() => {

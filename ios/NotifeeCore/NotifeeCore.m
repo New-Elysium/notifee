@@ -201,7 +201,15 @@
                   error);
         }];
 
-        content = [[content contentByUpdatingWithProvider:intent error:nil] mutableCopy];
+        NSError *contentError = nil;
+        UNNotificationContent *updatedContent =
+            [content contentByUpdatingWithProvider:intent error:&contentError];
+        if (contentError != nil) {
+          return dispatch_async(dispatch_get_main_queue(), ^{
+            block(contentError);
+          });
+        }
+        content = [updatedContent mutableCopy];
       }
     }
 
@@ -268,7 +276,15 @@
                   error);
         }];
 
-        content = [[content contentByUpdatingWithProvider:intent error:nil] mutableCopy];
+        NSError *contentError = nil;
+        UNNotificationContent *updatedContent =
+            [content contentByUpdatingWithProvider:intent error:&contentError];
+        if (contentError != nil) {
+          return dispatch_async(dispatch_get_main_queue(), ^{
+            block(contentError);
+          });
+        }
+        content = [updatedContent mutableCopy];
       }
     }
 
@@ -635,7 +651,9 @@
 
   id handler = ^(BOOL granted, NSError *_Nullable error) {
     if (error != nil) {
-      // TODO send error to notifeeMethodNSDictionaryBlock
+      NSLog(@"NotifeeCore: requestPermission failed: %@", error);
+      block(error, nil);
+      return;
     }
 
     [self getNotificationSettings:block];
@@ -764,7 +782,22 @@
     NSInteger badgeCount = application.applicationIconBadgeNumber;
 
     block(nil, badgeCount == -1 ? 0 : badgeCount);
+    return;
   }
+  block(nil, 0);
+}
+
++ (void)setNotificationConfig:(NSDictionary *)config withBlock:(notifeeMethodVoidBlock)block {
+  NSDictionary *iosConfig = config[@"ios"];
+  if ([iosConfig isKindOfClass:[NSDictionary class]]) {
+    id interceptValue = iosConfig[@"interceptRemoteNotifications"];
+    if ([interceptValue isKindOfClass:[NSNumber class]]) {
+      [NotifeeCoreUNUserNotificationCenter instance].shouldHandleRemoteNotifications =
+          [interceptValue boolValue];
+    }
+  }
+
+  block(nil);
 }
 
 + (void)incrementBadgeCount:(NSInteger)incrementBy withBlock:(notifeeMethodVoidBlock)block {

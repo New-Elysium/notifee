@@ -1,210 +1,208 @@
-# Comparison: @psync/notifee vs react-native-notify-kit
+# react-native-notify-kit Parity Tracker
 
-**Date:** 2026-04-04  
+**Last Updated:** 2026-04-18
 **Compared repos:**
-- **Ours:** `XChikuX/notifee` (`@psync/notifee` v9.2.7)
-- **Theirs:** `marcocrupi/react-native-notify-kit` (`react-native-notify-kit` v9.1.11)
+- **Ours:** `XChikuX/notifee` (`@psync/notifee`)
+- **Theirs:** `marcocrupi/react-native-notify-kit`
 
 Both are maintained forks of the original `@notifee/react-native` by Invertase.
 
 ---
 
-## Executive Summary
+## Implementation Status Summary
 
-The `react-native-notify-kit` fork focuses on **New Architecture (TurboModules)** migration while keeping the core notification logic identical. Our fork focuses on **modern tooling** (Bun, latest RN/SDK versions) while keeping the legacy bridge working. The TypeScript source, validators, and API logic are nearly identical between both repos, with a few minor divergences.
+| Category | Status |
+|----------|--------|
+| TurboModule Migration | ✅ Complete |
+| FCM Helpers (JS-only) | ✅ Complete |
+| TypeScript Bug Fixes | ✅ Complete |
+| Native Bug Fixes (35 upstream) | ⚠️ Partially tracked — see table below |
+| `setNotificationConfig()` API | ❌ Not implemented |
+| Baseline Profile | ❌ Not implemented |
 
 ---
 
 ## Architecture Comparison
 
-| Aspect | @psync/notifee (Ours) | react-native-notify-kit (Theirs) |
-|--------|----------------------|----------------------------------|
-| **Native Bridge** | Legacy `NativeModules` (Java/ObjC) | TurboModules (Kotlin/ObjC++) |
-| **Package Manager** | Bun 1.3.10 | Yarn 4.6.0 |
-| **Min React Native** | >=0.83.2 | >=0.73.0 (targets 0.84) |
-| **Min React** | >=19.2.4 | Not strictly enforced |
-| **Android SDK** | compileSdk 36, Java 21 | compileSdk 35, Java 17 |
-| **Gradle** | 9.0.0, AGP 8.8.2 | Not verified |
-| **Test Runner** | Jest 30 + babel-jest | Jest 29 + ts-jest |
-| **Test Location** | `tests_react_native/__tests__/` | `packages/react-native/__tests__/` |
-| **iOS Core** | Separate `NotifeeCore` lib | Same `NotifeeCore` lib |
-| **Android Core** | Separate AAR | Same AAR |
-
----
-
-## Detailed File-by-File Comparison
-
-### TypeScript Source (`packages/react-native/src/`)
-
-| File | Status | Notes |
-|------|--------|-------|
-| `NotifeeApiModule.ts` | **Near-identical** | Same API methods, same validation flow. Minor divergence in cancel API routing and iOS `getNotificationSettings` (see bugs below). |
-| `NotifeeNativeModule.ts` | **Different** | Ours uses `NativeModules[name]`; theirs uses `TurboModuleRegistry.getEnforcing<Spec>()`. Theirs has a proper TypeScript `Spec` type for the native module. |
-| `NotifeeNativeModule.web.ts` | **Identical** | Both return empty stubs. |
-| `NotifeeJSEventEmitter.ts` | **Identical** | Both use `react-native/Libraries/vendor/emitter/EventEmitter`. |
-| `NotifeeNativeError.ts` | **Identical** | Same custom error class. |
-| `index.ts` | **Identical** | Same export structure. |
-| `types/*.ts` | **Identical** | All 8 type files match. |
-| `utils/*.ts` | **Identical** | Same utility functions and constants. |
-| `validators/*.ts` | **Identical** | All 17 validators + iosCommunicationInfo match. |
-
-### Native Bridge Code
-
-| Component | @psync/notifee | react-native-notify-kit |
-|-----------|---------------|------------------------|
-| **Android RN Bridge** | Java (6 files in `packages/react-native/android/.../java/`) | **Kotlin** (6 files in `packages/react-native/android/.../kotlin/`), TurboModule-conformant |
-| **iOS RN Bridge** | Objective-C (`.m`) | **Objective-C++** (`.mm`), returns `NativeNotifeeModuleSpecJSI` |
-| **Android Core** | Java AAR (unchanged) | Java AAR (unchanged) |
-| **iOS Core** | ObjC/C++ (unchanged) | ObjC/C++ (unchanged) |
-| **TurboModule Spec** | None | `src/specs/NativeNotifeeModule.ts` with full `Spec` interface |
-| **Codegen Config** | None | `codegenConfig` in `package.json` |
-
-### Test Infrastructure
-
 | Aspect | @psync/notifee | react-native-notify-kit |
 |--------|---------------|------------------------|
-| **Location** | `tests_react_native/__tests__/` | `packages/react-native/__tests__/` |
-| **Import style** | Relative: `../../packages/react-native/src/...` | Module alias: `react-native-notify-kit/src/...` |
-| **Transpiler** | `babel-jest` | `ts-jest` |
-| **TS config for tests** | Shares root `tsconfig.json` | Separate `tsconfig.jest.json` |
-| **Setup** | `jest-setup.js` + `jest-mock.js` (separate files) | `__tests__/jest-setup.js` (combined) |
-| **Test count** | 19 suites, 274 tests | ~20 suites, similar count |
-| **Mock** | Missing `ANDROID_API_LEVEL` | Includes `getConstants: jest.fn(() => ({ ANDROID_API_LEVEL: 33 }))` |
-
-### Test Coverage (same test cases in both repos)
-
-Both repos have essentially the same validator test files:
-- `validate.test.ts`
-- `validateAndroidAction.test.ts` (note: typo `validateAndriodAction` in both)
-- `validateAndroidChannel.test.ts`
-- `validateAndroidChannelGroup.test.ts`
-- `validateAndroidFullScreenAction.test.ts`
-- `validateAndroidInput.test.ts`
-- `validateAndroidNotification.test.ts`
-- `validateAndroidPressAction.test.ts`
-- `validateAndroidStyle.test.ts`
-- `validateIOSAttachment.test.ts`
-- `validateIOSCategory.test.ts`
-- `validateIOSCategoryAction.test.ts`
-- `validateIOSInput.test.ts`
-- `validateIOSNotification.test.ts`
-- `validateIOSPermissions.test.ts`
-- `validateNotifications.test.ts`
-- `validateTrigger.test.ts`
-- `NotifeeApiModule.test.ts`
-- `notifeeAppModule.test.ts`
+| **Native Bridge** | ✅ TurboModules (Kotlin/ObjC++) | TurboModules (Kotlin/ObjC++) |
+| **Package Manager** | Bun 1.3.10 | Yarn 4.6.0 |
+| **Min React Native** | >=0.83.2 | >=0.73.0 |
+| **Android SDK** | compileSdk 36, Java 21 | compileSdk 35, Java 17 |
+| **Gradle** | 9.0.0, AGP 8.8.2 | Not verified |
+| **Single Android Module** | ✅ Source compilation | ✅ Source compilation |
+| **TurboModule Spec** | ✅ `src/specs/NativeNotifeeModule.ts` | ✅ `src/specs/NativeNotifeeModule.ts` |
+| **Codegen Config** | ✅ In `package.json` | ✅ In `package.json` |
 
 ---
 
-## Bugs Found & Fixed (in this PR)
+## Features Implemented ✅
 
-### 1. Missing `web: {}` in iOS `getNotificationSettings` response
-**File:** `packages/react-native/src/NotifeeApiModule.ts`  
-**Impact:** Low — mostly a type completeness issue  
-**Found in:** Both repos (but notify-kit fixed it)  
+### TurboModule Migration (Complete)
+- ✅ `NativeNotifeeModule.ts` TurboModule spec with full `Spec` interface
+- ✅ Android bridge rewritten in Kotlin (6 files)
+- ✅ iOS bridge uses Objective-C++ (`.mm`) with TurboModule conformance
+- ✅ `codegenConfig` in `package.json`
 
-The iOS path of `getNotificationSettings()` returned `{ authorizationStatus, ios, android }` without the `web: {}` field, while the Android and web paths both include it. The `NotificationSettings` type expects a `web` field. Fixed to include `web: {}` for consistency.
+### FCM Helpers (Complete)
+- ✅ `handleFcmMessage()` — turns FCM remote message into Notifee notification
+- ✅ `setFcmConfig()` — configure FCM handling behavior
+- ✅ `FcmConfig` and `FcmRemoteMessage` types exported
+- ✅ `parseFcmPayload` and `reconstructNotification` helpers
+- ✅ Jest coverage for FCM behavior
 
-### 2. Incorrect `||` operator in `getChannelGroup`/`getChannelGroups`
-**File:** `packages/react-native/src/NotifeeApiModule.ts`  
-**Impact:** Low — works correctly by accident due to `undefined >= 26` being `false`  
-**Found in:** Both repos (pre-existing from original notifee)  
+### TypeScript Bug Fixes (Complete)
+- ✅ Missing `web: {}` in iOS `getNotificationSettings` response
+- ✅ Incorrect `||` operator in `getChannelGroup`/`getChannelGroups` (now `&&`)
+- ✅ Missing `ANDROID_API_LEVEL` in native module mock
+- ✅ Android-specific cancel notification test coverage
 
-```typescript
-// Before (both repos):
-if (isAndroid || this.native.ANDROID_API_LEVEL >= 26) { ... }
-
-// After (correct, matches getChannel/getChannels/deleteChannel pattern):
-if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) { ... }
-```
-
-Every other channel-related method uses `&&`. The `||` was clearly a typo that happened to work because on non-Android platforms `ANDROID_API_LEVEL` is `undefined`, and `undefined >= 26` is `false`.
-
-### 3. Missing `ANDROID_API_LEVEL` in native module mock
-**File:** `packages/react-native/src/__mocks__/NotifeeNativeModule.ts`  
-**Impact:** Low — tests worked without it but the mock was incomplete  
-
-Added `ANDROID_API_LEVEL: 33` to the mock to match the actual native module interface.
-
-### 4. Missing Android-specific cancel notification tests
-**File:** `tests_react_native/__tests__/NotifeeApiModule.test.ts`  
-**Impact:** Medium — Android cancel routing (using `cancelAllNotificationsWithIds` with `NotificationType` enum) was untested  
-
-Added 6 new tests covering the Android cancel path which routes all cancel operations through `cancelAllNotificationsWithIds` with different `NotificationType` values (ALL=0, DISPLAYED=1, TRIGGER=2).
+### Additional Features We Have
+- ✅ `openPowerManagerSettings()` API
+- ✅ `getPowerManagerInfo()` API with `PowerManagerInfo` type
+- ✅ `openBatteryOptimizationSettings()` / `isBatteryOptimizationEnabled()` APIs
+- ✅ `openAlarmPermissionSettings()` API
+- ✅ Higher minimum requirements (RN 0.83+, React 19.2+, compileSdk 36)
+- ✅ Modern Jest 30 with babel-jest
+- ✅ Comprehensive CI workflows
+- ✅ TypeDoc documentation generation
 
 ---
 
-## What They Have That We Don't
+## Features Not Yet Implemented ❌
 
-### 1. TurboModule Support (HIGH EFFORT — NOT IMPLEMENTED)
-**Their approach:** Full TurboModule migration with:
-- `src/specs/NativeNotifeeModule.ts` — typed TurboModule spec
-- Kotlin Android bridge (6 files, ~35KB total)
-- Objective-C++ iOS bridge with `NativeNotifeeModuleSpecJSI`
-- `codegenConfig` in `package.json` for React Native codegen
+### `setNotificationConfig()` API
+**Priority:** Medium
+**Effort:** Requires native implementation on both platforms
 
-**Why we didn't implement:** This is the single biggest architectural difference. It requires:
-- Rewriting the entire Android bridge from Java to Kotlin with TurboModule conformance
-- Rewriting the iOS bridge from `.m` to `.mm` with JSI interop
-- Adding codegen configuration
-- Extensive testing on real devices
-- Risk of breaking existing installations
+The `react-native-notify-kit` fork provides `setNotificationConfig()` with an opt-out flag to prevent Notifee from intercepting iOS remote notification handlers. This addresses upstream issue #912 where Notifee breaks `@react-native-firebase/messaging`'s `onNotificationOpenedApp` / `getInitialNotification`.
 
-**Recommendation:** This should be a dedicated migration effort in a separate PR. The legacy bridge still works on all React Native versions through the compatibility layer. When ready, the notify-kit Kotlin/ObjC++ files could serve as a reference implementation.
+**What's needed:**
+- iOS native: Add a configuration flag to `NotifeeCore` that controls whether `UNUserNotificationCenterDelegate` interception is active for remote notifications
+- Android native: No-op or equivalent configuration storage
+- TypeScript: Add `setNotificationConfig(config: NotificationConfig)` to `Module` interface, `NotifeeApiModule`, `NativeNotifeeModule` spec, and mock
+- Types: Add `NotificationConfig` type with `ios.interceptRemoteNotifications: boolean` field
 
-### 2. Smoke Test App (LOW VALUE)
-They have `apps/smoke/` with a smoke test app. We have `packages/react-native/example/` which serves the same purpose.
+### Baseline Profile
+**Priority:** Low
+**Effort:** Android-only, build configuration
 
-### 3. `tsconfig.jest.json` (MINIMAL VALUE)
-Separate TypeScript config for tests. Our babel-jest approach works fine without this.
+The `react-native-notify-kit` fork ships a Baseline Profile that instructs ART to AOT-compile the foreground service notification hot path at install time, eliminating JIT penalty on first invocation.
 
-### 4. Module Alias Imports in Tests (COSMETIC)
-Their tests use `react-native-notify-kit/src/...` via Jest `moduleNameMapper`. Ours use relative paths. Both work; theirs is slightly cleaner but it's a cosmetic preference.
+**What's needed:**
+- Add `baseline-prof.txt` to the Android library module
+- Configure Baseline Profile generation in the Gradle build
+
+---
+
+## Upstream Bug Fixes Tracker
+
+The `react-native-notify-kit` fork claims 35+ upstream bug fixes. Below tracks which ones need verification or implementation in our codebase. Many of these are native-level fixes that may or may not already be present in our Kotlin/ObjC++ bridge code.
+
+### Legend
+- ✅ = Verified fixed in our codebase
+- ⚠️ = Needs verification in native code
+- ❌ = Not implemented
+
+### iOS Fixes
+
+| Bug | Upstream Issue | notify-kit Version | Our Status | Notes |
+|-----|---------------|-------------------|------------|-------|
+| Notifee intercepts iOS remote notification tap handlers | #912 | 9.1.12 | ⚠️ Needs `setNotificationConfig()` | Requires new API |
+| `completionHandler` not called on notification dismiss | Pre-existing | 9.1.12 | ⚠️ Verify in ObjC++ bridge | |
+| `completionHandler` not called in `willPresentNotification` fallback | Pre-existing | 9.1.12 | ⚠️ Verify in ObjC++ bridge | |
+| `getInitialNotification()` returns null on cold start | #1128 | 9.1.12 | ⚠️ Verify | Deprecated `UIApplicationLaunchOptionsLocalNotificationKey` check |
+| `willPresentNotification:` fallback drops foreground notifications | Pre-existing | 9.1.20 | ⚠️ Verify | Returns None instead of platform defaults |
+| All delivered notifications dismissed when app opened | #828 | 9.1.20 | ⚠️ Verify | |
+| Duplicate symbols linker error with NSE + static frameworks | Pre-existing | 9.1.22 | ⚠️ Verify | `NotifeeExtensionHelper` compiled by both pods |
+| `EventType.DELIVERED` not emitted for `displayNotification()` | Pre-existing | 9.3.0 | ⚠️ Verify | `notifeeTrigger != nil` guard suppressed event |
+| `didReceiveNotificationResponse:` delayed 15 seconds | Pre-existing | 9.4.0 | ⚠️ Verify | `dispatch_after` blocking subsequent taps |
+| `requestPermission:` swallows `NSError` | Pre-existing | 9.4.0 | ⚠️ Verify | MDM/parental-control failures invisible |
+| `contentByUpdatingWithProvider:` errors suppressed | Pre-existing | 9.4.0 | ⚠️ Verify | SiriKit intents silently fail |
+| `getBadgeCount:` never calls completion in app extension | Pre-existing | 9.4.0 | ✅ Fixed | Returns `0` in app-extension context instead of hanging |
+| NSE attachment downloads no timeout cap | Pre-existing | 9.4.0 | ⚠️ Verify | 60s default exceeds iOS 30s budget |
+
+### Android Fixes
+
+| Bug | Upstream Issue | notify-kit Version | Our Status | Notes |
+|-----|---------------|-------------------|------------|-------|
+| `getInitialNotification()` returns null without `pressAction` | #1128 | 9.1.12 | ⚠️ Verify | |
+| Foreground press events dropped when React not ready | #1279 | 9.1.12 | ⚠️ Verify | |
+| Trigger notifications not firing on Android 14-15 (killed) | #1100 | 9.1.12 | ⚠️ Verify | Missing `goAsync()` in BroadcastReceiver |
+| `SCHEDULE_EXACT_ALARM` denial drops scheduled alarms | #1100 | 9.1.12 | ⚠️ Verify | No fallback to inexact |
+| `getNotificationSettings()` returns DENIED on Android 13+ | #1237 | 9.1.12 | ⚠️ Verify | Before permission requested |
+| `AlarmType.SET_EXACT` doesn't work in Doze; `SET` uses `RTC` | #961 | 9.1.12 | ⚠️ Verify | Should use `RTC_WAKEUP` |
+| FGS crashes with ANR after ~3 min on Android 14+ | #703 | 9.1.13 | ⚠️ Verify | `shortService` timeout, missing `onTimeout()` |
+| Manifest merger failure overriding `foregroundServiceType` | #1108 | 9.1.13 | ⚠️ Verify | |
+| FGS notifications dismissible on Android 13+ with `ongoing: true` | #1248 | 9.1.14 | ⚠️ Verify | |
+| DST shifts repeating scheduled notifications | #875 | 9.1.14 | ⚠️ Verify | |
+| `!=` reference equality on String in `NotificationPendingIntent` | Pre-existing | 9.1.19 | ⚠️ Verify | Latent bug |
+| `pressAction.launchActivity` not defaulted at native layer | N/A | 9.1.19 | ⚠️ Verify | Defense-in-depth |
+| `app.notifee:core:+` / `FAIL_ON_PROJECT_REPOS` | #1079, #1226, #1262 | 9.2.0 | ✅ Fixed | Single module, source compilation |
+| Stale Gradle cache from reused Maven coordinates | N/A | 9.2.0 | ✅ Fixed | Source compilation eliminates this |
+| Tapping notification without `pressAction` does nothing | Pre-existing | 9.3.0 | ⚠️ Verify | `createIntent()` with null `pressActionModelBundle` |
+| FGS notifications delayed up to 10s on Android 12+ | #272, #1242 | 9.4.0 | ⚠️ Verify | Missing `FOREGROUND_SERVICE_IMMEDIATE` |
+| `cancelTriggerNotifications()` race with Room DB | #549 | 9.5.0 | ⚠️ Verify | |
+| Trigger notifications lost across reboot on OEM devices | #734 | 9.6.0 | ⚠️ Verify | BOOT_COMPLETED suppressed |
+| `RepeatFrequency.DAILY/WEEKLY` fires day 1 only | #601, #1063 | Multi-version | ⚠️ Verify | Stale Room anchors |
+| Timestamp triggers lost after reboot on Android 14 | #991 | Multi-version | ⚠️ Verify | |
+| `ObjectAlreadyConsumedException` in headless task | #266 | 9.6.0 | ⚠️ Verify | `WritableMap` reuse |
+| `getDisplayedNotifications()` no `data` field | #393 | 9.7.0 | ⚠️ Verify | iOS/Android parity |
+| Small icon resolution failure crashes in release | #733 | 10.1.0 | ⚠️ Verify | Should fall back to launcher icon |
+
+### Behavioral Changes from notify-kit
+
+These are intentional default changes. Track which ones we've adopted:
+
+| Change | notify-kit Default | Our Status | Notes |
+|--------|-------------------|------------|-------|
+| AlarmManager instead of WorkManager | Since 9.1.12 | ⚠️ Verify | |
+| `SET_EXACT_AND_ALLOW_WHILE_IDLE` default | Since 9.1.12 | ⚠️ Verify | |
+| `ongoing: true` for FGS notifications | Since 9.1.14 | ⚠️ Verify | |
+| FGS notifications auto re-posted on Android 14+ | Since 9.1.14 | ⚠️ Verify | |
+| `pressAction.launchActivity` defaults to `'default'` | Since 9.1.19 | ⚠️ Verify | |
+| `pressAction` defaults when omitted | Since 9.3.0 | ⚠️ Verify | |
+| No hardcoded `foregroundServiceType` | Since 9.1.13 | ⚠️ Verify | |
+| `FOREGROUND_SERVICE_IMMEDIATE` default | Since 9.4.0 | ⚠️ Verify | |
+| iOS `EventType.DELIVERED` for all foreground | Since 9.3.0 | ⚠️ Verify | |
+| Small icon fallback to launcher icon | Since 10.1.0 | ⚠️ Verify | |
+
+---
+
+## Documented Workarounds (from notify-kit)
+
+These are platform limitations that cannot be fixed in library code, but can be mitigated with documentation and helper APIs:
+
+| Issue | Root Cause | Our Status |
+|-------|-----------|------------|
+| #410 FGS paused on screen lock (Samsung/Xiaomi) | Vendor battery-saver policies | ✅ `openPowerManagerSettings()` API available |
+| #734 Triggers lost across reboot on OEM devices | `BOOT_COMPLETED` suppressed | ⚠️ Need `BOOT_COUNT` cold-start self-heal |
+| #927 Custom sound ignored for remote push (bg/killed) | OS delivers before library runs | Documentation only (platform limitation) |
+
+---
+
+## Recommended Implementation Order
+
+For the remaining ⚠️ items, the recommended implementation priority is:
+
+1. **`setNotificationConfig()` API** — Unblocks Firebase interop (#912)
+2. **Verify iOS delegate fixes** — completionHandler, willPresentNotification, didReceiveNotificationResponse
+3. **Verify Android scheduling fixes** — AlarmManager defaults, DST, reboot recovery
+4. **Verify Android press/action fixes** — pressAction defaults, getInitialNotification
+5. **Baseline Profile** — Low priority performance optimization
 
 ---
 
 ## What We Have That They Don't
 
-### 1. Higher Minimum Requirements
-We target React Native 0.83+ with React 19.2+, compileSdk 36, Java 21, and Gradle 9.0. This keeps us on the latest stable releases.
-
-### 2. Bun Package Manager
-Faster installs and builds with Bun 1.3.10 instead of Yarn 4.
-
-### 3. Modern Jest 30
-We use Jest 30 with babel-jest. They're still on Jest 29 with ts-jest.
-
-### 4. Better Cancel API Test Coverage (now)
-With the new tests added in this PR, we now have both iOS and Android cancel path tests.
-
-### 5. Comprehensive CI Workflows
-Multiple GitHub Actions workflows for tests, linting, building, and publishing.
-
-### 6. TypeDoc Documentation Generation
-Automated API reference generation via TypeDoc.
-
----
-
-## Recommendations for Future Work
-
-### High Priority
-1. **TurboModule Migration** — Consider porting their Kotlin/ObjC++ bridge. This is the only significant feature gap. Their implementation is proven and could be adapted.
-
-### Medium Priority
-2. **Add TurboModule Spec** — Even without full migration, adding `src/specs/NativeNotifeeModule.ts` would prepare for the eventual migration and provide better TypeScript typing for the native module interface.
-
-### Low Priority
-3. **Module alias imports in tests** — Could clean up the test import paths to use a Jest `moduleNameMapper` instead of relative paths.
-4. **Smoke test app** — Consider migrating `packages/react-native/example/` to a more comprehensive smoke test setup if needed.
-
----
-
-## Test Results After Changes
-
-```
-Test Suites: 19 passed, 19 total
-Tests:       274 passed, 274 total (was 268)
-Time:        ~3s
-```
-
-All existing tests continue to pass. 6 new Android cancel tests were added.
+| Feature | Notes |
+|---------|-------|
+| Higher minimum requirements | RN 0.83+, React 19.2+, compileSdk 36, Gradle 9.0 |
+| Bun package manager | Faster installs and builds |
+| Modern Jest 30 | vs Jest 29 with ts-jest |
+| Comprehensive CI workflows | Multiple GitHub Actions for tests, linting, building, publishing |
+| TypeDoc documentation generation | Automated API reference |
+| `openPowerManagerSettings()` + `getPowerManagerInfo()` | Vendor battery settings deep-link |
+| `openBatteryOptimizationSettings()` / `isBatteryOptimizationEnabled()` | Battery optimization APIs |
+| `openAlarmPermissionSettings()` | Alarm permission settings API |

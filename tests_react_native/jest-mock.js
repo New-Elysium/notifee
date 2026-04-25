@@ -7,7 +7,7 @@ jest.mock('react-native/Libraries/vendor/emitter/EventEmitter', () => {
     removeListener: jest.fn(),
     emit: jest.fn(),
   }));
-});
+}, { virtual: true });
 
 // Mock react-native
 jest.mock('react-native', () => {
@@ -37,6 +37,9 @@ jest.mock('react-native', () => {
     },
     AppRegistry: {
       registerHeadlessTask: jest.fn(),
+    },
+    AppState: {
+      currentState: 'active',
     },
   };
 });

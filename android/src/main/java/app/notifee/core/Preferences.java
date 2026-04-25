@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 
 class Preferences {
   private static final String PREFERENCES_FILE = "app.notifee.core";
+  static final String LAST_KNOWN_BOOT_COUNT_KEY = "notifee_last_known_boot_count";
   private static Preferences sharedInstance = new Preferences();
   private SharedPreferences preferences;
 

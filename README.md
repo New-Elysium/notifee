@@ -47,6 +47,14 @@ bun add @psync/notifee
 - [Overview](https://notifee.app/react-native/docs/overview)
 - [Reference](https://notifee.app/react-native/reference)
 
+## Expo Support TODOs
+
+- [ ] Add an Expo Router deep-link helper preset for common notification press/open flows
+- [ ] Publish a companion `expo-build-properties` preset / guide for SDK, JDK, and native build alignment
+- [ ] Add config-plugin support for foreground service manifest customization
+- [ ] Add an Expo + FCM interop preset covering Expo Push, direct FCM, and Notifee coexistence
+- [ ] Ship multiple Notification Service Extension templates (basic, rich media, communication notifications)
+
 ## Development
 
 This is a monorepo managed with Bun workspaces. See [CLAUDE.md](./CLAUDE.md) for detailed development instructions.
@@ -99,10 +107,6 @@ cd packages/react-native/example && npx react-native run-ios
 npm login
 npm publish                     # in ./packages/react-native/
 ```
-
-### Troubleshooting
-
-If you encounter build issues, see [EXAMPLE_APP_GRADLE_TRIAGE.md](./EXAMPLE_APP_GRADLE_TRIAGE.md) for common Android Gradle configuration fixes.
 
 ### Android
 

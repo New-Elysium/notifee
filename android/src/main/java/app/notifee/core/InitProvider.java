@@ -23,13 +23,18 @@ import android.content.Context;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.Settings;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @KeepForSdk
 public class InitProvider extends ContentProvider {
   private static final String PROVIDER_AUTHORITY = "notifee-init-provider";
+  private static final String TAG = "InitProvider";
 
   @Override
   public void attachInfo(Context context, ProviderInfo info) {
@@ -53,7 +58,68 @@ public class InitProvider extends ContentProvider {
       ContextHolder.setApplicationContext(context);
     }
 
+    Context appContext = ContextHolder.getApplicationContext();
+    if (appContext != null) {
+      dispatchBootCheck(appContext);
+    }
+
     return false;
+  }
+
+  private static void dispatchBootCheck(final Context context) {
+    ExecutorService executor =
+        Executors.newSingleThreadExecutor(
+            r -> {
+              Thread t = new Thread(r, "notifee-boot-check");
+              t.setDaemon(true);
+              t.setPriority(Thread.MIN_PRIORITY);
+              return t;
+            });
+
+    executor.submit(() -> runBootCheck(context));
+    executor.shutdown();
+  }
+
+  static void runBootCheck(Context context) {
+    try {
+      int currentBootCount = readBootCount(context);
+      int lastKnownBootCount =
+          Preferences.getSharedInstance().getIntValue(Preferences.LAST_KNOWN_BOOT_COUNT_KEY, -1);
+
+      boolean shouldReschedule = shouldRescheduleAfterBoot(currentBootCount, lastKnownBootCount);
+
+      if (currentBootCount != -1) {
+        Preferences.getSharedInstance()
+            .setIntValue(Preferences.LAST_KNOWN_BOOT_COUNT_KEY, currentBootCount);
+      }
+
+      if (shouldReschedule) {
+        Logger.i(TAG, "BOOT_COUNT change detected (or unavailable); running cold-start reschedule");
+        new NotifeeAlarmManager().rescheduleNotifications(null);
+      }
+    } catch (Throwable t) {
+      Logger.e(TAG, "Cold-start reschedule check failed", t);
+    }
+  }
+
+  private static int readBootCount(Context context) {
+    try {
+      return Settings.Global.getInt(context.getContentResolver(), Settings.Global.BOOT_COUNT, -1);
+    } catch (Throwable t) {
+      Logger.w(TAG, "Failed to read Settings.Global.BOOT_COUNT", t);
+      return -1;
+    }
+  }
+
+  @VisibleForTesting
+  static boolean shouldRescheduleAfterBoot(int currentBootCount, int lastKnownBootCount) {
+    if (currentBootCount == -1) {
+      return true;
+    }
+    if (lastKnownBootCount == -1) {
+      return false;
+    }
+    return currentBootCount != lastKnownBootCount;
   }
 
   @Nullable

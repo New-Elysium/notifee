@@ -2,7 +2,7 @@
  * Copyright (c) 2016-present Invertase Limited
  */
 
-import { AppRegistry, Platform } from 'react-native';
+import { AppRegistry, AppState, Platform } from 'react-native';
 import { Module } from './types/Module';
 import {
   AndroidChannel,
@@ -44,10 +44,33 @@ import validateAndroidChannelGroup from './validators/validateAndroidChannelGrou
 import { IOSNotificationCategory, IOSNotificationPermissions } from './types/NotificationIOS';
 import validateIOSCategory from './validators/validateIOSCategory';
 import validateIOSPermissions from './validators/validateIOSPermissions';
+import type { FcmConfig, FcmRemoteMessage } from './fcm/types';
+import type { NotificationConfig } from './types/NotificationConfig';
+import { parseFcmPayload } from './fcm/parseFcmPayload';
+import { reconstructNotification } from './fcm/reconstructNotification';
 
 let backgroundEventHandler: (event: Event) => Promise<void>;
+let fcmConfig: FcmConfig = {};
+let notificationConfig: NotificationConfig = {};
 
 let registeredForegroundServiceTask: (notification: Notification) => Promise<void>;
+
+function cloneFcmConfig(config: FcmConfig): FcmConfig {
+  return {
+    ...config,
+    defaultPressAction: config.defaultPressAction ? { ...config.defaultPressAction } : undefined,
+    ios: config.ios ? { ...config.ios } : undefined,
+  };
+}
+
+/**
+ * Returns the current notification configuration set via `setNotificationConfig()`.
+ * This is primarily intended for internal use and for consumers who need to check
+ * the current config state.
+ */
+export function getNotificationConfig(): NotificationConfig {
+  return { ...notificationConfig, ios: notificationConfig.ios ? { ...notificationConfig.ios } : undefined };
+}
 
 if (isAndroid) {
   // Register foreground service
@@ -82,15 +105,21 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     } else if (isIOS) {
       this.emitter.addListener(
         kReactNativeNotifeeNotificationBackgroundEvent,
-        (event: Event): Promise<void> => {
+        (event: Event): void => {
           if (!backgroundEventHandler) {
             console.warn(
               '[notifee] no background event handler has been set. Set a handler via the "onBackgroundEvent" method.',
             );
-            return Promise.resolve();
+            return;
           }
 
-          return backgroundEventHandler(event);
+          try {
+            void backgroundEventHandler(event).catch(error => {
+              console.error('[notifee] background event handler rejected asynchronously.', error);
+            });
+          } catch (error) {
+            console.error('[notifee] background event handler threw synchronously.', error);
+          }
         },
       );
     }
@@ -152,7 +181,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
           return this.native.cancelAllNotificationsWithIds(
             notificationIds,
             NotificationType.ALL,
-            tag,
+            tag ?? null,
           );
         }
         return this.native.cancelAllNotificationsWithIds(notificationIds);
@@ -173,7 +202,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
           return this.native.cancelAllNotificationsWithIds(
             notificationIds,
             NotificationType.DISPLAYED,
-            tag,
+            tag ?? null,
           );
         }
 
@@ -210,7 +239,11 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     }
 
     if (isAndroid) {
-      return this.native.cancelAllNotificationsWithIds([notificationId], NotificationType.ALL, tag);
+      return this.native.cancelAllNotificationsWithIds(
+        [notificationId],
+        NotificationType.ALL,
+        tag ?? null,
+      );
     }
 
     if (isIOS) {
@@ -231,7 +264,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       return this.native.cancelAllNotificationsWithIds(
         [notificationId],
         NotificationType.DISPLAYED,
-        tag,
+        tag ?? null,
       );
     }
 
@@ -391,6 +424,73 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     }
 
     return Promise.resolve('');
+  };
+
+  public handleFcmMessage = async (remoteMessage: FcmRemoteMessage): Promise<string | null> => {
+    if (remoteMessage == null || typeof remoteMessage !== 'object') {
+      throw new Error("notifee.handleFcmMessage(*) 'remoteMessage' expected an object.");
+    }
+
+    const config = cloneFcmConfig(fcmConfig);
+
+    const parsed = parseFcmPayload(remoteMessage.data);
+
+    if (parsed === null && config.fallbackBehavior === 'ignore') {
+      return null;
+    }
+
+    const notification = reconstructNotification(parsed, remoteMessage, config);
+
+    if (isIOS) {
+      if (AppState.currentState !== 'active') {
+        return null;
+      }
+
+      if (config.ios?.suppressForegroundBanner === true) {
+        return null;
+      }
+    }
+
+    if (!notification.title && !notification.body) {
+      console.warn(
+        '[notifee] handleFcmMessage: displaying notification with empty title and body. Check your FCM payload.',
+      );
+    }
+
+    if (isAndroid && !notification.android?.channelId) {
+      console.warn(
+        '[notifee] handleFcmMessage: Android fallback path has no channelId (no payload channelId, no defaultChannelId configured). Notification may be dropped by the OS.',
+      );
+    }
+
+    return this.displayNotification(notification);
+  };
+
+  public setFcmConfig = (config: FcmConfig): Promise<void> => {
+    if (config == null || typeof config !== 'object' || Array.isArray(config)) {
+      const got = config === null ? 'null' : Array.isArray(config) ? 'array' : typeof config;
+      throw new Error(`notifee.setFcmConfig(*) config must be a plain object. Got: ${got}`);
+    }
+
+    fcmConfig = cloneFcmConfig(config);
+
+    return Promise.resolve();
+  };
+
+  public setNotificationConfig = (config: NotificationConfig): Promise<void> => {
+    if (config == null || typeof config !== 'object' || Array.isArray(config)) {
+      const got = config === null ? 'null' : Array.isArray(config) ? 'array' : typeof config;
+      throw new Error(
+        `notifee.setNotificationConfig(*) config must be a plain object. Got: ${got}`,
+      );
+    }
+
+    notificationConfig = {
+      ...config,
+      ios: config.ios ? { ...config.ios } : undefined,
+    };
+
+    return this.native.setNotificationConfig(notificationConfig);
   };
 
   public openAlarmPermissionSettings = (): Promise<void> => {

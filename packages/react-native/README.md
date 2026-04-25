@@ -41,6 +41,70 @@ yarn add @psync/notifee
 ```bash
 bun add @psync/notifee
 ```
+
+### Expo config plugin
+
+`@psync/notifee` now ships an official Expo config plugin for `expo prebuild`.
+
+Add it to your Expo config:
+
+```js
+export default {
+  expo: {
+    plugins: [
+      [
+        '@psync/notifee',
+        {
+          apsEnvMode: 'development',
+          backgroundModes: ['remote-notification'],
+          androidIcons: [
+            {
+              name: 'ic_stat_notify',
+              path: './assets/notifications/ic_stat_notify.png',
+              type: 'small',
+            },
+          ],
+          enableNotificationServiceExtension: true,
+          iosSoundFiles: ['./assets/notifications/chime.wav'],
+          iosDeploymentTarget: '15.1',
+        },
+      ],
+    ],
+  },
+};
+```
+
+Supported plugin options:
+
+- `apsEnvMode?: 'development' | 'production'`
+- `backgroundModes?: string[]`
+- `enableCommunicationNotifications?: boolean`
+- `androidIcons?: Array<{ name: string; path: string; type: 'small' | 'large' }>`
+- `iosSoundFiles?: string[]`
+- `enableNotificationServiceExtension?: boolean`
+- `iosDeploymentTarget?: string`
+- `notificationServiceExtensionName?: string`
+- `customNotificationServiceFilePath?: string`
+- `appleDevTeamId?: string`
+- `appGroupName?: string`
+- `verbose?: boolean`
+
+When `enableNotificationServiceExtension` is enabled, the plugin will:
+
+- create an iOS Notification Service Extension target,
+- add the required `RNNotifeeCore` Podfile target with `$NotifeeExtension = true`,
+- generate a default `NotificationService.m` that calls `NotifeeExtensionHelper`,
+- add application-group entitlements for the app and extension, and
+- register the extension in `expo.extra.eas.build.experimental.ios.appExtensions`.
+
+When `iosSoundFiles` is set, the plugin will copy supported iOS notification sound assets (`.wav`, `.aif`, `.aiff`, `.caf`) into the generated native iOS project, and also into the Notification Service Extension target when extension automation is enabled. MP3 files are not supported here; convert them to one of the supported formats first.
+
+Android icon notes:
+
+- small icons should be transparent, monochrome status-bar assets,
+- the plugin now warns when a small icon source is not a PNG, and
+- the plugin warns when an icon source is not square.
+
 ## Documentation
 
 - [Overview](https://notifee.app/react-native/docs/overview)
@@ -68,8 +132,8 @@ Below you'll find guides that cover the supported iOS features.
 
 | Topic                                                             |                                                                          |
 | ----------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [Appearance](https://notifee.app/react-native/docs/ios/appearance)           | Change now the notification is displayed to your users.       |
-| [Behaviour](https://notifee.app/react-native/docs/ios/behaviour)            | Control how notifications behave when they are displayed to a device; sound, crtitial alerts etc.  |
+| [Appearance](https://notifee.app/react-native/docs/ios/appearance)           | Change how the notification is displayed to your users.       |
+| [Behaviour](https://notifee.app/react-native/docs/ios/behaviour)            | Control how notifications behave when they are displayed to a device; sound, critical alerts etc.  |
 | [Categories](https://notifee.app/react-native/docs/ios/categories) | Create & assign categories to notifications.          |
 | [Interaction](https://notifee.app/react-native/docs/ios/interaction)                 | Handle user interaction with your notifications. |                                                    |
 | [Permissions](https://notifee.app/react-native/docs/ios/permissions)                 | Request permission from your application users to display notifications. |                                                    |
@@ -106,11 +170,11 @@ You can then add the following line to that setup file to mock `notifee`:
 jest.mock('@psync/notifee', () => require('@psync/notifee/jest-mock'))
 ```
 
-You will also need to add `@notifee` to `transformIgnorePatterns` in your config file (`jest.config.js`):
+You will also need to add `@psync/notifee` to `transformIgnorePatterns` in your config file (`jest.config.js`):
 
 ```bash
 transformIgnorePatterns: [
-    'node_modules/(?!(jest-)?react-native|@react-native|@notifee)'
+    'node_modules/(?!(jest-)?react-native|@react-native|@psync/notifee)'
 ]
 ```
 

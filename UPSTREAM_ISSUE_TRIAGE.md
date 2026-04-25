@@ -1,6 +1,9 @@
 # Upstream Issue Triage for `XChikuX/notifee`
 
 Date: 2026-04-03
+Updated: 2026-04-18
+
+> **Note:** Many of the architecture-level issues described below have been partially or fully addressed by the TurboModule migration (Kotlin/ObjC++ bridge rewrite) and the react-native-notify-kit feature parity work. See [NOTIFY_KIT_COMPARISON.md](./NOTIFY_KIT_COMPARISON.md) for a detailed tracker of which upstream bug fixes have been verified vs still need verification.
 
 ## Scope
 

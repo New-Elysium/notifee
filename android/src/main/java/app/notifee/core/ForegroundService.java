@@ -162,4 +162,20 @@ public class ForegroundService extends Service {
   public IBinder onBind(Intent intent) {
     return null;
   }
+
+  @androidx.annotation.RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+  @Override
+  public void onTimeout(int startId) {
+    Logger.e(TAG, "Foreground service timed out on Android 14+, stopping service to avoid ANR.");
+    stopForeground(true);
+    stopSelf(startId);
+    mCurrentNotificationId = null;
+    mCurrentForegroundServiceType = -1;
+  }
+
+  @androidx.annotation.RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
+  @Override
+  public void onTimeout(int startId, int fgsType) {
+    onTimeout(startId);
+  }
 }

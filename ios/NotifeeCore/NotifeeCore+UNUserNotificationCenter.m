@@ -36,6 +36,7 @@ struct {
     sharedInstance.initialNotification = nil;
     sharedInstance.initialNotificationGathered = false;
     sharedInstance.initialNotificationBlock = nil;
+    sharedInstance.shouldHandleRemoteNotifications = YES;
   });
   return sharedInstance;
 }
@@ -74,8 +75,7 @@ struct {
 - (nullable NSDictionary *)getInitialNotification {
   if (_initialNotificationGathered && _initialNotificationBlock != nil) {
     // copying initial notification
-    if (_initialNotification != nil &&
-        [_initialNoticationID isEqualToString:_notificationOpenedAppID]) {
+    if (_initialNotification != nil && _notificationOpenedAppID != nil) {
       NSDictionary *initialNotificationCopy = [_initialNotification copy];
       _initialNotification = nil;
       _initialNotificationBlock(nil, initialNotificationCopy);
@@ -148,16 +148,14 @@ struct {
       presentationOptions |= UNNotificationPresentationOptionAlert;
     }
 
-    NSDictionary *notifeeTrigger = notification.request.content.userInfo[kNotifeeUserInfoTrigger];
-    if (notifeeTrigger != nil) {
-      // post DELIVERED event
-      [[NotifeeCoreDelegateHolder instance] didReceiveNotifeeCoreEvent:@{
-        @"type" : @(NotifeeCoreEventTypeDelivered),
-        @"detail" : @{
-          @"notification" : notifeeNotification,
-        }
-      }];
-    }
+    // Emit DELIVERED for every Notifee-owned foreground notification. Upstream only emitted this
+    // for trigger notifications, which made iOS diverge from Android for displayNotification().
+    [[NotifeeCoreDelegateHolder instance] didReceiveNotifeeCoreEvent:@{
+      @"type" : @(NotifeeCoreEventTypeDelivered),
+      @"detail" : @{
+        @"notification" : notifeeNotification,
+      }
+    }];
 
     completionHandler(presentationOptions);
 
@@ -194,6 +192,17 @@ struct {
 
   // handle notification outside of notifee
   if (notifeeNotification == nil) {
+    if (!self.shouldHandleRemoteNotifications) {
+      if (_originalDelegate != nil &&
+          originalUNCDelegateRespondsTo.didReceiveNotificationResponse) {
+        [_originalDelegate userNotificationCenter:center
+                   didReceiveNotificationResponse:response
+                            withCompletionHandler:completionHandler];
+      } else {
+        completionHandler();
+      }
+      return;
+    }
     if (_originalDelegate != nil && originalUNCDelegateRespondsTo.didReceiveNotificationResponse) {
       [_originalDelegate userNotificationCenter:center
                  didReceiveNotificationResponse:response
@@ -206,7 +215,6 @@ struct {
   }
 
   if (notifeeNotification == nil) {
-    // No notifee data and no original delegate — still must call completionHandler
     completionHandler();
     return;
   }
@@ -260,7 +268,7 @@ struct {
 
   // post PRESS/ACTION_PRESS event
   // Set is initial notification to true
-  if (_notificationOpenedAppID != nil &&
+  if (_notificationOpenedAppID != nil && _initialNoticationID != nil &&
       [_initialNoticationID isEqualToString:_notificationOpenedAppID]) {
     eventDetail[@"initialNotification"] = @1;
   }
