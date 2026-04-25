@@ -150,9 +150,9 @@ class HeadlessTask {
             Log.d(HEADLESS_TASK_NAME, "initialize ReactContext")
             val reactHost = getReactHost(context)
             val callback = object : ReactInstanceEventListener {
-                override fun onReactContextInitialized(reactCtx: ReactContext) {
+                override fun onReactContextInitialized(context: ReactContext) {
                     mIsReactContextInitialized.set(true)
-                    drainTaskQueue(reactCtx)
+                    drainTaskQueue(context)
                     try {
                         val removeMethod = reactHost!!.javaClass.getMethod(
                             "removeReactInstanceEventListener",
