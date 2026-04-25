@@ -69,7 +69,10 @@ function cloneFcmConfig(config: FcmConfig): FcmConfig {
  * the current config state.
  */
 export function getNotificationConfig(): NotificationConfig {
-  return { ...notificationConfig, ios: notificationConfig.ios ? { ...notificationConfig.ios } : undefined };
+  return {
+    ...notificationConfig,
+    ios: notificationConfig.ios ? { ...notificationConfig.ios } : undefined,
+  };
 }
 
 if (isAndroid) {
@@ -135,7 +138,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
 
   public getTriggerNotifications = (): Promise<TriggerNotification[]> => {
     if (isAndroid || isIOS) {
-      return this.native.getTriggerNotifications();
+      return this.native.getTriggerNotifications() as unknown as Promise<TriggerNotification[]>;
     }
 
     return Promise.resolve([]);
@@ -143,7 +146,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
 
   public getDisplayedNotifications = (): Promise<DisplayedNotification[]> => {
     if (isAndroid || isIOS) {
-      return this.native.getDisplayedNotifications();
+      return this.native.getDisplayedNotifications() as unknown as Promise<DisplayedNotification[]>;
     }
 
     return Promise.resolve([]);
@@ -154,7 +157,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       throw new Error("notifee.isChannelBlocked(*) 'channelId' expected a string value.");
     }
 
-    if (isWeb || isIOS || this.native.ANDROID_API_LEVEL < 26) {
+    if (isWeb || isIOS || this.native.getConstants().ANDROID_API_LEVEL < 26) {
       return Promise.resolve(false);
     }
 
@@ -167,7 +170,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       throw new Error("notifee.isChannelCreated(*) 'channelId' expected a string value.");
     }
 
-    if (isWeb || isIOS || this.native.ANDROID_API_LEVEL < 26) {
+    if (isWeb || isIOS || this.native.getConstants().ANDROID_API_LEVEL < 26) {
       return Promise.resolve(true);
     }
 
@@ -306,7 +309,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     }
 
     if (isAndroid) {
-      if (this.native.ANDROID_API_LEVEL < 26) {
+      if (this.native.getConstants().ANDROID_API_LEVEL < 26) {
         return Promise.resolve(options.id);
       }
 
@@ -332,7 +335,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       throw new Error(`notifee.createChannels(*) 'channels' a channel is invalid: ${e.message}`);
     }
 
-    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
+    if (isAndroid && this.native.getConstants().ANDROID_API_LEVEL >= 26) {
       return this.native.createChannels(options);
     }
 
@@ -348,7 +351,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     }
 
     if (isAndroid) {
-      if (this.native.ANDROID_API_LEVEL < 26) {
+      if (this.native.getConstants().ANDROID_API_LEVEL < 26) {
         return Promise.resolve(options.id);
       }
 
@@ -378,7 +381,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       );
     }
 
-    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
+    if (isAndroid && this.native.getConstants().ANDROID_API_LEVEL >= 26) {
       return this.native.createChannelGroups(options);
     }
 
@@ -390,7 +393,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       throw new Error("notifee.deleteChannel(*) 'channelId' expected a string value.");
     }
 
-    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
+    if (isAndroid && this.native.getConstants().ANDROID_API_LEVEL >= 26) {
       return this.native.deleteChannel(channelId);
     }
 
@@ -402,7 +405,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       throw new Error("notifee.deleteChannelGroup(*) 'channelGroupId' expected a string value.");
     }
 
-    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
+    if (isAndroid && this.native.getConstants().ANDROID_API_LEVEL >= 26) {
       return this.native.deleteChannelGroup(channelGroupId);
     }
 
@@ -534,16 +537,16 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       throw new Error("notifee.getChannel(*) 'channelId' expected a string value.");
     }
 
-    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
-      return this.native.getChannel(channelId);
+    if (isAndroid && this.native.getConstants().ANDROID_API_LEVEL >= 26) {
+      return this.native.getChannel(channelId) as unknown as Promise<NativeAndroidChannel | null>;
     }
 
     return Promise.resolve(null);
   };
 
   public getChannels = (): Promise<NativeAndroidChannel[]> => {
-    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
-      return this.native.getChannels();
+    if (isAndroid && this.native.getConstants().ANDROID_API_LEVEL >= 26) {
+      return this.native.getChannels() as unknown as Promise<NativeAndroidChannel[]>;
     }
 
     return Promise.resolve([]);
@@ -554,16 +557,18 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       throw new Error("notifee.getChannelGroup(*) 'channelGroupId' expected a string value.");
     }
 
-    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
-      return this.native.getChannelGroup(channelGroupId);
+    if (isAndroid && this.native.getConstants().ANDROID_API_LEVEL >= 26) {
+      return this.native.getChannelGroup(
+        channelGroupId,
+      ) as unknown as Promise<NativeAndroidChannelGroup | null>;
     }
 
     return Promise.resolve(null);
   };
 
   public getChannelGroups = (): Promise<NativeAndroidChannelGroup[]> => {
-    if (isAndroid && this.native.ANDROID_API_LEVEL >= 26) {
-      return this.native.getChannelGroups();
+    if (isAndroid && this.native.getConstants().ANDROID_API_LEVEL >= 26) {
+      return this.native.getChannelGroups() as unknown as Promise<NativeAndroidChannelGroup[]>;
     }
 
     return Promise.resolve([]);
@@ -571,7 +576,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
 
   public getInitialNotification = (): Promise<InitialNotification | null> => {
     if (isIOS || isAndroid) {
-      return this.native.getInitialNotification();
+      return this.native.getInitialNotification() as unknown as Promise<InitialNotification | null>;
     }
 
     return Promise.resolve(null);
@@ -620,33 +625,26 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     permissions: IOSNotificationPermissions = {},
   ): Promise<NotificationSettings> => {
     if (isAndroid) {
-      return this.native
-        .requestPermission()
-        .then(
-          ({
+      return this.native.requestPermission({}).then(({ authorizationStatus, android }: any) => {
+        return {
+          authorizationStatus,
+          android,
+          ios: {
+            alert: 1,
+            badge: 1,
+            criticalAlert: 1,
+            showPreviews: 1,
+            sound: 1,
+            carPlay: 1,
+            lockScreen: 1,
+            announcement: 1,
+            notificationCenter: 1,
+            inAppNotificationSettings: 1,
             authorizationStatus,
-            android,
-          }: Pick<NotificationSettings, 'authorizationStatus' | 'android'>) => {
-            return {
-              authorizationStatus,
-              android,
-              ios: {
-                alert: 1,
-                badge: 1,
-                criticalAlert: 1,
-                showPreviews: 1,
-                sound: 1,
-                carPlay: 1,
-                lockScreen: 1,
-                announcement: 1,
-                notificationCenter: 1,
-                inAppNotificationSettings: 1,
-                authorizationStatus,
-              },
-              web: {},
-            };
           },
-        );
+          web: {},
+        };
+      });
     }
 
     if (isIOS) {
@@ -657,23 +655,16 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
         throw new Error(`notifee.requestPermission(*) ${e.message}`);
       }
 
-      return this.native
-        .requestPermission(options)
-        .then(
-          ({
-            authorizationStatus,
-            ios,
-          }: Pick<NotificationSettings, 'authorizationStatus' | 'ios'>) => {
-            return {
-              authorizationStatus,
-              ios,
-              android: {
-                alarm: AndroidNotificationSetting.ENABLED,
-              },
-              web: {},
-            };
+      return this.native.requestPermission(options).then(({ authorizationStatus, ios }: any) => {
+        return {
+          authorizationStatus,
+          ios,
+          android: {
+            alarm: AndroidNotificationSetting.ENABLED,
           },
-        );
+          web: {},
+        };
+      });
     }
 
     // assume web
@@ -741,58 +732,44 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       return Promise.resolve([]);
     }
 
-    return this.native.getNotificationCategories();
+    return this.native.getNotificationCategories() as unknown as Promise<IOSNotificationCategory[]>;
   };
 
   public getNotificationSettings = (): Promise<NotificationSettings> => {
     if (isAndroid) {
-      return this.native
-        .getNotificationSettings()
-        .then(
-          ({
+      return this.native.getNotificationSettings().then(({ authorizationStatus, android }: any) => {
+        return {
+          authorizationStatus,
+          android,
+          ios: {
+            alert: 1,
+            badge: 1,
+            criticalAlert: 1,
+            showPreviews: 1,
+            sound: 1,
+            carPlay: 1,
+            lockScreen: 1,
+            announcement: 1,
+            notificationCenter: 1,
+            inAppNotificationSettings: 1,
             authorizationStatus,
-            android,
-          }: Pick<NotificationSettings, 'authorizationStatus' | 'android'>) => {
-            return {
-              authorizationStatus,
-              android,
-              ios: {
-                alert: 1,
-                badge: 1,
-                criticalAlert: 1,
-                showPreviews: 1,
-                sound: 1,
-                carPlay: 1,
-                lockScreen: 1,
-                announcement: 1,
-                notificationCenter: 1,
-                inAppNotificationSettings: 1,
-                authorizationStatus,
-              },
-              web: {},
-            };
           },
-        );
+          web: {},
+        };
+      });
     }
 
     if (isIOS) {
-      return this.native
-        .getNotificationSettings()
-        .then(
-          ({
-            authorizationStatus,
-            ios,
-          }: Pick<NotificationSettings, 'authorizationStatus' | 'ios'>) => {
-            return {
-              authorizationStatus,
-              ios,
-              android: {
-                alarm: AndroidNotificationSetting.ENABLED,
-              },
-              web: {},
-            };
+      return this.native.getNotificationSettings().then(({ authorizationStatus, ios }: any) => {
+        return {
+          authorizationStatus,
+          ios,
+          android: {
+            alarm: AndroidNotificationSetting.ENABLED,
           },
-        );
+          web: {},
+        };
+      });
     }
 
     // assume web
@@ -902,7 +879,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       } as PowerManagerInfo);
     }
 
-    return this.native.getPowerManagerInfo();
+    return this.native.getPowerManagerInfo() as unknown as Promise<PowerManagerInfo>;
   };
 
   public openPowerManagerSettings = (): Promise<void> => {

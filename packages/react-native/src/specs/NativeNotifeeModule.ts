@@ -4,20 +4,9 @@
 
 import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
-import type {
-  DisplayedNotification,
-  InitialNotification,
-  NotificationSettings,
-  TriggerNotification,
-} from '../types/Notification';
-import type { NativeAndroidChannel, NativeAndroidChannelGroup } from '../types/NotificationAndroid';
-import type { NotificationConfig } from '../types/NotificationConfig';
-import type { IOSNotificationCategory } from '../types/NotificationIOS';
-import type { PowerManagerInfo } from '../types/PowerManagerInfo';
 
 export interface Spec extends TurboModule {
   // Constants (Android only; iOS returns 0)
-  ANDROID_API_LEVEL: number;
   getConstants(): { ANDROID_API_LEVEL: number };
 
   // ─── Shared ───────────────────────────────────────────────────────────────
@@ -31,35 +20,35 @@ export interface Spec extends TurboModule {
     notificationType: number,
     tag: string | null,
   ): Promise<void>;
-  getDisplayedNotifications(): Promise<DisplayedNotification[]>;
-  getTriggerNotifications(): Promise<TriggerNotification[]>;
+  getDisplayedNotifications(): Promise<Array<Object>>;
+  getTriggerNotifications(): Promise<Array<Object>>;
   getTriggerNotificationIds(): Promise<Array<string>>;
-  displayNotification(notification: object): Promise<void>;
-  createTriggerNotification(notification: object, trigger: object): Promise<void>;
-  requestPermission(permissions?: object): Promise<NotificationSettings>;
-  getNotificationSettings(): Promise<NotificationSettings>;
-  getInitialNotification(): Promise<InitialNotification | null>;
-  setNotificationConfig(config: NotificationConfig): Promise<void>;
+  displayNotification(notification: Object): Promise<void>;
+  createTriggerNotification(notification: Object, trigger: Object): Promise<void>;
+  requestPermission(permissions: Object): Promise<Object>;
+  getNotificationSettings(): Promise<Object>;
+  getInitialNotification(): Promise<Object | null>;
+  setNotificationConfig(config: Object): Promise<void>;
 
   // ─── Android-only ─────────────────────────────────────────────────────────
 
-  createChannel(channelMap: object): Promise<void>;
-  createChannels(channelsArray: Array<object>): Promise<void>;
-  createChannelGroup(channelGroupMap: object): Promise<void>;
-  createChannelGroups(channelGroupsArray: Array<object>): Promise<void>;
+  createChannel(channelMap: Object): Promise<void>;
+  createChannels(channelsArray: Array<Object>): Promise<void>;
+  createChannelGroup(channelGroupMap: Object): Promise<void>;
+  createChannelGroups(channelGroupsArray: Array<Object>): Promise<void>;
   deleteChannel(channelId: string): Promise<void>;
   deleteChannelGroup(channelGroupId: string): Promise<void>;
-  getChannel(channelId: string): Promise<NativeAndroidChannel | null>;
-  getChannels(): Promise<NativeAndroidChannel[]>;
-  getChannelGroup(channelGroupId: string): Promise<NativeAndroidChannelGroup | null>;
-  getChannelGroups(): Promise<NativeAndroidChannelGroup[]>;
+  getChannel(channelId: string): Promise<Object | null>;
+  getChannels(): Promise<Array<Object>>;
+  getChannelGroup(channelGroupId: string): Promise<Object | null>;
+  getChannelGroups(): Promise<Array<Object>>;
   isChannelCreated(channelId: string): Promise<boolean>;
   isChannelBlocked(channelId: string): Promise<boolean>;
   openAlarmPermissionSettings(): Promise<void>;
   openNotificationSettings(channelId: string | null): Promise<void>;
   openBatteryOptimizationSettings(): Promise<void>;
   isBatteryOptimizationEnabled(): Promise<boolean>;
-  getPowerManagerInfo(): Promise<PowerManagerInfo>;
+  getPowerManagerInfo(): Promise<Object>;
   openPowerManagerSettings(): Promise<void>;
   stopForegroundService(): Promise<void>;
   hideNotificationDrawer(): void;
@@ -73,8 +62,8 @@ export interface Spec extends TurboModule {
   cancelTriggerNotification(notificationId: string): Promise<void>;
   cancelDisplayedNotificationsWithIds(ids: Array<string>): Promise<void>;
   cancelTriggerNotificationsWithIds(ids: Array<string>): Promise<void>;
-  getNotificationCategories(): Promise<IOSNotificationCategory[]>;
-  setNotificationCategories(categories: Array<object>): Promise<void>;
+  getNotificationCategories(): Promise<Array<Object>>;
+  setNotificationCategories(categories: Array<Object>): Promise<void>;
   setBadgeCount(count: number): Promise<void>;
   getBadgeCount(): Promise<number>;
   incrementBadgeCount(incrementBy: number): Promise<void>;
