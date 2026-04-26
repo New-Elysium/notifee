@@ -1,5 +1,10 @@
 /*
  * Copyright (c) 2016-present Invertase Limited
+ *
+ * Note: iOS rejects notification requests that have no visible/audible content
+ * (for example no title, no body, no sound, and no attachments). Native code
+ * applies a fallback for this case, but we also warn here so developers get
+ * earlier feedback during validation.
  */
 
 import {
@@ -18,6 +23,9 @@ import { Notification } from '../types/Notification';
 import { Platform } from 'react-native';
 import { NotificationAndroid } from '../types/NotificationAndroid';
 import { NotificationIOS } from '..';
+
+const IOS_EMPTY_CONTENT_WARNING =
+  'iOS notifications with no title, body, sound, or attachments may be rejected by the OS. Consider providing at least one of those fields.';
 
 /**
  * Validate platform-specific notification
@@ -50,6 +58,8 @@ export default function validateNotification(notification: Notification): Notifi
   if (!isObject(notification)) {
     throw new Error("'notification' expected an object value.");
   }
+
+  let shouldWarnForEmptyIOSContent = false;
 
   // Defaults
   const out: Notification = {
@@ -150,6 +160,21 @@ export default function validateNotification(notification: Notification): Notifi
   const validatedIOS = validatePlatformSpecificNotification(notification, 'ios') as NotificationIOS;
   if (isIOS) {
     out.ios = validatedIOS;
+
+    const hasTitle = isString(out.title) && out.title.length > 0;
+    const hasBody = isString(out.body) && out.body.length > 0;
+    const hasSound =
+      isString(validatedIOS?.sound) ||
+      validatedIOS?.sound === 'default' ||
+      validatedIOS?.critical === true;
+    const hasAttachments =
+      Array.isArray(validatedIOS?.attachments) && validatedIOS.attachments.length > 0;
+
+    shouldWarnForEmptyIOSContent = !hasTitle && !hasBody && !hasSound && !hasAttachments;
+  }
+
+  if (shouldWarnForEmptyIOSContent) {
+    console.warn(IOS_EMPTY_CONTENT_WARNING);
   }
 
   return out;

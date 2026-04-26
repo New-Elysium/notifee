@@ -678,7 +678,6 @@ class NotificationManager {
       NotificationModel notificationModel, Bundle triggerBundle) {
     IntervalTriggerModel trigger = IntervalTriggerModel.fromBundle(triggerBundle);
     String uniqueWorkName = "trigger:" + notificationModel.getId();
-    WorkManager workManager = WorkManager.getInstance(getApplicationContext());
 
     Data.Builder workDataBuilder =
         new Data.Builder()
@@ -686,21 +685,37 @@ class NotificationManager {
             .putString(Worker.KEY_WORK_REQUEST, Worker.WORK_REQUEST_PERIODIC)
             .putString("id", notificationModel.getId());
 
-    WorkDataRepository.getInstance(getApplicationContext())
-        .insertTriggerNotification(notificationModel, triggerBundle, false);
+    ListenableFuture<Void> insertFuture =
+        WorkDataRepository.getInstance(getApplicationContext())
+            .insertTriggerNotificationAwait(notificationModel, triggerBundle, false);
 
-    long interval = trigger.getInterval();
+    Futures.addCallback(
+        insertFuture,
+        new FutureCallback<Void>() {
+          @Override
+          public void onSuccess(Void result) {
+            WorkManager workManager = WorkManager.getInstance(getApplicationContext());
 
-    PeriodicWorkRequest.Builder workRequestBuilder;
-    workRequestBuilder =
-        new PeriodicWorkRequest.Builder(Worker.class, interval, trigger.getTimeUnit())
-            .setInitialDelay(interval, trigger.getTimeUnit());
+            long interval = trigger.getInterval();
 
-    workRequestBuilder.addTag(Worker.WORK_TYPE_NOTIFICATION_TRIGGER);
-    workRequestBuilder.addTag(uniqueWorkName);
-    workRequestBuilder.setInputData(workDataBuilder.build());
-    workManager.enqueueUniquePeriodicWork(
-        uniqueWorkName, ExistingPeriodicWorkPolicy.UPDATE, workRequestBuilder.build());
+            PeriodicWorkRequest.Builder workRequestBuilder;
+            workRequestBuilder =
+                new PeriodicWorkRequest.Builder(Worker.class, interval, trigger.getTimeUnit())
+                    .setInitialDelay(interval, trigger.getTimeUnit());
+
+            workRequestBuilder.addTag(Worker.WORK_TYPE_NOTIFICATION_TRIGGER);
+            workRequestBuilder.addTag(uniqueWorkName);
+            workRequestBuilder.setInputData(workDataBuilder.build());
+            workManager.enqueueUniquePeriodicWork(
+                uniqueWorkName, ExistingPeriodicWorkPolicy.UPDATE, workRequestBuilder.build());
+          }
+
+          @Override
+          public void onFailure(Throwable t) {
+            Logger.e(TAG, "Failed to insert trigger notification into database", t);
+          }
+        },
+        LISTENING_CACHED_THREAD_POOL);
   }
 
   static void createTimestampTriggerNotification(
@@ -720,44 +735,62 @@ class NotificationManager {
 
     Boolean withAlarmManager = trigger.getWithAlarmManager();
 
-    WorkDataRepository.getInstance(getApplicationContext())
-        .insertTriggerNotification(notificationModel, triggerBundle, withAlarmManager);
+    ListenableFuture<Void> insertFuture =
+        WorkDataRepository.getInstance(getApplicationContext())
+            .insertTriggerNotificationAwait(notificationModel, triggerBundle, withAlarmManager);
 
-    // Schedule notification with alarm manager
-    if (withAlarmManager) {
-      NotifeeAlarmManager.scheduleTimestampTriggerNotification(notificationModel, trigger);
-      return;
-    }
+    Futures.addCallback(
+        insertFuture,
+        new FutureCallback<Void>() {
+          @Override
+          public void onSuccess(Void result) {
+            // Schedule notification with alarm manager
+            if (withAlarmManager) {
+              NotifeeAlarmManager.scheduleTimestampTriggerNotification(
+                  notificationModel, trigger);
+              return;
+            }
 
-    // Continue to schedule trigger notification with WorkManager
-    WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+            // Continue to schedule trigger notification with WorkManager
+            WorkManager workManager = WorkManager.getInstance(getApplicationContext());
 
-    // WorkManager - One time trigger
-    if (interval == -1) {
-      OneTimeWorkRequest.Builder workRequestBuilder = new OneTimeWorkRequest.Builder(Worker.class);
-      workRequestBuilder.addTag(Worker.WORK_TYPE_NOTIFICATION_TRIGGER);
-      workRequestBuilder.addTag(uniqueWorkName);
-      workDataBuilder.putString(Worker.KEY_WORK_REQUEST, Worker.WORK_REQUEST_ONE_TIME);
-      workRequestBuilder.setInputData(workDataBuilder.build());
-      workRequestBuilder.setInitialDelay(delay, TimeUnit.SECONDS);
-      workManager.enqueueUniqueWork(
-          uniqueWorkName, ExistingWorkPolicy.REPLACE, workRequestBuilder.build());
-    } else {
-      // WorkManager - repeat trigger
-      PeriodicWorkRequest.Builder workRequestBuilder;
+            // WorkManager - One time trigger
+            if (interval == -1) {
+              OneTimeWorkRequest.Builder workRequestBuilder =
+                  new OneTimeWorkRequest.Builder(Worker.class);
+              workRequestBuilder.addTag(Worker.WORK_TYPE_NOTIFICATION_TRIGGER);
+              workRequestBuilder.addTag(uniqueWorkName);
+              workDataBuilder.putString(Worker.KEY_WORK_REQUEST, Worker.WORK_REQUEST_ONE_TIME);
+              workRequestBuilder.setInputData(workDataBuilder.build());
+              workRequestBuilder.setInitialDelay(delay, TimeUnit.SECONDS);
+              workManager.enqueueUniqueWork(
+                  uniqueWorkName, ExistingWorkPolicy.REPLACE, workRequestBuilder.build());
+            } else {
+              // WorkManager - repeat trigger
+              PeriodicWorkRequest.Builder workRequestBuilder;
 
-      workRequestBuilder =
-          new PeriodicWorkRequest.Builder(
-              Worker.class, trigger.getInterval(), trigger.getTimeUnit());
+              workRequestBuilder =
+                  new PeriodicWorkRequest.Builder(
+                      Worker.class, trigger.getInterval(), trigger.getTimeUnit());
 
-      workRequestBuilder.addTag(Worker.WORK_TYPE_NOTIFICATION_TRIGGER);
-      workRequestBuilder.addTag(uniqueWorkName);
-      workRequestBuilder.setInitialDelay(delay, TimeUnit.SECONDS);
-      workDataBuilder.putString(Worker.KEY_WORK_REQUEST, Worker.WORK_REQUEST_PERIODIC);
-      workRequestBuilder.setInputData(workDataBuilder.build());
-      workManager.enqueueUniquePeriodicWork(
-          uniqueWorkName, ExistingPeriodicWorkPolicy.UPDATE, workRequestBuilder.build());
-    }
+              workRequestBuilder.addTag(Worker.WORK_TYPE_NOTIFICATION_TRIGGER);
+              workRequestBuilder.addTag(uniqueWorkName);
+              workRequestBuilder.setInitialDelay(delay, TimeUnit.SECONDS);
+              workDataBuilder.putString(Worker.KEY_WORK_REQUEST, Worker.WORK_REQUEST_PERIODIC);
+              workRequestBuilder.setInputData(workDataBuilder.build());
+              workManager.enqueueUniquePeriodicWork(
+                  uniqueWorkName,
+                  ExistingPeriodicWorkPolicy.UPDATE,
+                  workRequestBuilder.build());
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable t) {
+            Logger.e(TAG, "Failed to insert trigger notification into database", t);
+          }
+        },
+        LISTENING_CACHED_THREAD_POOL);
   }
 
   static ListenableFuture<List<Bundle>> getDisplayedNotifications() {

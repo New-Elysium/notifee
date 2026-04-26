@@ -51,6 +51,14 @@ public class WorkDataRepository {
         });
   }
 
+  public ListenableFuture<Void> insertAwait(WorkDataEntity workData) {
+    return NotifeeCoreDatabase.databaseWriteListeningExecutor.submit(
+        () -> {
+          mWorkDataDao.insert(workData);
+          return null;
+        });
+  }
+
   public ListenableFuture<WorkDataEntity> getWorkDataById(String id) {
     return NotifeeCoreDatabase.databaseWriteListeningExecutor.submit(
         () -> mWorkDataDao.getWorkDataById(id));
@@ -96,6 +104,18 @@ public class WorkDataRepository {
             withAlarmManager);
 
     mInstance.insert(workData);
+  }
+
+  public static ListenableFuture<Void> insertTriggerNotificationAwait(
+      NotificationModel notificationModel, Bundle triggerBundle, Boolean withAlarmManager) {
+    WorkDataEntity workData =
+        new WorkDataEntity(
+            notificationModel.getId(),
+            ObjectUtils.bundleToBytes(notificationModel.toBundle()),
+            ObjectUtils.bundleToBytes(triggerBundle),
+            withAlarmManager);
+
+    return mInstance.insertAwait(workData);
   }
 
   public void update(WorkDataEntity workData) {

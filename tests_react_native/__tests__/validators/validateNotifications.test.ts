@@ -1,6 +1,7 @@
 import validateNotification from '../../../packages/react-native/src/validators/validateNotification';
 import { Notification } from '../../../packages/react-native/src/types/Notification';
 import { setPlatform } from '../testSetup';
+import { Platform } from 'react-native';
 
 describe('Validate Notification', () => {
   describe('validateNotification()', () => {
@@ -91,6 +92,66 @@ describe('Validate Notification', () => {
       expect($.data).toEqual({});
     });
 
+    test('returns valid minimal ios notification content', () => {
+      setPlatform('ios');
+      const notification: Notification = {
+        ios: {},
+      };
+
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const $ = validateNotification(notification);
+
+      expect($.id).toBeDefined();
+      expect($.title).toEqual(undefined);
+      expect($.body).toEqual(undefined);
+      expect($.ios).toEqual({
+        foregroundPresentationOptions: {
+          alert: true,
+          badge: true,
+          sound: true,
+          banner: true,
+          list: true,
+        },
+      });
+      expect(warnSpy).toHaveBeenCalledWith(
+        'iOS notifications with no title, body, sound, or attachments may be rejected by the OS. Consider providing at least one of those fields.',
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    test('returns valid ios notification with only data payload', () => {
+      setPlatform('ios');
+      const notification: Notification = {
+        data: { foo: 'bar' },
+        ios: {},
+      };
+
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const $ = validateNotification(notification);
+
+      expect($.id).toBeDefined();
+      expect($.title).toEqual(undefined);
+      expect($.body).toEqual(undefined);
+      expect($.data).toEqual({ foo: 'bar' });
+      expect($.ios).toEqual({
+        foregroundPresentationOptions: {
+          alert: true,
+          badge: true,
+          sound: true,
+          banner: true,
+          list: true,
+        },
+      });
+      expect(warnSpy).toHaveBeenCalledWith(
+        'iOS notifications with no title, body, sound, or attachments may be rejected by the OS. Consider providing at least one of those fields.',
+      );
+
+      warnSpy.mockRestore();
+    });
+
     test('returns invalid when an invalid id property is provided', () => {
       const notification: Notification = {
         id: null as any,
@@ -149,6 +210,15 @@ describe('Validate Notification', () => {
       expect(() => validateNotification(notification)).toThrow(
         '\'notification.data\' value for key "id" is invalid, expected a string value.',
       );
+    });
+
+    test('does not throw for minimal ios notification content on non-ios platform', () => {
+      setPlatform(Platform.OS === 'ios' ? 'android' : 'ios');
+      const notification: Notification = {
+        ios: {},
+      };
+
+      expect(() => validateNotification(notification)).not.toThrow();
     });
   });
 });

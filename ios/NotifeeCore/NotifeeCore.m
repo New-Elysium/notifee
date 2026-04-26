@@ -250,9 +250,14 @@
     UNNotificationTrigger *unTrigger = [NotifeeCoreUtil triggerFromDictionary:trigger];
 
     if (unTrigger == nil) {
-      // do nothing if trigger is null
       return dispatch_async(dispatch_get_main_queue(), ^{
-        block(nil);
+        block([NSError errorWithDomain:@"NotifeeCore"
+                                  code:1001
+                              userInfo:@{
+                                NSLocalizedDescriptionKey :
+                                    @"Failed to create notification trigger. Ensure the trigger "
+                                    @"configuration is valid."
+                              }]);
       });
     }
 
@@ -303,6 +308,9 @@
                        @"notification" : notificationDetail,
                      }
                    }];
+                 } else {
+                   NSLog(@"NotifeeCore: addNotificationRequest failed for id %@: %@",
+                         notification[@"id"], error);
                  }
                  block(error);
                }];
@@ -464,6 +472,13 @@
   if (iosDict[@"attachments"] != nil && !remote) {
     content.attachments =
         [NotifeeCoreUtil notificationAttachmentsFromDictionaryArray:iosDict[@"attachments"]];
+  }
+
+  // If no title, body, sound, or attachments are provided, default to the system
+  // default sound to prevent iOS from silently rejecting the notification request (#826)
+  if (content.sound == nil && (content.title == nil || content.title.length == 0) &&
+      (content.body == nil || content.body.length == 0) && content.attachments.count == 0) {
+    content.sound = [UNNotificationSound defaultSound];
   }
 
   return content;

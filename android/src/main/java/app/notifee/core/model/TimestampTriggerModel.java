@@ -20,6 +20,10 @@ package app.notifee.core.model;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import app.notifee.core.utility.ObjectUtils;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 public class TimestampTriggerModel {
@@ -147,26 +151,38 @@ public class TimestampTriggerModel {
     }
 
     long timestamp = getTimestamp();
-    long interval = 0;
+
+    // For HOURLY, fixed millisecond interval is correct (not affected by DST)
+    if (mRepeatFrequency == TimestampTriggerModel.HOURLY) {
+      long interval = HOUR_IN_MS;
+      while (timestamp < System.currentTimeMillis()) {
+        timestamp += interval;
+      }
+      this.mTimestamp = timestamp;
+      return;
+    }
+
+    // For DAILY and WEEKLY, use java.time to preserve wall-clock time across DST boundaries (#875)
+    ZoneId zoneId = ZoneId.systemDefault();
+    ZonedDateTime scheduledTime = Instant.ofEpochMilli(timestamp).atZone(zoneId);
+    ZonedDateTime now = ZonedDateTime.now(zoneId);
 
     switch (mRepeatFrequency) {
-      case TimestampTriggerModel.WEEKLY:
-        interval = 7 * DAY_IN_MS;
-        break;
       case TimestampTriggerModel.DAILY:
-        interval = DAY_IN_MS;
+        // Advance day-by-day preserving the original local time until we're in the future
+        while (!scheduledTime.isAfter(now)) {
+          scheduledTime = scheduledTime.plusDays(1);
+        }
         break;
-      case TimestampTriggerModel.HOURLY:
-        interval = HOUR_IN_MS;
+      case TimestampTriggerModel.WEEKLY:
+        // Advance week-by-week preserving the original local time until we're in the future
+        while (!scheduledTime.isAfter(now)) {
+          scheduledTime = scheduledTime.plusWeeks(1);
+        }
         break;
     }
 
-    // prevent alarm manager notification firing straight away
-    while (timestamp < System.currentTimeMillis()) {
-      timestamp += interval;
-    }
-
-    this.mTimestamp = timestamp;
+    this.mTimestamp = scheduledTime.toInstant().toEpochMilli();
   }
 
   public enum AlarmType {
