@@ -1,5 +1,7 @@
 // @ts-ignore
-import NotifeeApiModule from '../../packages/react-native/src/NotifeeApiModule';
+import NotifeeApiModule, {
+  getNotificationConfig,
+} from '../../packages/react-native/src/NotifeeApiModule';
 import Notifee, { AuthorizationStatus } from '../../packages/react-native/src/index';
 
 import {
@@ -24,6 +26,11 @@ const apiModule = new NotifeeApiModule({
 describe('Notifee Api Module', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    setPlatform('android');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   test('Module is defined on import', () => {
@@ -102,7 +109,9 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelAllNotifications(['id']);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(1, ['id']);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(1, [
+      'id',
+    ]);
   });
 
   test('cancelDisplayedNotifications(ids) - iOS', async () => {
@@ -110,7 +119,9 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelDisplayedNotifications(['id']);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelDisplayedNotificationsWithIds).toHaveBeenNthCalledWith(1, ['id']);
+    expect(mockNotifeeNativeModule.cancelDisplayedNotificationsWithIds).toHaveBeenNthCalledWith(1, [
+      'id',
+    ]);
   });
 
   test('cancelTriggerNotifications(ids) - iOS', async () => {
@@ -118,7 +129,9 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelTriggerNotifications(['id']);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelTriggerNotificationsWithIds).toHaveBeenNthCalledWith(1, ['id']);
+    expect(mockNotifeeNativeModule.cancelTriggerNotificationsWithIds).toHaveBeenNthCalledWith(1, [
+      'id',
+    ]);
   });
 
   test('cancelNotification - iOS', async () => {
@@ -136,7 +149,9 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelDisplayedNotification(notificationId);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelDisplayedNotification).toHaveBeenCalledWith(notificationId);
+    expect(mockNotifeeNativeModule.cancelDisplayedNotification).toHaveBeenCalledWith(
+      notificationId,
+    );
   });
 
   test('cancelTriggerNotification - iOS', async () => {
@@ -153,7 +168,7 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelAllNotifications(['id']);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIdsAndroid).toHaveBeenNthCalledWith(
       1,
       ['id'],
       0,
@@ -166,7 +181,7 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelDisplayedNotifications(['id']);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIdsAndroid).toHaveBeenNthCalledWith(
       1,
       ['id'],
       1,
@@ -179,7 +194,12 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelTriggerNotifications(['id']);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenNthCalledWith(1, ['id'], 2, null);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIdsAndroid).toHaveBeenNthCalledWith(
+      1,
+      ['id'],
+      2,
+      null,
+    );
   });
 
   test('cancelNotification - Android', async () => {
@@ -188,7 +208,7 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelNotification(notificationId);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith(
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIdsAndroid).toHaveBeenCalledWith(
       [notificationId],
       0,
       null,
@@ -201,7 +221,7 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelDisplayedNotification(notificationId);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith(
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIdsAndroid).toHaveBeenCalledWith(
       [notificationId],
       1,
       null,
@@ -214,7 +234,11 @@ describe('Notifee Api Module', () => {
     const res = await apiModule.cancelTriggerNotification(notificationId);
 
     expect(res).toBe(undefined);
-    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIds).toHaveBeenCalledWith([notificationId], 2, null);
+    expect(mockNotifeeNativeModule.cancelAllNotificationsWithIdsAndroid).toHaveBeenCalledWith(
+      [notificationId],
+      2,
+      null,
+    );
   });
 
   describe('createChannel', () => {
@@ -309,6 +333,393 @@ describe('Notifee Api Module', () => {
 
       expect(res).toBe(true);
       expect(mockNotifeeNativeModule.createChannel).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('setFcmConfig', () => {
+    test('throws when config is null', () => {
+      expect(() => apiModule.setFcmConfig(null as any)).toThrow(
+        'notifee.setFcmConfig(*) config must be a plain object. Got: null',
+      );
+    });
+
+    test('throws when config is an array', () => {
+      expect(() => apiModule.setFcmConfig([] as any)).toThrow(
+        'notifee.setFcmConfig(*) config must be a plain object. Got: array',
+      );
+    });
+
+    test('stores a cloned config snapshot', async () => {
+      const config = {
+        defaultChannelId: 'default-channel',
+        defaultPressAction: {
+          id: 'default',
+          launchActivity: 'default',
+        },
+        ios: {
+          suppressForegroundBanner: true,
+        },
+      };
+
+      await apiModule.setFcmConfig(config);
+
+      config.defaultPressAction.id = 'mutated';
+      config.ios.suppressForegroundBanner = false;
+
+      const displaySpy = jest
+        .spyOn(apiModule, 'displayNotification')
+        .mockImplementation(async notification => notification.id ?? 'auto-id');
+
+      await apiModule.handleFcmMessage({
+        messageId: 'msg-config-clone',
+        notification: {
+          title: 'Fallback title',
+          body: 'Fallback body',
+        },
+      });
+
+      expect(displaySpy).toHaveBeenCalledWith({
+        id: 'msg-config-clone',
+        title: 'Fallback title',
+        body: 'Fallback body',
+        android: {
+          channelId: 'default-channel',
+          pressAction: {
+            id: 'default',
+            launchActivity: 'default',
+          },
+        },
+      });
+
+      displaySpy.mockRestore();
+    });
+  });
+
+  describe('setNotificationConfig', () => {
+    test('throws when config is null', () => {
+      expect(() => apiModule.setNotificationConfig(null as any)).toThrow(
+        'notifee.setNotificationConfig(*) config must be a plain object. Got: null',
+      );
+    });
+
+    test('throws when config is an array', () => {
+      expect(() => apiModule.setNotificationConfig([] as any)).toThrow(
+        'notifee.setNotificationConfig(*) config must be a plain object. Got: array',
+      );
+    });
+
+    test('passes a cloned config to native', async () => {
+      setPlatform('ios');
+      const config = {
+        ios: {
+          interceptRemoteNotifications: false,
+        },
+      };
+
+      await apiModule.setNotificationConfig(config);
+
+      expect(mockNotifeeNativeModule.setNotificationConfig).toHaveBeenCalledTimes(1);
+      expect(mockNotifeeNativeModule.setNotificationConfig).toHaveBeenCalledWith({
+        ios: {
+          interceptRemoteNotifications: false,
+        },
+      });
+      expect(mockNotifeeNativeModule.setNotificationConfig.mock.calls[0][0]).not.toBe(config);
+      expect(mockNotifeeNativeModule.setNotificationConfig.mock.calls[0][0].ios).not.toBe(
+        config.ios,
+      );
+    });
+
+    test('stores a cloned config in the getter', async () => {
+      setPlatform('ios');
+      const config = {
+        ios: {
+          interceptRemoteNotifications: false,
+        },
+      };
+
+      await apiModule.setNotificationConfig(config);
+
+      const storedConfig = getNotificationConfig();
+
+      expect(storedConfig).toEqual({
+        ios: {
+          interceptRemoteNotifications: false,
+        },
+      });
+      expect(storedConfig).not.toBe(config);
+      expect(storedConfig.ios).not.toBe(config.ios);
+    });
+
+    test('passes through undefined ios config without mutation', async () => {
+      const config = {};
+
+      await apiModule.setNotificationConfig(config);
+
+      expect(mockNotifeeNativeModule.setNotificationConfig).toHaveBeenCalledTimes(1);
+      expect(mockNotifeeNativeModule.setNotificationConfig).toHaveBeenCalledWith({});
+      expect(mockNotifeeNativeModule.setNotificationConfig.mock.calls[0][0]).not.toBe(config);
+    });
+  });
+
+  describe('getInitialNotification', () => {
+    test('returns native initial notification on Android', async () => {
+      setPlatform('android');
+      const initialNotification = {
+        notification: {
+          id: 'notification-id',
+          data: {
+            foo: 'bar',
+          },
+        },
+        pressAction: {
+          id: 'default',
+          launchActivity: 'default',
+        },
+      };
+
+      mockNotifeeNativeModule.getInitialNotification.mockResolvedValue(initialNotification);
+
+      const res = await apiModule.getInitialNotification();
+
+      expect(res).toEqual(initialNotification);
+      expect(mockNotifeeNativeModule.getInitialNotification).toHaveBeenCalledTimes(1);
+    });
+
+    test('returns native initial notification on iOS', async () => {
+      setPlatform('ios');
+      const initialNotification = {
+        notification: {
+          id: 'notification-id',
+        },
+        pressAction: {
+          id: 'default',
+        },
+        initialNotification: true,
+      };
+
+      mockNotifeeNativeModule.getInitialNotification.mockResolvedValue(initialNotification);
+
+      const res = await apiModule.getInitialNotification();
+
+      expect(res).toEqual(initialNotification);
+      expect(mockNotifeeNativeModule.getInitialNotification).toHaveBeenCalledTimes(1);
+    });
+
+    test('returns null on unsupported platforms', async () => {
+      setPlatform('web');
+      const res = await apiModule.getInitialNotification();
+
+      expect(res).toBeNull();
+      expect(mockNotifeeNativeModule.getInitialNotification).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('event handlers', () => {
+    test('onBackgroundEvent throws when observer is not a function', () => {
+      expect(() => apiModule.onBackgroundEvent(null as any)).toThrow(
+        "notifee.onBackgroundEvent(*) 'observer' expected a function.",
+      );
+    });
+
+    test('onBackgroundEvent accepts a valid observer', () => {
+      const observer = jest.fn(async () => undefined);
+
+      expect(() => apiModule.onBackgroundEvent(observer)).not.toThrow();
+    });
+
+    test('onForegroundEvent throws when observer is not a function', () => {
+      expect(() => apiModule.onForegroundEvent(null as any)).toThrow(
+        "notifee.onForegroundEvent(*) 'observer' expected a function.",
+      );
+    });
+
+    test('onForegroundEvent subscribes and unsubscribes correctly', () => {
+      const remove = jest.fn();
+      const addListenerSpy = jest.spyOn(apiModule.emitter, 'addListener').mockReturnValue({
+        remove,
+      } as any);
+
+      const observer = jest.fn();
+      const unsubscribe = apiModule.onForegroundEvent(observer);
+
+      expect(addListenerSpy).toHaveBeenCalledTimes(1);
+      expect(typeof unsubscribe).toBe('function');
+
+      unsubscribe();
+
+      expect(remove).toHaveBeenCalledTimes(1);
+      addListenerSpy.mockRestore();
+    });
+  });
+
+  describe('android utility methods', () => {
+    test('openAlarmPermissionSettings calls native on Android', async () => {
+      setPlatform('android');
+
+      await apiModule.openAlarmPermissionSettings();
+
+      expect(mockNotifeeNativeModule.openAlarmPermissionSettings).toHaveBeenCalledTimes(1);
+    });
+
+    test('openAlarmPermissionSettings resolves on non-Android', async () => {
+      setPlatform('ios');
+
+      await expect(apiModule.openAlarmPermissionSettings()).resolves.toBeUndefined();
+      expect(mockNotifeeNativeModule.openAlarmPermissionSettings).not.toHaveBeenCalled();
+    });
+
+    test('openBatteryOptimizationSettings calls native on Android', async () => {
+      setPlatform('android');
+
+      await apiModule.openBatteryOptimizationSettings();
+
+      expect(mockNotifeeNativeModule.openBatteryOptimizationSettings).toHaveBeenCalledTimes(1);
+    });
+
+    test('openBatteryOptimizationSettings resolves on non-Android', async () => {
+      setPlatform('ios');
+
+      await expect(apiModule.openBatteryOptimizationSettings()).resolves.toBeUndefined();
+      expect(mockNotifeeNativeModule.openBatteryOptimizationSettings).not.toHaveBeenCalled();
+    });
+
+    test('getPowerManagerInfo returns native value on Android', async () => {
+      setPlatform('android');
+      mockNotifeeNativeModule.getPowerManagerInfo.mockResolvedValue({
+        manufacturer: 'xiaomi',
+        model: 'activity-name',
+      });
+
+      const res = await apiModule.getPowerManagerInfo();
+
+      expect(res).toEqual({
+        manufacturer: 'xiaomi',
+        model: 'activity-name',
+      });
+      expect(mockNotifeeNativeModule.getPowerManagerInfo).toHaveBeenCalledTimes(1);
+    });
+
+    test('getPowerManagerInfo returns defaults on non-Android', async () => {
+      setPlatform('ios');
+
+      const res = await apiModule.getPowerManagerInfo();
+
+      expect(res).toEqual({
+        manufacturer: expect.any(String),
+        activity: null,
+      });
+      expect(mockNotifeeNativeModule.getPowerManagerInfo).not.toHaveBeenCalled();
+    });
+
+    test('openPowerManagerSettings calls native on Android', async () => {
+      setPlatform('android');
+
+      await apiModule.openPowerManagerSettings();
+
+      expect(mockNotifeeNativeModule.openPowerManagerSettings).toHaveBeenCalledTimes(1);
+    });
+
+    test('openPowerManagerSettings resolves on non-Android', async () => {
+      setPlatform('ios');
+
+      await expect(apiModule.openPowerManagerSettings()).resolves.toBeUndefined();
+      expect(mockNotifeeNativeModule.openPowerManagerSettings).not.toHaveBeenCalled();
+    });
+
+    test('stopForegroundService calls native on Android', async () => {
+      setPlatform('android');
+
+      await apiModule.stopForegroundService();
+
+      expect(mockNotifeeNativeModule.stopForegroundService).toHaveBeenCalledTimes(1);
+    });
+
+    test('stopForegroundService resolves on non-Android', async () => {
+      setPlatform('ios');
+
+      await expect(apiModule.stopForegroundService()).resolves.toBeUndefined();
+      expect(mockNotifeeNativeModule.stopForegroundService).not.toHaveBeenCalled();
+    });
+
+    test('hideNotificationDrawer calls native on Android', () => {
+      setPlatform('android');
+
+      apiModule.hideNotificationDrawer();
+
+      expect(mockNotifeeNativeModule.hideNotificationDrawer).toHaveBeenCalledTimes(1);
+    });
+
+    test('hideNotificationDrawer is a no-op on non-Android', () => {
+      setPlatform('ios');
+
+      apiModule.hideNotificationDrawer();
+
+      expect(mockNotifeeNativeModule.hideNotificationDrawer).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('requestPermission', () => {
+    test('returns Android-shaped settings on Android', async () => {
+      setPlatform('android');
+      mockNotifeeNativeModule.requestPermission.mockResolvedValue({
+        authorizationStatus: AuthorizationStatus.AUTHORIZED,
+        android: {
+          alarm: AndroidNotificationSetting.ENABLED,
+        },
+      });
+
+      const res = await apiModule.requestPermission();
+
+      expect(res).toEqual({
+        authorizationStatus: AuthorizationStatus.AUTHORIZED,
+        android: {
+          alarm: AndroidNotificationSetting.ENABLED,
+        },
+        ios: {
+          alert: 1,
+          badge: 1,
+          criticalAlert: 1,
+          showPreviews: 1,
+          sound: 1,
+          carPlay: 1,
+          lockScreen: 1,
+          announcement: 1,
+          notificationCenter: 1,
+          inAppNotificationSettings: 1,
+          authorizationStatus: AuthorizationStatus.AUTHORIZED,
+        },
+        web: {},
+      });
+      expect(mockNotifeeNativeModule.requestPermission).toHaveBeenCalledWith({});
+    });
+
+    test('returns web defaults on unsupported platforms', async () => {
+      setPlatform('web');
+
+      const res = await apiModule.requestPermission();
+
+      expect(res).toEqual({
+        authorizationStatus: AuthorizationStatus.NOT_DETERMINED,
+        android: {
+          alarm: AndroidNotificationSetting.ENABLED,
+        },
+        ios: {
+          alert: 1,
+          badge: 1,
+          criticalAlert: 1,
+          showPreviews: 1,
+          sound: 1,
+          carPlay: 1,
+          lockScreen: 1,
+          announcement: 1,
+          notificationCenter: 1,
+          inAppNotificationSettings: 1,
+          authorizationStatus: AuthorizationStatus.NOT_DETERMINED,
+        },
+        web: {},
+      });
+      expect(mockNotifeeNativeModule.requestPermission).not.toHaveBeenCalled();
     });
   });
 

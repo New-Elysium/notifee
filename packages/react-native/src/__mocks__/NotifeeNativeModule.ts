@@ -11,6 +11,7 @@ export const mockNotifeeNativeModule = {
   getTriggerNotifications: jest.fn(),
   cancelAllNotifications: jest.fn(),
   cancelAllNotificationsWithIds: jest.fn(),
+  cancelAllNotificationsWithIdsAndroid: jest.fn(),
   cancelDisplayedNotifications: jest.fn(),
   cancelDisplayedNotificationsWithIds: jest.fn(),
   cancelTriggerNotifications: jest.fn(),
