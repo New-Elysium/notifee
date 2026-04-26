@@ -1,0 +1,35 @@
+[**@psync/notifee**](react-native/reference/index)
+
+***
+
+[@psync/notifee](react-native/reference/index) / NotificationConfigIOS
+
+# Interface: NotificationConfigIOS
+
+Defined in: [packages/react-native/src/types/NotificationConfig.ts:8](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationConfig.ts#L8)
+
+iOS-specific notification configuration options.
+
+## Properties
+
+### interceptRemoteNotifications?
+
+> `optional` **interceptRemoteNotifications?**: `boolean`
+
+Defined in: [packages/react-native/src/types/NotificationConfig.ts:22](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationConfig.ts#L22)
+
+When `true` (default), Notifee intercepts iOS remote notification tap handlers,
+preventing libraries like `@react-native-firebase/messaging` from receiving
+`onNotificationOpenedApp` / `getInitialNotification` events.
+
+Set to `false` to allow other libraries to handle remote notification taps.
+Local notifications created via `displayNotification()` or `createTriggerNotification()`
+are always handled by Notifee regardless of this setting.
+
+When omitted, the native implementation defaults this to `true` for backward compatibility.
+
+#### Default
+
+```ts
+true
+```

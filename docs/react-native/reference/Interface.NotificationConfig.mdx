@@ -1,0 +1,34 @@
+[**@psync/notifee**](react-native/reference/index)
+
+***
+
+[@psync/notifee](react-native/reference/index) / NotificationConfig
+
+# Interface: NotificationConfig
+
+Defined in: [packages/react-native/src/types/NotificationConfig.ts:41](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationConfig.ts#L41)
+
+Configuration object for controlling Notifee's notification handling behavior.
+
+Use `setNotificationConfig()` to apply this configuration.
+
+```js
+import notifee from '@psync/notifee';
+
+// Allow Firebase Messaging to handle remote notification taps
+await notifee.setNotificationConfig({
+  ios: {
+    interceptRemoteNotifications: false,
+  },
+});
+```
+
+## Properties
+
+### ios?
+
+> `optional` **ios?**: [`NotificationConfigIOS`](react-native/reference/Interface.NotificationConfigIOS)
+
+Defined in: [packages/react-native/src/types/NotificationConfig.ts:45](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationConfig.ts#L45)
+
+iOS-specific notification configuration.

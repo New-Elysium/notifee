@@ -6,6 +6,8 @@
 
 # Interface: AndroidInput
 
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:537](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L537)
+
 The interface used to enable advanced user input on a notification.
 
 View the [Action Input](/react-native/android/interaction#action-input) documentation to learn more.
@@ -18,7 +20,9 @@ android
 
 ### allowFreeFormInput?
 
-> `optional` **allowFreeFormInput**: `boolean`
+> `optional` **allowFreeFormInput?**: `boolean`
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:548](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L548)
 
 Sets whether the user can freely enter text into the input.
 
@@ -29,15 +33,13 @@ This value changes the behaviour of the notification:
 
 Defaults to `true`.
 
-#### Defined in
-
-[packages/react-native/src/types/NotificationAndroid.ts:548](https://github.com/invertase/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L548)
-
 ***
 
 ### allowGeneratedReplies?
 
-> `optional` **allowGeneratedReplies**: `boolean`
+> `optional` **allowGeneratedReplies?**: `boolean`
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:558](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L558)
 
 Sets whether generated replies can be added to the action.
 
@@ -46,29 +48,25 @@ is able to generate replies.
 
 Defaults to `true`.
 
-#### Defined in
-
-[packages/react-native/src/types/NotificationAndroid.ts:558](https://github.com/invertase/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L558)
-
 ***
 
 ### choices?
 
-> `optional` **choices**: `string`\[]
+> `optional` **choices?**: `string`\[]
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:565](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L565)
 
 An array of pre-defined input choices the user can select.
 
 If `allowFreeFormInput` is `false`, this property must contain at least one choice.
 
-#### Defined in
-
-[packages/react-native/src/types/NotificationAndroid.ts:565](https://github.com/invertase/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L565)
-
 ***
 
 ### editableChoices?
 
-> `optional` **editableChoices**: `boolean`
+> `optional` **editableChoices?**: `boolean`
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:574](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L574)
 
 If `true`, the user will be able to edit the selected choice before sending the action event, however
 `allowFreeFormInput` must also be `true`.
@@ -76,18 +74,12 @@ If `true`, the user will be able to edit the selected choice before sending the 
 By default, the platform will decide whether choices can be editable. To explicitly enable or disable
 this, provide `true` or `false`.
 
-#### Defined in
-
-[packages/react-native/src/types/NotificationAndroid.ts:574](https://github.com/invertase/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L574)
-
 ***
 
 ### placeholder?
 
-> `optional` **placeholder**: `string`
+> `optional` **placeholder?**: `string`
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:579](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L579)
 
 The placeholder text to display inside of the user input area.
-
-#### Defined in
-
-[packages/react-native/src/types/NotificationAndroid.ts:579](https://github.com/invertase/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L579)

@@ -32,7 +32,7 @@
     "format:ios": "bunx clang-format -i --glob=\"ios/**/*.{h,cpp,m,mm}\" --style=Google",
     "format:ios:check": "bunx clang-format --glob=\"ios/**/*.{h,cpp,m,mm}\" --style=Google -n -Werror",
     "validate:all": "bun run validate:all:js && bun run validate:all:ts && bun run gen:reference",
-    "validate:all:js": "eslint . --ext .js,.jsx,.ts,.tsx --resolve-plugins-relative-to .",
+    "validate:all:js": "eslint . --ext .js,.jsx,.ts,.tsx",
     "validate:all:ts": "tsc --project ./",
     "lerna:bootstrap": "bun install",
     "lerna:link": "echo 'Bun workspaces handle linking natively'",

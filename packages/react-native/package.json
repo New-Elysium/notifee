@@ -1,12 +1,12 @@
 {
   "name": "@psync/notifee",
-  "version": "9.3.0",
+  "version": "9.3.1",
   "author": "Psync <oss@psync.dev> (https://psync.club)",
   "description": "Notifee - a feature rich notifications library for React Native.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "validate:all:js": "eslint . --ext .js,.jsx,.ts,.tsx --resolve-plugins-relative-to .",
+    "validate:all:js": "eslint . --ext .js,.jsx,.ts,.tsx",
     "validate:all:ts": "tsc --project ./",
     "build": "bunx genversion --es6 --semi src/version.ts && tsc",
     "build:clean": "rimraf android/libs && rimraf android/build && rimraf ios/build && rimraf dist",
