@@ -1,9 +1,5 @@
 {
-  "include": [
-    "packages/react-native/src/**/*.ts",
-    "tests_react_native/__tests__",
-    "tests_react_native/example",
-  ],
+  "include": ["packages/react-native/src/**/*.ts", "tests_react_native/__tests__"],
   "compilerOptions": {
     "noEmit": true,
     "allowJs": true,
