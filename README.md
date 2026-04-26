@@ -21,12 +21,12 @@ A feature rich Android & iOS notifications library for React Native.
 
 ## Platform Requirements
 
-| Requirement | Minimum Version |
-|-------------|-----------------|
-| React Native | 0.83+ (New Architecture only!) |
-| iOS Deployment Target | 15.1+ |
-| Android minSdk | 28+ |
-| Xcode | 16.2+ (for iOS development) |
+| Requirement           | Minimum Version                |
+| --------------------- | ------------------------------ |
+| React Native          | 0.83+ (New Architecture only!) |
+| iOS Deployment Target | 15.1+                          |
+| Android minSdk        | 28+                            |
+| Xcode                 | 16.2+ (for iOS development)    |
 
 ## Installation
 
@@ -47,8 +47,39 @@ bun add @psync/notifee
 - [Overview](https://notifee.app/react-native/docs/overview)
 - [Reference](https://notifee.app/react-native/reference)
 
-## Expo Support TODOs
+## Expo Support
 
+`@psync/notifee` ships an official Expo config plugin for `expo prebuild`. Add it to your Expo config:
+
+```js
+export default {
+  expo: {
+    plugins: [
+      [
+        '@psync/notifee',
+        {
+          apsEnvMode: 'development',
+          backgroundModes: ['remote-notification'],
+          androidIcons: [
+            {
+              name: 'ic_stat_notify',
+              path: './assets/notifications/ic_stat_notify.png',
+              type: 'small',
+            },
+          ],
+          enableNotificationServiceExtension: true,
+          iosSoundFiles: ['./assets/notifications/chime.wav'],
+          iosDeploymentTarget: '15.1',
+        },
+      ],
+    ],
+  },
+};
+```
+
+See the [package README](./packages/react-native/README.md#expo-config-plugin) for all supported options.
+
+## Expo Support TODOs
 - [ ] Add an Expo Router deep-link helper preset for common notification press/open flows
 - [ ] Publish a companion `expo-build-properties` preset / guide for SDK, JDK, and native build alignment
 - [ ] Add config-plugin support for foreground service manifest customization
@@ -119,7 +150,7 @@ The APIs for Android allow for creating rich, styled and highly interactive noti
 | [Channels & Groups](https://notifee.app/react-native/docs/android/channels)              | Organize your notifications into channels & groups to allow users to control how notifications are handled on their device        |
 | [Foreground Service](https://notifee.app/react-native/docs/android/foreground-service)   | Long running background tasks can take advantage of an Android Foreground Service to display an on-going, prominent notification. |
 | [Grouping & Sorting](https://notifee.app/react-native/docs/android/grouping-and-sorting) | Group and sort related notifications in a single notification pane.                                                               |
-| [Interaction](https://notifee.app/react-native/docs/android/interaction)                 | Allow users to interact with your application directly from the notification, with actions.                                        |
+| [Interaction](https://notifee.app/react-native/docs/android/interaction)                 | Allow users to interact with your application directly from the notification, with actions.                                       |
 | [Progress Indicators](https://notifee.app/react-native/docs/android/progress-indicators) | Show users a progress indicator of an on-going background task, and learn how to keep it updated.                                 |
 | [Styles](https://notifee.app/react-native/docs/android/styles)                           | Style notifications to show richer content, such as expandable images/text, or message conversations.                             |
 | [Timers](https://notifee.app/react-native/docs/android/timers)                           | Display counting timers on your notification, useful for on-going tasks such as a phone call, or event time remaining.            |
@@ -128,13 +159,13 @@ The APIs for Android allow for creating rich, styled and highly interactive noti
 
 Below you'll find guides that cover the supported iOS features.
 
-| Topic                                                             |                                                                          |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [Appearance](https://notifee.app/react-native/docs/ios/appearance)           | Change how the notification is displayed to your users.       |
-| [Behaviour](https://notifee.app/react-native/docs/ios/behaviour)            | Control how notifications behave when they are displayed on a device; sound, crtitial alerts, etc.  |
-| [Categories](https://notifee.app/react-native/docs/ios/categories) | Create & assign categories to notifications.          |
-| [Interaction](https://notifee.app/react-native/docs/ios/interaction)                 | Handle user interaction with your notifications. |                                                    |
-| [Permissions](https://notifee.app/react-native/docs/ios/permissions)                 | Request permission from your application users to display notifications. |                                                    |
+| Topic                                                                |                                                                                                    |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | --- |
+| [Appearance](https://notifee.app/react-native/docs/ios/appearance)   | Change how the notification is displayed to your users.                                            |
+| [Behaviour](https://notifee.app/react-native/docs/ios/behaviour)     | Control how notifications behave when they are displayed on a device; sound, crtitial alerts, etc. |
+| [Categories](https://notifee.app/react-native/docs/ios/categories)   | Create & assign categories to notifications.                                                       |
+| [Interaction](https://notifee.app/react-native/docs/ios/interaction) | Handle user interaction with your notifications.                                                   |     |
+| [Permissions](https://notifee.app/react-native/docs/ios/permissions) | Request permission from your application users to display notifications.                           |     |
 
 ### Jest Testing
 
@@ -165,7 +196,7 @@ setupFiles: ['<rootDir>/jest.setup.js'],
 You can then add the following line to that setup file to mock `notifee`:
 
 ```js
-jest.mock('@psync/notifee', () => require('@psync/notifee/jest-mock'))
+jest.mock('@psync/notifee', () => require('@psync/notifee/jest-mock'));
 ```
 
 You will also need to add `@psync/notifee` to `transformIgnorePatterns` in your config file (`jest.config.js`):
@@ -200,9 +231,6 @@ To utilise Detox's functionality to mock a local notification and trigger notife
 
 The important part is to make sure you have a `__notifee_notification` object under `payload` with the default properties.
 
-## Firebase Integration
-
-If using Firebase Cloud Messaging with Notifee, see the [Firebase Migration Guide](./FIREBASE_MIGRATION_v14_to_v23.md) for upgrading from v14 to v23.
 
 **Note**: Firebase Dynamic Links has been deprecated and removed. Migrate to Universal Links (iOS) and App Links (Android) for deep linking functionality.
 

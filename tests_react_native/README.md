@@ -8,10 +8,9 @@ Tests are powered by [Jet ✈️](https://github.com/invertase/jet).
 
 ## Requirements
 
-- Make sure you have **Xcode 16.2+** installed (required for Firebase v23+).
-- Make sure you have NodeJS installed (Node 20+ is required for Firebase JS SDK v12+).
+- Make sure you have **Xcode 16.2+** installed.
+- Make sure you have NodeJS 24+ installed.
 - Make sure you have all required dependencies installed:
-
   - [Apple Sim Utils](https://github.com/wix/AppleSimulatorUtils):
 
     ```bash
@@ -23,9 +22,8 @@ Tests are powered by [Jet ✈️](https://github.com/invertase/jet).
 
 ### Firebase Integration
 
-This test project uses Firebase Cloud Messaging for push notification testing. The Firebase packages have been updated to v23.
+This test project uses Firebase Cloud Messaging for push notification testing.
 
-- See [Firebase Migration Guide](../../FIREBASE_MIGRATION_v14_to_v23.md) for details on breaking changes
 - **Note**: Firebase Dynamic Links has been removed. If you need deep linking, use Universal Links (iOS) and App Links (Android)
 
 ---
@@ -44,25 +42,21 @@ yarn build:all:clean
 ### Step 1: Install test project dependencies
 
 ```bash
-yarn
-yarn tests_rn:ios:pod:install
+bun install
+cd ios && pod install && cd ..
 ```
 
 ---
 
-### Step 2: Start Packager Script
-
-Start the React Native packager using the script provided;
+### Step 2: Start Metro Packager
 
 ```bash
-yarn tests_rn:packager:jet
+bun run tests_rn:packager:jet
 ```
 
-> ⚠️ It must be this script only that starts the RN Packager, using the default RN packager command will not work.
+> ⚠️ It must be this script only that starts the RN Packager — the default RN packager command will not work.
 
-> ⚠️ Also ensure that all existing packagers are terminated and that you have no React Native debugger tabs open on your browsers.
-
-> This packager will automatically rebuild on any JS changes to the library code. You don't need to restart this, leave it running whilst developing.
+> ⚠️ Ensure all existing packagers are terminated and that you have no React Native debugger tabs open in your browser.
 
 ---
 
@@ -75,13 +69,13 @@ As always; the first build for each platform will take a while. Subsequent build
 #### Android
 
 ```bash
-yarn tests_rn:android:build
+bun run tests_rn:android:build
 ```
 
 #### iOS
 
 ```bash
-yarn tests_rn:ios:build
+bun run tests_rn:ios:build
 ```
 
 ---
