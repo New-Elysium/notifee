@@ -78,6 +78,12 @@ export default [
     },
   },
   {
+    files: ['packages/react-native/src/specs/NativeNotifeeModule.ts'],
+    rules: {
+      '@typescript-eslint/no-wrapper-object-types': 'off',
+    },
+  },
+  {
     ignores: [
       'node_modules/**',
       'build/**',
@@ -86,6 +92,8 @@ export default [
       '*.min.js',
       'android/build/**',
       'ios/build/**',
+      'packages/react-native/dist/**',
+      'packages/react-native/TEMP/**',
       'packages/react-native/example/**',
       'tests_react_native/**',
       'docs/**',

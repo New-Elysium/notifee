@@ -1,0 +1,1516 @@
+[**@psync/notifee**](react-native/reference/index)
+
+***
+
+[@psync/notifee](react-native/reference/index) / ModuleWithStatics
+
+# Interface: ModuleWithStatics
+
+Defined in: [packages/react-native/src/types/Module.ts:664](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L664)
+
+Interface describing the static properties available on the default `@psync/notifee` export.
+
+```js
+import notifee from `@psync/notifee`;
+
+console.log(notifee.SDK_VERSION);
+```
+
+## Extends
+
+* [`Module`](react-native/reference/Interface.Module).[`ModuleStatics`](react-native/reference/Interface.ModuleStatics)
+
+## Properties
+
+### SDK\_VERSION
+
+> **SDK\_VERSION**: `string`
+
+Defined in: [packages/react-native/src/types/Module.ts:661](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L661)
+
+Returns the current Notifee SDK version in use.
+
+#### Inherited from
+
+[`ModuleStatics`](react-native/reference/Interface.ModuleStatics).[`SDK_VERSION`](react-native/reference/Interface.ModuleStatics#sdk_version)
+
+## Methods
+
+### cancelAllNotifications()
+
+> **cancelAllNotifications**(`notificationIds?`, `tag?`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:33](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L33)
+
+API used to cancel all notifications.
+
+The `cancelAllNotifications` API removes any displayed notifications from the users device and
+any pending trigger notifications.
+
+This method does not cancel Android [Foreground Service](/react-native/android/foreground-service)
+notifications.
+
+#### Parameters
+
+##### notificationIds?
+
+`string`\[]
+
+An array of notifications IDs. This is automatically generated and returned
+when creating a notification, or has been set manually via the `id` property.
+
+##### tag?
+
+`string`
+
+The tag set when creating the notification. This is only relative to Android.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`cancelAllNotifications`](react-native/reference/Interface.Module#cancelallnotifications)
+
+***
+
+### cancelDisplayedNotification()
+
+> **cancelDisplayedNotification**(`notificationId`, `tag?`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:76](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L76)
+
+API used to cancel a single displayed notification.
+
+This method does not cancel [Foreground Service](/react-native/android/foreground-service)
+notifications.
+
+#### Parameters
+
+##### notificationId
+
+`string`
+
+The unique notification ID. This is automatically generated and returned
+when creating a notification, or has been set manually via the `id` property.
+
+##### tag?
+
+`string`
+
+The tag set when creating the notification. This is only relative to Android.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`cancelDisplayedNotification`](react-native/reference/Interface.Module#canceldisplayednotification)
+
+***
+
+### cancelDisplayedNotifications()
+
+> **cancelDisplayedNotifications**(`notificationIds?`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:41](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L41)
+
+API used to cancel any displayed notifications.
+
+This method does not cancel Android [Foreground Service](/react-native/android/foreground-service)
+notifications.
+
+#### Parameters
+
+##### notificationIds?
+
+`string`\[]
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`cancelDisplayedNotifications`](react-native/reference/Interface.Module#canceldisplayednotifications)
+
+***
+
+### cancelNotification()
+
+> **cancelNotification**(`notificationId`, `tag?`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:62](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L62)
+
+API used to cancel a single notification.
+
+The `cancelNotification` API removes any displayed notifications or ones with triggers
+set for the specified ID.
+
+This method does not cancel [Foreground Service](/react-native/android/foreground-service)
+notifications.
+
+#### Parameters
+
+##### notificationId
+
+`string`
+
+The unique notification ID. This is automatically generated and returned
+when creating a notification, or has been set manually via the `id` property.
+
+##### tag?
+
+`string`
+
+The tag set when creating the notification. This is only relative to Android.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`cancelNotification`](react-native/reference/Interface.Module#cancelnotification)
+
+***
+
+### cancelTriggerNotification()
+
+> **cancelTriggerNotification**(`notificationId`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:85](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L85)
+
+API used to cancel a single trigger notification.
+
+#### Parameters
+
+##### notificationId
+
+`string`
+
+The unique notification ID. This is automatically generated and returned
+when creating a notification, or has been set manually via the `id` property.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`cancelTriggerNotification`](react-native/reference/Interface.Module#canceltriggernotification)
+
+***
+
+### cancelTriggerNotifications()
+
+> **cancelTriggerNotifications**(`notificationIds?`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:46](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L46)
+
+API used to cancel any trigger notifications.
+
+#### Parameters
+
+##### notificationIds?
+
+`string`\[]
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`cancelTriggerNotifications`](react-native/reference/Interface.Module#canceltriggernotifications)
+
+***
+
+### createChannel()
+
+> **createChannel**(`channel`): `Promise`<`string`>
+
+Defined in: [packages/react-native/src/types/Module.ts:104](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L104)
+
+API to create and update channels on supported Android devices.
+
+Creates a new Android channel. Channels are used to collectively assign notifications to
+a single responsible channel. Users can manage settings for channels, e.g. disabling sound or vibration.
+Channels can be further organized into groups (see `createChannelGroup`).
+
+By providing a `groupId` property, channels can be assigned to groups created with
+[`createChannelGroup`](/react-native/reference/createchannelgroup).
+
+The channel ID is returned once the operation has completed.
+
+View the [Channels & Groups](/react-native/android/channels) documentation for more information.
+
+#### Parameters
+
+##### channel
+
+[`AndroidChannel`](react-native/reference/Interface.AndroidChannel)
+
+The [`AndroidChannel`](/react-native/reference/androidchannel) interface used to create/update a group.
+
+#### Returns
+
+`Promise`<`string`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`createChannel`](react-native/reference/Interface.Module#createchannel)
+
+***
+
+### createChannelGroup()
+
+> **createChannelGroup**(`channelGroup`): `Promise`<`string`>
+
+Defined in: [packages/react-native/src/types/Module.ts:135](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L135)
+
+API to create or update a channel group on supported Android devices.
+
+Creates a new Android channel group. Groups are used to further organize the appearance of your
+channels in the settings UI. Groups allow users to easily identify and control multiple
+notification channels.
+
+Channels can be assigned to groups during creation using the
+[`createChannel`](/react-native/reference/createchannel) method.
+
+The channel group ID is returned once the operation has completed.
+
+View the [Channels & Groups](/react-native/android/channels) documentation for more information.
+
+#### Parameters
+
+##### channelGroup
+
+[`AndroidChannelGroup`](react-native/reference/Interface.AndroidChannelGroup)
+
+The [`AndroidChannelGroup`](/react-native/reference/androidchannelgroup)
+interface used to create/update a group.
+
+#### Returns
+
+`Promise`<`string`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`createChannelGroup`](react-native/reference/Interface.Module#createchannelgroup)
+
+***
+
+### createChannelGroups()
+
+> **createChannelGroups**(`channelGroups`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:146](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L146)
+
+API to create and update multiple channel groups on supported Android devices.
+
+This API is used to perform a single operation to create or update channel groups. See the
+[`createChannelGroup`](/react-native/reference/createchannelgroup) documentation for more information.
+
+#### Parameters
+
+##### channelGroups
+
+[`AndroidChannelGroup`](react-native/reference/Interface.AndroidChannelGroup)\[]
+
+An array of [`AndroidChannelGroup`](/react-native/reference/androidchannelgroup) interfaces.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`createChannelGroups`](react-native/reference/Interface.Module#createchannelgroups)
+
+***
+
+### createChannels()
+
+> **createChannels**(`channels`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:115](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L115)
+
+API to create and update multiple channels on supported Android devices.
+
+This API is used to perform a single operation to create or update channels. See the
+[`createChannel`](/react-native/reference/createchannel) documentation for more information.
+
+#### Parameters
+
+##### channels
+
+[`AndroidChannel`](react-native/reference/Interface.AndroidChannel)\[]
+
+An array of [`AndroidChannel`](/react-native/reference/androidchannel) interfaces.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`createChannels`](react-native/reference/Interface.Module#createchannels)
+
+***
+
+### createTriggerNotification()
+
+> **createTriggerNotification**(`notification`, `trigger`): `Promise`<`string`>
+
+Defined in: [packages/react-native/src/types/Module.ts:223](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L223)
+
+API used to create a trigger notification.
+
+All channels/categories should be created before calling this method during the apps lifecycle.
+
+View the [Triggers](/react-native/triggers) documentation for more information.
+
+#### Parameters
+
+##### notification
+
+[`Notification`](react-native/reference/Interface.Notification)
+
+The [`Notification`](/react-native/reference/notification) interface used
+to create a notification.
+
+##### trigger
+
+[`Trigger`](react-native/reference/TypeAlias.Trigger)
+
+The [`Trigger`](/react-native/reference/trigger) interface used
+to create a trigger.
+
+#### Returns
+
+`Promise`<`string`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`createTriggerNotification`](react-native/reference/Interface.Module#createtriggernotification)
+
+***
+
+### decrementBadgeCount()
+
+> **decrementBadgeCount**(`decrementBy?`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:549](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L549)
+
+Decrements the badge count for this application on the current device by a specified
+value.
+
+Defaults to an decrement of `1`.
+
+#### Parameters
+
+##### decrementBy?
+
+`number`
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+ios
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`decrementBadgeCount`](react-native/reference/Interface.Module#decrementbadgecount)
+
+***
+
+### deleteChannel()
+
+> **deleteChannel**(`channelId`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:161](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L161)
+
+API used to delete a channel by ID on supported Android devices.
+
+Channels can be deleted using this API by providing the channel ID. Channel information (including
+the ID) can be retrieved from the [`getChannels`](/react-native/reference/getchannels) API.
+
+> When a channel is deleted, notifications assigned to that channel will fail to display.
+
+View the [Channels & Groups](/react-native/android/channels) documentation for more information.
+
+#### Parameters
+
+##### channelId
+
+`string`
+
+The unique channel ID to delete.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`deleteChannel`](react-native/reference/Interface.Module#deletechannel)
+
+***
+
+### deleteChannelGroup()
+
+> **deleteChannelGroup**(`channelGroupId`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:177](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L177)
+
+API used to delete a channel group by ID on supported Android devices.
+
+Channel groups can be deleted using this API by providing the channel ID. Channel information (including
+the ID) can be retrieved from the [`getChannels`](/react-native/reference/getchannels) API.
+
+Deleting a group does not delete channels which are assigned to the group, they will instead be
+unassigned the group and continue to function as expected.
+
+View the [Channels & Groups](/react-native/android/channels) documentation for more information.
+
+#### Parameters
+
+##### channelGroupId
+
+`string`
+
+The unique channel group ID to delete.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`deleteChannelGroup`](react-native/reference/Interface.Module#deletechannelgroup)
+
+***
+
+### displayNotification()
+
+> **displayNotification**(`notification`): `Promise`<`string`>
+
+Defined in: [packages/react-native/src/types/Module.ts:191](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L191)
+
+API used to immediately display or update a notification on the users device.
+
+This API is used to display a notification on the users device. All
+channels/categories should be created before triggering this method during the apps lifecycle.
+
+View the [Displaying a Notification](/react-native/displaying-a-notification)
+documentation for more information.
+
+#### Parameters
+
+##### notification
+
+[`Notification`](react-native/reference/Interface.Notification)
+
+The [`Notification`](/react-native/reference/notification) interface used
+to create a notification for both Android & iOS.
+
+#### Returns
+
+`Promise`<`string`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`displayNotification`](react-native/reference/Interface.Module#displaynotification)
+
+***
+
+### getBadgeCount()
+
+> **getBadgeCount**(): `Promise`<`number`>
+
+Defined in: [packages/react-native/src/types/Module.ts:515](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L515)
+
+Get the current badge count value for this application on the current device.
+
+Returns `0` on Android.
+
+#### Returns
+
+`Promise`<`number`>
+
+#### Platform
+
+ios
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getBadgeCount`](react-native/reference/Interface.Module#getbadgecount)
+
+***
+
+### getChannel()
+
+> **getChannel**(`channelId`): `Promise`<[`NativeAndroidChannel`](react-native/reference/Interface.NativeAndroidChannel) | `null`>
+
+Defined in: [packages/react-native/src/types/Module.ts:258](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L258)
+
+API used to return a channel on supported Android devices.
+
+This API is used to return a `NativeAndroidChannel`. Returns `null` if no channel could be matched to
+the given ID.
+
+A "native channel" also includes additional properties about the channel at the time it's
+retrieved from the device. View the [`NativeAndroidChannel`](/react-native/reference/nativeandroidchannel)
+documentation for more information.
+
+View the [Channels & Groups](/react-native/android/channels) documentation for more information.
+
+#### Parameters
+
+##### channelId
+
+`string`
+
+The channel ID created with [`createChannel`](/react-native/reference/createchannel). If
+a unknown channel ID is provided, `null` is returned.
+
+#### Returns
+
+`Promise`<[`NativeAndroidChannel`](react-native/reference/Interface.NativeAndroidChannel) | `null`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getChannel`](react-native/reference/Interface.Module#getchannel)
+
+***
+
+### getChannelGroup()
+
+> **getChannelGroup**(`channelGroupId`): `Promise`<[`NativeAndroidChannelGroup`](react-native/reference/Interface.NativeAndroidChannelGroup) | `null`>
+
+Defined in: [packages/react-native/src/types/Module.ts:310](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L310)
+
+API used to return a channel group on supported Android devices.
+
+This API is used to return an `NativeAndroidChannelGroup`. Returns `null` if no channel could be matched to
+the given ID.
+
+A "native channel group" also includes additional properties about the channel group at the time it's
+retrieved from the device. View the [`NativeAndroidChannelGroup`](/react-native/reference/nativeandroidchannelgroup)
+documentation for more information.
+
+View the [Channels & Groups](/react-native/android/channels) documentation for more information.
+
+#### Parameters
+
+##### channelGroupId
+
+`string`
+
+The channel ID created with [`createChannelGroup`](/react-native/reference/createchannelgroup). If
+a unknown channel group ID is provided, `null` is returned.
+
+#### Returns
+
+`Promise`<[`NativeAndroidChannelGroup`](react-native/reference/Interface.NativeAndroidChannelGroup) | `null`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getChannelGroup`](react-native/reference/Interface.Module#getchannelgroup)
+
+***
+
+### getChannelGroups()
+
+> **getChannelGroups**(): `Promise`<[`NativeAndroidChannelGroup`](react-native/reference/Interface.NativeAndroidChannelGroup)\[]>
+
+Defined in: [packages/react-native/src/types/Module.ts:326](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L326)
+
+API used to return all channel groups on supported Android devices.
+
+This API is used to return a `NativeAndroidChannelGroup`. Returns an empty array if no channel
+groups exist.
+
+A "native channel group" also includes additional properties about the channel group at the time it's
+retrieved from the device. View the [`NativeAndroidChannelGroup`](/react-native/reference/nativeandroidchannelgroup)
+documentation for more information.
+
+View the [Channels & Groups](/react-native/android/channels) documentation for more information.
+
+#### Returns
+
+`Promise`<[`NativeAndroidChannelGroup`](react-native/reference/Interface.NativeAndroidChannelGroup)\[]>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getChannelGroups`](react-native/reference/Interface.Module#getchannelgroups)
+
+***
+
+### getChannels()
+
+> **getChannels**(): `Promise`<[`NativeAndroidChannel`](react-native/reference/Interface.NativeAndroidChannel)\[]>
+
+Defined in: [packages/react-native/src/types/Module.ts:292](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L292)
+
+API used to return all channels on supported Android devices.
+
+This API is used to return a `NativeAndroidChannel`. Returns an empty array if no channels
+exist.
+
+A "native channel" also includes additional properties about the channel at the time it's
+retrieved from the device. View the [`NativeAndroidChannel`](/react-native/reference/nativeandroidchannel)
+documentation for more information.
+
+View the [Channels & Groups](/react-native/android/channels) documentation for more information.
+
+#### Returns
+
+`Promise`<[`NativeAndroidChannel`](react-native/reference/Interface.NativeAndroidChannel)\[]>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getChannels`](react-native/reference/Interface.Module#getchannels)
+
+***
+
+### getDisplayedNotifications()
+
+> **getDisplayedNotifications**(): `Promise`<[`DisplayedNotification`](react-native/reference/Interface.DisplayedNotification)\[]>
+
+Defined in: [packages/react-native/src/types/Module.ts:235](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L235)
+
+API used to return the notifications that are displayed.
+
+#### Returns
+
+`Promise`<[`DisplayedNotification`](react-native/reference/Interface.DisplayedNotification)\[]>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getDisplayedNotifications`](react-native/reference/Interface.Module#getdisplayednotifications)
+
+***
+
+### getInitialNotification()
+
+> **getInitialNotification**(): `Promise`<[`InitialNotification`](react-native/reference/Interface.InitialNotification) | `null`>
+
+Defined in: [packages/react-native/src/types/Module.ts:343](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L343)
+
+API used to fetch the notification which causes the application to open.
+
+This API can be used to fetch which notification & press action has caused the application to
+open. The call returns a `null` value when the application wasn't launched by a notification.
+
+Once the initial notification has been consumed by this API, it is removed and will no longer
+be available. It will also be removed if the user relaunches the application.
+
+View the [App open events](/react-native/events#app-open-events) documentation for more
+information and example usage.
+
+Deprecated for iOS in favour of `onForegroundEvent` - you can still use this method on iOS
+but you will also receive a `onForegroundEvent`
+
+#### Returns
+
+`Promise`<[`InitialNotification`](react-native/reference/Interface.InitialNotification) | `null`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getInitialNotification`](react-native/reference/Interface.Module#getinitialnotification)
+
+***
+
+### getNotificationCategories()
+
+> **getNotificationCategories**(): `Promise`<[`IOSNotificationCategory`](react-native/reference/Interface.IOSNotificationCategory)\[]>
+
+Defined in: [packages/react-native/src/types/Module.ts:499](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L499)
+
+Gets the currently set notification categories on this Apple device.
+
+Returns an empty array on Android.
+
+#### Returns
+
+`Promise`<[`IOSNotificationCategory`](react-native/reference/Interface.IOSNotificationCategory)\[]>
+
+#### Platform
+
+ios
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getNotificationCategories`](react-native/reference/Interface.Module#getnotificationcategories)
+
+***
+
+### getNotificationSettings()
+
+> **getNotificationSettings**(): `Promise`<[`NotificationSettings`](react-native/reference/Interface.NotificationSettings)>
+
+Defined in: [packages/react-native/src/types/Module.ts:506](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L506)
+
+Get the current notification settings for this application on the current device.
+On Android, `authorizationStatus` will return only either `AuthorizationStatus.DENIED` or `AuthorizationStatus.AUTHORIZED`
+and all of the properties on the `IOSNotificationSettings` interface response return as `AUTHORIZED`.
+
+#### Returns
+
+`Promise`<[`NotificationSettings`](react-native/reference/Interface.NotificationSettings)>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getNotificationSettings`](react-native/reference/Interface.Module#getnotificationsettings)
+
+***
+
+### getPowerManagerInfo()
+
+> **getPowerManagerInfo**(): `Promise`<[`PowerManagerInfo`](react-native/reference/Interface.PowerManagerInfo)>
+
+Defined in: [packages/react-native/src/types/Module.ts:599](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L599)
+
+API used to get information about the device and its power manager settings, including manufacturer, model, version and activity.
+
+If `activity` is `null`, `openPowerManagerSettings()` will be noop.
+
+On iOS, an instance of `PowerManagerInfo` will be returned with `activity` set to `null`.
+
+View the [Background Restrictions](/react-native/android/background-restrictions) documentation for more information.
+
+```js
+import notifee from `@psync/notifee`;
+
+const powerManagerInfo = await notifee.getPowerManagerInfo();
+
+if (powerManagerInfo.activity) {
+ // 1. ask the user to adjust their Power Manager settings
+ // ...
+
+ // 2. open settings
+ await notifee.openPowerManagerSettings();
+}
+```
+
+#### Returns
+
+`Promise`<[`PowerManagerInfo`](react-native/reference/Interface.PowerManagerInfo)>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getPowerManagerInfo`](react-native/reference/Interface.Module#getpowermanagerinfo)
+
+***
+
+### getTriggerNotificationIds()
+
+> **getTriggerNotificationIds**(): `Promise`<`string`\[]>
+
+Defined in: [packages/react-native/src/types/Module.ts:230](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L230)
+
+API used to return the ids of trigger notifications that are pending.
+
+View the [Triggers](/react-native/triggers) documentation for more information.
+
+#### Returns
+
+`Promise`<`string`\[]>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getTriggerNotificationIds`](react-native/reference/Interface.Module#gettriggernotificationids)
+
+***
+
+### getTriggerNotifications()
+
+> **getTriggerNotifications**(): `Promise`<[`TriggerNotification`](react-native/reference/Interface.TriggerNotification)\[]>
+
+Defined in: [packages/react-native/src/types/Module.ts:240](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L240)
+
+API used to return the trigger notifications that are pending.
+
+#### Returns
+
+`Promise`<[`TriggerNotification`](react-native/reference/Interface.TriggerNotification)\[]>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`getTriggerNotifications`](react-native/reference/Interface.Module#gettriggernotifications)
+
+***
+
+### handleFcmMessage()
+
+> **handleFcmMessage**(`remoteMessage`): `Promise`<`string` | `null`>
+
+Defined in: [packages/react-native/src/types/Module.ts:196](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L196)
+
+Displays a notification from an FCM remote message using notifee-compatible payload fields.
+
+#### Parameters
+
+##### remoteMessage
+
+[`FcmRemoteMessage`](react-native/reference/TypeAlias.FcmRemoteMessage)
+
+#### Returns
+
+`Promise`<`string` | `null`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`handleFcmMessage`](react-native/reference/Interface.Module#handlefcmmessage)
+
+***
+
+### hideNotificationDrawer()
+
+> **hideNotificationDrawer**(): `void`
+
+Defined in: [packages/react-native/src/types/Module.ts:645](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L645)
+
+API used to hide the notification drawer, for example,
+when the user presses one of the quick actions on the notification, you may wish to hide the drawer.
+
+Please use this functionality carefully as it could potentially be quite intrusive to the user.
+
+Requires the following permission to be added to your `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+```
+
+```js
+import notifee from `@psync/notifee`;
+
+notifee.hideNotificationDrawer();
+```
+
+#### Returns
+
+`void`
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`hideNotificationDrawer`](react-native/reference/Interface.Module#hidenotificationdrawer)
+
+***
+
+### incrementBadgeCount()
+
+> **incrementBadgeCount**(`incrementBy?`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:539](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L539)
+
+Increments the badge count for this application on the current device by a specified
+value.
+
+Defaults to an increment of `1`.
+
+#### Parameters
+
+##### incrementBy?
+
+`number`
+
+The value to increment the badge count by.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+ios
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`incrementBadgeCount`](react-native/reference/Interface.Module#incrementbadgecount)
+
+***
+
+### isBatteryOptimizationEnabled()
+
+> **isBatteryOptimizationEnabled**(): `Promise`<`boolean`>
+
+Defined in: [packages/react-native/src/types/Module.ts:572](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L572)
+
+API used to check if battery optimization is enabled for your application.
+
+Supports API versions >= 23.
+
+View the [Background Restrictions](/react-native/android/behaviour#background-restrictions) documentation for more information.
+
+#### Returns
+
+`Promise`<`boolean`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`isBatteryOptimizationEnabled`](react-native/reference/Interface.Module#isbatteryoptimizationenabled)
+
+***
+
+### isChannelBlocked()
+
+> **isChannelBlocked**(`channelId`): `Promise`<`boolean`>
+
+Defined in: [packages/react-native/src/types/Module.ts:276](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L276)
+
+API used to check if a channel is blocked.
+
+On iOS, this will default to false
+
+#### Parameters
+
+##### channelId
+
+`string`
+
+#### Returns
+
+`Promise`<`boolean`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`isChannelBlocked`](react-native/reference/Interface.Module#ischannelblocked)
+
+***
+
+### isChannelCreated()
+
+> **isChannelCreated**(`channelId`): `Promise`<`boolean`>
+
+Defined in: [packages/react-native/src/types/Module.ts:267](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L267)
+
+API used to check if a channel is created.
+
+On iOS, this will default to true
+
+#### Parameters
+
+##### channelId
+
+`string`
+
+#### Returns
+
+`Promise`<`boolean`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`isChannelCreated`](react-native/reference/Interface.Module#ischannelcreated)
+
+***
+
+### onBackgroundEvent()
+
+> **onBackgroundEvent**(`observer`): `void`
+
+Defined in: [packages/react-native/src/types/Module.ts:360](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L360)
+
+API used to handle events when the application is in a background state.
+
+Applications in a background state will use an event handler registered by this API method
+to send events. The handler must return a Promise once complete and only a single event handler
+can be registered for the application.
+
+View the [Background events](/react-native/events#background-events) documentation for more
+information and example usage.
+
+To listen to foreground events, see the [`onForegroundEvent`](/react-native/reference/onforegroundevent) documentation.
+
+#### Parameters
+
+##### observer
+
+(`event`) => `Promise`<`void`>
+
+A Function which returns a Promise, called on a new event when the application
+is in a background state.
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`onBackgroundEvent`](react-native/reference/Interface.Module#onbackgroundevent)
+
+***
+
+### onForegroundEvent()
+
+> **onForegroundEvent**(`observer`): () => `void`
+
+Defined in: [packages/react-native/src/types/Module.ts:377](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L377)
+
+API used to handle events when the application is in a foreground state.
+
+Applications in a foreground state will use an event handler registered by this API method
+to send events. Multiple foreground observers can be registered throughout the applications
+lifecycle. The method returns a function, used to unsubscribe from further events,
+
+View the [Foreground events](/react-native/events#foreground-events) documentation for more
+information and example usage.
+
+To listen to background events, see the [`onBackgroundEvent`](/react-native/reference/onbackgroundevent) documentation.
+
+#### Parameters
+
+##### observer
+
+(`event`) => `void`
+
+A Function which returns a Promise, called on a new event when the application
+is in a foreground state.
+
+#### Returns
+
+() => `void`
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`onForegroundEvent`](react-native/reference/Interface.Module#onforegroundevent)
+
+***
+
+### openAlarmPermissionSettings()
+
+> **openAlarmPermissionSettings**(): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:208](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L208)
+
+API used to open the Android Alarm special access settings for the application.
+
+On Android >= 12 / API >= 31, the alarm special access settings screen is displayed, otherwise,
+this is a no-op & instantly resolves.
+
+View the [Trigger](/react-native/android/triggers#android-12-limitations) documentation for more information.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`openAlarmPermissionSettings`](react-native/reference/Interface.Module#openalarmpermissionsettings)
+
+***
+
+### openBatteryOptimizationSettings()
+
+> **openBatteryOptimizationSettings**(): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:561](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L561)
+
+API used to open the Android System settings for the application.
+
+If the API version is >= 23, the battery optimization settings screen is displayed, otherwise,
+this is a no-op & instantly resolves.
+
+View the [Background Restrictions](/react-native/android/behaviour#background-restrictions) documentation for more information.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`openBatteryOptimizationSettings`](react-native/reference/Interface.Module#openbatteryoptimizationsettings)
+
+***
+
+### openNotificationSettings()
+
+> **openNotificationSettings**(`channelId?`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:398](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L398)
+
+API used to open the Android System settings for the application.
+
+If the API version is >= 26:
+
+* With no `channelId`, the notification settings screen is displayed.
+* With a `channelId`, the notification settings screen for the specific channel is displayed.
+
+If the API version is < 26, the application settings screen is displayed. The `channelId`
+is ignored.
+
+If an invalid `channelId` is provided (e.g. does not exist), the settings screen will redirect
+back to your application.
+
+On iOS, this is a no-op & instantly resolves.
+
+#### Parameters
+
+##### channelId?
+
+`string`
+
+The ID of the channel which will be opened. Can be ignored/omitted to display the
+overall notification settings.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`openNotificationSettings`](react-native/reference/Interface.Module#opennotificationsettings)
+
+***
+
+### openPowerManagerSettings()
+
+> **openPowerManagerSettings**(): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:624](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L624)
+
+API used to navigate to the appropriate Android System settings for the device.
+
+Call `getPowerManagerInfo()` first to find out if the user's device is supported.
+
+View the [Background Restrictions](/react-native/android/background-restrictions) documentation for more information.
+
+```js
+import notifee from `@psync/notifee`;
+
+const powerManagerInfo = await notifee.getPowerManagerInfo
+
+if (powerManagerInfo.activity) {
+// 1. ask the user to adjust their Power Manager settings
+// ...
+
+// 2. if yes, navigate them to settings
+await notifee.openPowerManagerSettings();
+}
+```
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`openPowerManagerSettings`](react-native/reference/Interface.Module#openpowermanagersettings)
+
+***
+
+### registerForegroundService()
+
+> **registerForegroundService**(`task`): `void`
+
+Defined in: [packages/react-native/src/types/Module.ts:415](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L415)
+
+API used to register a foreground service on Android devices.
+
+This method is used to register a long running task which can be used with Foreground Service
+notifications.
+
+Only a single foreground service can exist for the application, and calling this method more
+than once will update the existing task runner.
+
+View the [Foreground Service](/react-native/android/foreground-service) documentation for
+more information.
+
+#### Parameters
+
+##### task
+
+[`ForegroundServiceTask`](react-native/reference/TypeAlias.ForegroundServiceTask)
+
+The runner function which runs for the duration of the service's lifetime.
+
+#### Returns
+
+`void`
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`registerForegroundService`](react-native/reference/Interface.Module#registerforegroundservice)
+
+***
+
+### requestPermission()
+
+> **requestPermission**(`permissions?`): `Promise`<[`NotificationSettings`](react-native/reference/Interface.NotificationSettings)>
+
+Defined in: [packages/react-native/src/types/Module.ts:453](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L453)
+
+Request specific notification permissions for your application on the current device.
+
+Both iOS & Android return an `NotificationSettings` interface. To check whether overall
+permission was granted, check the `authorizationStatus` property in the response:
+
+```js
+import notifee, { AuthorizationStatus } from '@psync/notifee';
+
+const settings = await notifee.requestPermission(...);
+
+if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
+  console.log('User denied permissions request');
+} else if (settings.authorizationStatus === AuthorizationStatus.AUTHORIZED) {
+   console.log('User granted permissions request');
+} else if (settings.authorizationStatus === AuthorizationStatus.PROVISIONAL) {
+   console.log('User provisionally granted permissions request');
+}
+```
+
+For iOS specific settings, use the `ios` properties to view which specific permissions were
+authorized.
+
+On Android, `authorizationStatus` will return only either `AuthorizationStatus.DENIED` or `AuthorizationStatus.AUTHORIZED`
+and all of the properties on the `ios` interface response return as `AUTHORIZED`.
+
+#### Parameters
+
+##### permissions?
+
+[`IOSNotificationPermissions`](react-native/reference/Interface.IOSNotificationPermissions)
+
+#### Returns
+
+`Promise`<[`NotificationSettings`](react-native/reference/Interface.NotificationSettings)>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`requestPermission`](react-native/reference/Interface.Module#requestpermission)
+
+***
+
+### setBadgeCount()
+
+> **setBadgeCount**(`count`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:527](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L527)
+
+Set the badge count value for this application on the current device.
+
+If set to zero, the badge count is removed from the device. The count must also
+be a positive number.
+
+#### Parameters
+
+##### count
+
+`number`
+
+The number value to set as the badge count.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+ios
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`setBadgeCount`](react-native/reference/Interface.Module#setbadgecount)
+
+***
+
+### setFcmConfig()
+
+> **setFcmConfig**(`config`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:458](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L458)
+
+Configures defaults used by `handleFcmMessage`.
+
+#### Parameters
+
+##### config
+
+[`FcmConfig`](react-native/reference/TypeAlias.FcmConfig)
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`setFcmConfig`](react-native/reference/Interface.Module#setfcmconfig)
+
+***
+
+### setNotificationCategories()
+
+> **setNotificationCategories**(`categories`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:490](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L490)
+
+Set the notification categories to be used on this Apple device.
+
+#### Parameters
+
+##### categories
+
+[`IOSNotificationCategory`](react-native/reference/Interface.IOSNotificationCategory)\[]
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+ios
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`setNotificationCategories`](react-native/reference/Interface.Module#setnotificationcategories)
+
+***
+
+### setNotificationConfig()
+
+> **setNotificationConfig**(`config`): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:481](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L481)
+
+Configures how Notifee handles notifications at a global level.
+
+Currently supports an iOS-specific opt-out flag to prevent Notifee from intercepting
+remote notification tap handlers. This is useful when using Notifee alongside
+`@react-native-firebase/messaging`, where Notifee's interception prevents
+`onNotificationOpenedApp` / `getInitialNotification` from firing.
+
+```js
+import notifee from '@psync/notifee';
+
+// Allow Firebase Messaging to handle remote notification taps
+await notifee.setNotificationConfig({
+  ios: {
+    interceptRemoteNotifications: false,
+  },
+});
+```
+
+#### Parameters
+
+##### config
+
+[`NotificationConfig`](react-native/reference/Interface.NotificationConfig)
+
+The [NotificationConfig](react-native/reference/Interface.NotificationConfig) object.
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`setNotificationConfig`](react-native/reference/Interface.Module#setnotificationconfig)
+
+***
+
+### stopForegroundService()
+
+> **stopForegroundService**(): `Promise`<`void`>
+
+Defined in: [packages/react-native/src/types/Module.ts:423](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L423)
+
+Call this to stop the foreground service that is running
+
+#### Returns
+
+`Promise`<`void`>
+
+#### Platform
+
+android
+
+#### Inherited from
+
+[`Module`](react-native/reference/Interface.Module).[`stopForegroundService`](react-native/reference/Interface.Module#stopforegroundservice)
