@@ -54,3 +54,50 @@ Defined in: [packages/react-native/src/types/NotificationAndroid.ts:830](https:/
 The maximum progress number. E.g `10`.
 
 Must be greater than the `current` value.
+
+***
+
+### points?
+
+> `optional` **points?**: [`AndroidProgressPoint`](react-native/reference/Interface.AndroidProgressPoint)\[]
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:880](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L880)
+
+Point markers for Android 16+ progress-centric notifications.
+
+Positions use the same unit as `segments[].length`.
+
+***
+
+### segments?
+
+> `optional` **segments?**: [`AndroidProgressSegment`](react-native/reference/Interface.AndroidProgressSegment)\[]
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:873](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L873)
+
+Segment definitions for Android 16+ progress-centric notifications.
+
+When provided, `segments` become the source of truth for the total progress length and `max`
+must not be set.
+
+***
+
+### styledByProgress?
+
+> `optional` **styledByProgress?**: `boolean`
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:887](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L887)
+
+Whether the platform should derive segment colors from progress state.
+
+Defaults to `true` when omitted by the native Android 16+ ProgressStyle builder.
+
+***
+
+### trackerIcon?
+
+> `optional` **trackerIcon?**: `string`
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:892](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L892)
+
+Drawable resource name for the Android 16+ progress tracker icon.

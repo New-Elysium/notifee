@@ -556,6 +556,17 @@ describe('Validate Android Notification', () => {
       );
     });
 
+    test('throws an error when progress segment length is zero', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: { current: 0, segments: [{ length: 0, color: '#ff0000' }] },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.segments[].length' expected a positive number value.",
+      );
+    });
+
     test('throws an error when progress point color is invalid', () => {
       const channelGroup: NotificationAndroid = {
         channelId: 'channelId',
@@ -568,6 +579,21 @@ describe('Validate Android Notification', () => {
 
       expect(() => validateAndroidNotification(channelGroup)).toThrowError(
         "'notification.android.progress.points[].color' invalid color. Expected an AndroidColor or hexadecimal string value.",
+      );
+    });
+
+    test('throws an error when progress point position is zero', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: {
+          current: 0,
+          segments: [{ length: 2, color: '#ff0000' }],
+          points: [{ position: 0, color: '#00ff00' }],
+        },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.points[].position' expected a positive number value.",
       );
     });
 

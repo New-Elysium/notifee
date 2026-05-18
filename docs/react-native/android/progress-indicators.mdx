@@ -83,15 +83,17 @@ notifee.displayNotification({
 Segmented progress rules:
 
 - `segments` becomes the source of truth for the total progress length.
+- `segments[].length` must be greater than 0.
 - `current` must use the same unit as `segments[].length`.
 - `max` must not be provided when `segments` is used.
-- `points[].position` must use the same unit as `segments[].length`.
+- `points[].position` must be greater than 0 and use the same unit as `segments[].length`.
+- `styledByProgress` defaults to `true`; set it to `false` when you want to indicate progress using your own segment colors or tracker icon.
 - `trackerIcon` must be a drawable resource name.
 - `android.style` cannot be combined with `progress.segments`, because `ProgressStyle` occupies the notification style slot.
 
-If `shortCriticalText` is an empty string, Notifee still forwards it to Android. This lets OEMs
-or the platform intentionally fall back to other compact metadata when rendering promoted ongoing
-chips.
+If `shortCriticalText` is an empty string, Notifee still forwards it to Android. Android treats
+that as an intentional request for the promoted ongoing chip to have no text. Omit
+`shortCriticalText` instead when you want Android to fall back to other compact metadata.
 
 On Android versions below 16, segmented progress automatically falls back to the existing linear
 `setProgress(max, current, indeterminate)` behavior, using the sum of segment lengths as the

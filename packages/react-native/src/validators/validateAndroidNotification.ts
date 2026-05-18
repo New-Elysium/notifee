@@ -589,7 +589,7 @@ export default function validateAndroidNotification(
           );
         }
 
-        if (!isNumber(segment.length) || segment.length < 0) {
+        if (!isNumber(segment.length) || segment.length <= 0) {
           throw new Error(
             "'notification.android.progress.segments[].length' expected a positive number value.",
           );
@@ -639,7 +639,7 @@ export default function validateAndroidNotification(
             );
           }
 
-          if (!isNumber(point.position) || point.position < 0) {
+          if (!isNumber(point.position) || point.position <= 0) {
             throw new Error(
               "'notification.android.progress.points[].position' expected a positive number value.",
             );

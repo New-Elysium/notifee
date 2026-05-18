@@ -234,7 +234,7 @@ export interface NotificationAndroid {
    * - Ongoing notifications are sorted above the regular notifications in the notification panel.
    * - Ongoing notifications do not have an 'X' close button, and are not affected by the "Clear all" button.
    *
-  * View the [Ongoing](/react-native/android/behaviour#ongoing) documentation for more information.
+   * View the [Ongoing](/react-native/android/behaviour#ongoing) documentation for more information.
    */
   ongoing?: boolean;
 
@@ -320,7 +320,7 @@ export interface NotificationAndroid {
    * A notification can show current progress of a task. The progress state can either be fixed or
    * indeterminate (unknown).
    *
-  * View the [Progress Indicators](/react-native/android/progress-indicators) documentation
+   * View the [Progress Indicators](/react-native/android/progress-indicators) documentation
    * to learn more.
    */
   progress?: AndroidProgress;
@@ -329,7 +329,8 @@ export interface NotificationAndroid {
    * Overrides the compact text used by promoted ongoing surfaces when supported by the platform.
    *
    * On Android 16+, this maps to the notification's short critical text. An empty string is allowed
-   * and can be used to intentionally suppress compact text so the system falls back to other metadata.
+   * and intentionally leaves the promoted ongoing chip without text. Leave this undefined to let
+   * the system fall back to other compact metadata.
    */
   shortCriticalText?: string;
 
@@ -881,7 +882,7 @@ export interface AndroidProgress {
   /**
    * Whether the platform should derive segment colors from progress state.
    *
-   * Defaults to `false` when omitted by the native Android 16+ ProgressStyle builder.
+   * Defaults to `true` when omitted by the native Android 16+ ProgressStyle builder.
    */
   styledByProgress?: boolean;
 
@@ -899,6 +900,7 @@ export interface AndroidProgress {
 export interface AndroidProgressSegment {
   /**
    * The segment length using the same unit as `current` in segmented progress mode.
+   * Must be greater than 0.
    */
   length: number;
 
@@ -916,6 +918,7 @@ export interface AndroidProgressSegment {
 export interface AndroidProgressPoint {
   /**
    * The point position using the same unit as `segments[].length`.
+   * Must be greater than 0.
    */
   position: number;
 
