@@ -9,6 +9,7 @@ import {
   AndroidCategory,
   AndroidProgress,
   AndroidImportance,
+  AndroidStyle,
 } from '../../../packages/react-native/src/types/NotificationAndroid';
 import { NotificationPressAction } from '../../../packages/react-native/src/types/Notification';
 
@@ -52,6 +53,8 @@ describe('Validate Android Notification', () => {
         largeIcon: 'largeIcon',
         lights: ['blue', 1, 1],
         progress: androidProgress,
+        promotedOngoing: true,
+        shortCriticalText: '',
         smallIconLevel: 1,
         sortKey: 'sortkey',
         tag: 'tag',
@@ -86,6 +89,8 @@ describe('Validate Android Notification', () => {
       expect($.largeIcon).toEqual('largeIcon');
       expect($.lights).toEqual(['blue', 1, 1]);
       expect($.smallIconLevel).toEqual(1);
+      expect($.promotedOngoing).toEqual(true);
+      expect($.shortCriticalText).toEqual('');
       expect($.sortKey).toEqual('sortkey');
       expect($.tag).toEqual('tag');
       expect($.ticker).toEqual('ticker');
@@ -108,6 +113,7 @@ describe('Validate Android Notification', () => {
       expect($.groupAlertBehavior).toEqual(AndroidGroupAlertBehavior.ALL);
       expect($.groupSummary).toEqual(false);
       expect($.ongoing).toEqual(false);
+      expect($.promotedOngoing).toEqual(false);
       expect($.onlyAlertOnce).toEqual(false);
       expect($.importance).toEqual(AndroidImportance.DEFAULT);
       expect($.showTimestamp).toEqual(false);
@@ -495,6 +501,117 @@ describe('Validate Android Notification', () => {
       );
     });
 
+    test('accepts segmented progress payload', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: {
+          current: 4,
+          segments: [
+            { length: 3, color: '#ff0000' },
+            { length: 4, color: 'green' },
+          ],
+          points: [{ position: 2, color: '#00ff00' }],
+          styledByProgress: false,
+          trackerIcon: 'ic_tracker',
+        },
+      };
+
+      const validated = validateAndroidNotification(channelGroup);
+      expect(validated.progress).toEqual({
+        ...channelGroup.progress,
+        indeterminate: false,
+      });
+    });
+
+    test('throws an error when progress segments is not an array', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: { current: 1, segments: {} as any },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.segments' expected an array.",
+      );
+    });
+
+    test('throws an error when progress segments is empty', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: { current: 0, segments: [] },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.segments' expected a non-empty array of segment objects.",
+      );
+    });
+
+    test('throws an error when progress segment color is invalid', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: { current: 1, segments: [{ length: 2, color: 'not-a-color' }] as any },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.segments[].color' invalid color. Expected an AndroidColor or hexadecimal string value.",
+      );
+    });
+
+    test('throws an error when progress point color is invalid', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: {
+          current: 1,
+          segments: [{ length: 2, color: '#ff0000' }],
+          points: [{ position: 1, color: 'not-a-color' }] as any,
+        },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.points[].color' invalid color. Expected an AndroidColor or hexadecimal string value.",
+      );
+    });
+
+    test('throws an error when max is provided with segmented progress', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: {
+          current: 1,
+          max: 10,
+          segments: [{ length: 2, color: '#ff0000' }],
+        },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.max' must not be provided when 'notification.android.progress.segments' is set.",
+      );
+    });
+
+    test('throws an error when segmented progress omits current in determinate mode', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: {
+          segments: [{ length: 2, color: '#ff0000' }],
+        },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.current' is required when 'notification.android.progress.segments' is provided unless indeterminate is true.",
+      );
+    });
+
+    test('accepts segmented progress without current in indeterminate mode', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: {
+          indeterminate: true,
+          segments: [{ length: 2, color: '#ff0000' }],
+        },
+      };
+
+      const validated = validateAndroidNotification(channelGroup);
+      expect(validated.progress).toEqual(channelGroup.progress);
+    });
+
     test('throws an error when current value is more than max', () => {
       const channelGroup: NotificationAndroid = {
         channelId: 'channelId',
@@ -503,6 +620,38 @@ describe('Validate Android Notification', () => {
 
       expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress' the current value cannot be greater than the max value.",
+      );
+    });
+
+    test('throws an error when segmented current exceeds total segment length', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: {
+          current: 8,
+          segments: [
+            { length: 3, color: '#ff0000' },
+            { length: 4, color: '#00ff00' },
+          ],
+        },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.current' cannot be greater than the sum of 'notification.android.progress.segments[].length'.",
+      );
+    });
+
+    test('throws an error when progress point position exceeds total segment length', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: {
+          current: 1,
+          segments: [{ length: 2, color: '#ff0000' }],
+          points: [{ position: 3, color: '#00ff00' }],
+        },
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.progress.points[].position' cannot be greater than the sum of 'notification.android.progress.segments[].length'.",
       );
     });
 
@@ -547,6 +696,21 @@ describe('Validate Android Notification', () => {
 
       expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.style' expected an object value.",
+      );
+    });
+
+    test('throws an error when style is used with segmented progress', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        progress: {
+          current: 1,
+          segments: [{ length: 2, color: '#ff0000' }],
+        },
+        style: { type: AndroidStyle.BIGTEXT, text: 'progress' } as any,
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.style' cannot be used when 'notification.android.progress.segments' is provided.",
       );
     });
 
@@ -667,6 +831,28 @@ describe('Validate Android Notification', () => {
 
       expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.timestamp' expected a number value.",
+      );
+    });
+
+    test('throws an error when promotedOngoing is invalid', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        promotedOngoing: [] as any,
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.promotedOngoing' expected a boolean value.",
+      );
+    });
+
+    test('throws an error when shortCriticalText is invalid', () => {
+      const channelGroup: NotificationAndroid = {
+        channelId: 'channelId',
+        shortCriticalText: [] as any,
+      };
+
+      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+        "'notification.android.shortCriticalText' expected a string value.",
       );
     });
 

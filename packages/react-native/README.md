@@ -26,6 +26,7 @@ A feature rich Android & iOS notifications library for React Native.
 | React Native          | 0.83+ (New Architecture only!) |
 | iOS Deployment Target | 15.1+                          |
 | Android minSdk        | 28+                            |
+| Android SDK setup     | compileSdk 36+, targetSdk 35+  |
 | Xcode                 | 16.2+ (for iOS development)    |
 
 ## Installation
@@ -135,6 +136,45 @@ Android icon notes:
 
 - [Overview](https://notifee.app/react-native/docs/overview)
 - [Reference](https://notifee.app/react-native/reference)
+
+## Android 16 ongoing progress notifications
+
+`@psync/notifee` now supports Android 16's promoted ongoing notification APIs:
+
+- `android.promotedOngoing`
+- `android.shortCriticalText`
+- segmented `android.progress` via `segments`, `points`, `styledByProgress`, and `trackerIcon`
+
+```js
+await notifee.displayNotification({
+  title: 'Continue on BR-116',
+  subtitle: '2 km',
+  android: {
+    ongoing: true,
+    promotedOngoing: true,
+    shortCriticalText: '2 km',
+    progress: {
+      current: 456,
+      segments: [
+        { length: 41, color: '#2f2f2f' },
+        { length: 552, color: '#f4a261' },
+        { length: 253, color: '#f4a261' },
+        { length: 94, color: '#55a630' },
+      ],
+      points: [{ position: 60, color: '#e63946' }],
+      styledByProgress: false,
+      trackerIcon: 'ic_navigation_car',
+    },
+  },
+});
+```
+
+Notes:
+
+- `progress.segments` is Android 16+ only and becomes the source of truth for total progress length.
+- `progress.max` cannot be combined with `progress.segments`.
+- `android.style` cannot be combined with segmented progress, because Android's `ProgressStyle` occupies the notification style slot.
+- On older Android versions, segmented progress falls back to the existing linear progress bar using the summed segment length as `max`.
 
 ### Android
 

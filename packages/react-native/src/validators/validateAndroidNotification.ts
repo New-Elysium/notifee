@@ -64,6 +64,7 @@ export default function validateAndroidNotification(
     groupSummary: false,
     localOnly: false,
     ongoing: false,
+    promotedOngoing: false,
     loopSound: false,
     onlyAlertOnce: false,
     importance: AndroidImportance.DEFAULT,
@@ -382,6 +383,17 @@ export default function validateAndroidNotification(
   }
 
   /**
+   * promotedOngoing
+   */
+  if (objectHasProperty(android, 'promotedOngoing')) {
+    if (!isBoolean(android.promotedOngoing)) {
+      throw new Error("'notification.android.promotedOngoing' expected a boolean value.");
+    }
+
+    out.promotedOngoing = android.promotedOngoing;
+  }
+
+  /**
    * loopSound
    */
   if (objectHasProperty(android, 'loopSound')) {
@@ -507,6 +519,8 @@ export default function validateAndroidNotification(
     const progress: AndroidProgress = {
       indeterminate: false,
     };
+    const hasSegments =
+      objectHasProperty(android.progress, 'segments') && !isUndefined(android.progress.segments);
 
     if (objectHasProperty(android.progress, 'indeterminate')) {
       if (!isBoolean(android.progress.indeterminate)) {
@@ -519,6 +533,12 @@ export default function validateAndroidNotification(
     if (!isUndefined(android.progress.max)) {
       if (!isNumber(android.progress.max) || android.progress.max < 0) {
         throw new Error("'notification.android.progress.max' expected a positive number value.");
+      }
+
+      if (hasSegments) {
+        throw new Error(
+          "'notification.android.progress.max' must not be provided when 'notification.android.progress.segments' is set.",
+        );
       }
 
       if (isUndefined(android.progress.current)) {
@@ -537,7 +557,7 @@ export default function validateAndroidNotification(
         );
       }
 
-      if (isUndefined(android.progress.max)) {
+      if (!hasSegments && isUndefined(android.progress.max)) {
         throw new Error(
           "'notification.android.progress.current' when providing a current value, you must also specify a `max` value.",
         );
@@ -546,8 +566,134 @@ export default function validateAndroidNotification(
       progress.current = android.progress.current;
     }
 
+    if (hasSegments) {
+      if (!isArray(android.progress.segments)) {
+        throw new Error("'notification.android.progress.segments' expected an array.");
+      }
+
+      if (android.progress.segments.length === 0) {
+        throw new Error(
+          "'notification.android.progress.segments' expected a non-empty array of segment objects.",
+        );
+      }
+
+      progress.segments = [];
+      let totalLength = 0;
+
+      for (let i = 0; i < android.progress.segments.length; i++) {
+        const segment = android.progress.segments[i];
+
+        if (!isObject(segment)) {
+          throw new Error(
+            "'notification.android.progress.segments' expected an array of segment objects.",
+          );
+        }
+
+        if (!isNumber(segment.length) || segment.length < 0) {
+          throw new Error(
+            "'notification.android.progress.segments[].length' expected a positive number value.",
+          );
+        }
+
+        if (!isString(segment.color)) {
+          throw new Error(
+            "'notification.android.progress.segments[].color' expected a string value.",
+          );
+        }
+
+        if (!isValidColor(segment.color)) {
+          throw new Error(
+            "'notification.android.progress.segments[].color' invalid color. Expected an AndroidColor or hexadecimal string value.",
+          );
+        }
+
+        progress.segments.push(segment);
+        totalLength += segment.length;
+      }
+
+      if (isUndefined(progress.current) && progress.indeterminate !== true) {
+        throw new Error(
+          "'notification.android.progress.current' is required when 'notification.android.progress.segments' is provided unless indeterminate is true.",
+        );
+      }
+
+      if (!isUndefined(progress.current) && progress.current > totalLength) {
+        throw new Error(
+          "'notification.android.progress.current' cannot be greater than the sum of 'notification.android.progress.segments[].length'.",
+        );
+      }
+
+      if (objectHasProperty(android.progress, 'points') && !isUndefined(android.progress.points)) {
+        if (!isArray(android.progress.points)) {
+          throw new Error("'notification.android.progress.points' expected an array.");
+        }
+
+        progress.points = [];
+
+        for (let i = 0; i < android.progress.points.length; i++) {
+          const point = android.progress.points[i];
+
+          if (!isObject(point)) {
+            throw new Error(
+              "'notification.android.progress.points' expected an array of point objects.",
+            );
+          }
+
+          if (!isNumber(point.position) || point.position < 0) {
+            throw new Error(
+              "'notification.android.progress.points[].position' expected a positive number value.",
+            );
+          }
+
+          if (point.position > totalLength) {
+            throw new Error(
+              "'notification.android.progress.points[].position' cannot be greater than the sum of 'notification.android.progress.segments[].length'.",
+            );
+          }
+
+          if (!isString(point.color)) {
+            throw new Error(
+              "'notification.android.progress.points[].color' expected a string value.",
+            );
+          }
+
+          if (!isValidColor(point.color)) {
+            throw new Error(
+              "'notification.android.progress.points[].color' invalid color. Expected an AndroidColor or hexadecimal string value.",
+            );
+          }
+
+          progress.points.push(point);
+        }
+      }
+
+      if (
+        objectHasProperty(android.progress, 'styledByProgress') &&
+        !isUndefined(android.progress.styledByProgress)
+      ) {
+        if (!isBoolean(android.progress.styledByProgress)) {
+          throw new Error(
+            "'notification.android.progress.styledByProgress' expected a boolean value.",
+          );
+        }
+
+        progress.styledByProgress = android.progress.styledByProgress;
+      }
+
+      if (
+        objectHasProperty(android.progress, 'trackerIcon') &&
+        !isUndefined(android.progress.trackerIcon)
+      ) {
+        if (!isString(android.progress.trackerIcon)) {
+          throw new Error("'notification.android.progress.trackerIcon' expected a string value.");
+        }
+
+        progress.trackerIcon = android.progress.trackerIcon;
+      }
+    }
+
     // We have a max/current value
-    if (!isUndefined(progress.max) && !isUndefined(progress.current)) {
+    if (!hasSegments && !isUndefined(progress.max) && !isUndefined(progress.current)) {
       if (progress.current > progress.max) {
         throw new Error(
           "'notification.android.progress' the current value cannot be greater than the max value.",
@@ -609,6 +755,12 @@ export default function validateAndroidNotification(
   if (objectHasProperty(android, 'style') && !isUndefined(android.style)) {
     if (!isObject(android.style)) {
       throw new Error("'notification.android.style' expected an object value.");
+    }
+
+    if (!isUndefined(out.progress?.segments)) {
+      throw new Error(
+        "'notification.android.style' cannot be used when 'notification.android.progress.segments' is provided.",
+      );
     }
 
     switch (android.style.type) {
@@ -707,6 +859,17 @@ export default function validateAndroidNotification(
     }
 
     out.visibility = android.visibility;
+  }
+
+  /**
+   * shortCriticalText
+   */
+  if (objectHasProperty(android, 'shortCriticalText') && !isUndefined(android.shortCriticalText)) {
+    if (!isString(android.shortCriticalText)) {
+      throw new Error("'notification.android.shortCriticalText' expected a string value.");
+    }
+
+    out.shortCriticalText = android.shortCriticalText;
   }
 
   /**

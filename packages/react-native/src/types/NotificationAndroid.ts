@@ -234,9 +234,20 @@ export interface NotificationAndroid {
    * - Ongoing notifications are sorted above the regular notifications in the notification panel.
    * - Ongoing notifications do not have an 'X' close button, and are not affected by the "Clear all" button.
    *
-   * View the [Ongoing](/react-native/android/behaviour#ongoing) documentation for more information.
+  * View the [Ongoing](/react-native/android/behaviour#ongoing) documentation for more information.
    */
   ongoing?: boolean;
+
+  /**
+   * Requests the system's promoted ongoing rendering when supported.
+   *
+   * On Android 16+, this enables the platform's progress-centric ongoing presentation
+   * for eligible notifications. On some OEM builds, mirroring the request via extras
+   * can also affect rendering on earlier Android versions.
+   *
+   * Defaults to `false`.
+   */
+  promotedOngoing?: boolean;
 
   /**
    * Set whether the sound should loop, by default, the sound will only play once.
@@ -309,10 +320,18 @@ export interface NotificationAndroid {
    * A notification can show current progress of a task. The progress state can either be fixed or
    * indeterminate (unknown).
    *
-   * View the [Progress Indicators](/react-native/android/progress-indicators) documentation
+  * View the [Progress Indicators](/react-native/android/progress-indicators) documentation
    * to learn more.
    */
   progress?: AndroidProgress;
+
+  /**
+   * Overrides the compact text used by promoted ongoing surfaces when supported by the platform.
+   *
+   * On Android 16+, this maps to the notification's short critical text. An empty string is allowed
+   * and can be used to intentionally suppress compact text so the system falls back to other metadata.
+   */
+  shortCriticalText?: string;
 
   /**
    * Sets whether the `timestamp` provided is shown in the notification.
@@ -843,6 +862,67 @@ export interface AndroidProgress {
    * Defaults to `false`.
    */
   indeterminate?: boolean;
+
+  /**
+   * Segment definitions for Android 16+ progress-centric notifications.
+   *
+   * When provided, `segments` become the source of truth for the total progress length and `max`
+   * must not be set.
+   */
+  segments?: AndroidProgressSegment[];
+
+  /**
+   * Point markers for Android 16+ progress-centric notifications.
+   *
+   * Positions use the same unit as `segments[].length`.
+   */
+  points?: AndroidProgressPoint[];
+
+  /**
+   * Whether the platform should derive segment colors from progress state.
+   *
+   * Defaults to `false` when omitted by the native Android 16+ ProgressStyle builder.
+   */
+  styledByProgress?: boolean;
+
+  /**
+   * Drawable resource name for the Android 16+ progress tracker icon.
+   */
+  trackerIcon?: string;
+}
+
+/**
+ * A colored segment for Android 16+ progress-centric notifications.
+ *
+ * @platform android
+ */
+export interface AndroidProgressSegment {
+  /**
+   * The segment length using the same unit as `current` in segmented progress mode.
+   */
+  length: number;
+
+  /**
+   * The segment color as an AndroidColor or hexadecimal string.
+   */
+  color: AndroidColor | string;
+}
+
+/**
+ * A colored point marker for Android 16+ progress-centric notifications.
+ *
+ * @platform android
+ */
+export interface AndroidProgressPoint {
+  /**
+   * The point position using the same unit as `segments[].length`.
+   */
+  position: number;
+
+  /**
+   * The point color as an AndroidColor or hexadecimal string.
+   */
+  color: AndroidColor | string;
 }
 
 /**
