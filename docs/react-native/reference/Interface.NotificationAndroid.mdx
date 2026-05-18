@@ -426,6 +426,22 @@ View the [Ongoing](/react-native/android/behaviour#ongoing) documentation for mo
 
 ***
 
+### promotedOngoing?
+
+> `optional` **promotedOngoing?**: `boolean`
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:250](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L250)
+
+Requests the system's promoted ongoing rendering when supported.
+
+On Android 16+, this enables the platform's progress-centric ongoing presentation
+for eligible notifications. On some OEM builds, mirroring the request via extras
+can also affect rendering on earlier Android versions.
+
+Defaults to `false`.
+
+***
+
 ### onlyAlertOnce?
 
 > `optional` **onlyAlertOnce?**: `boolean`
@@ -468,6 +484,20 @@ indeterminate (unknown).
 
 View the [Progress Indicators](/react-native/android/progress-indicators) documentation
 to learn more.
+
+***
+
+### shortCriticalText?
+
+> `optional` **shortCriticalText?**: `string`
+
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:335](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L335)
+
+Overrides the compact text used by promoted ongoing surfaces when supported by the platform.
+
+On Android 16+, this maps to the notification's short critical text. An empty string is allowed
+and intentionally leaves the promoted ongoing chip without text. Leave this undefined to let
+the system fall back to other compact metadata.
 
 ***
 

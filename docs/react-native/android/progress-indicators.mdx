@@ -49,6 +49,56 @@ notifee.displayNotification({
 
 If `indeterminate` is true, any `max` and `current` values will be ignored.
 
+## Android 16+ progress-centric notifications
+
+On Android 16 and above, Notifee can render segmented progress notifications using the platform
+`ProgressStyle` API. This is designed for ongoing experiences such as navigation, where the
+progress bar may contain multiple colored segments, milestone points and a moving tracker icon.
+
+To enable this mode, provide `progress.segments`:
+
+```js
+notifee.displayNotification({
+  title: 'Continue on BR-116',
+  subtitle: '2 km',
+  android: {
+    promotedOngoing: true,
+    shortCriticalText: '2 km',
+    progress: {
+      current: 456,
+      segments: [
+        { length: 41, color: '#2f2f2f' },
+        { length: 552, color: '#f4a261' },
+        { length: 253, color: '#f4a261' },
+        { length: 94, color: '#55a630' },
+      ],
+      points: [{ position: 60, color: '#e63946' }],
+      styledByProgress: false,
+      trackerIcon: 'ic_navigation_car',
+    },
+  },
+});
+```
+
+Segmented progress rules:
+
+- `segments` becomes the source of truth for the total progress length.
+- `segments[].length` must be greater than 0.
+- `current` must use the same unit as `segments[].length`.
+- `max` must not be provided when `segments` is used.
+- `points[].position` must be greater than 0 and use the same unit as `segments[].length`.
+- `styledByProgress` defaults to `true`; set it to `false` when you want to indicate progress using your own segment colors or tracker icon.
+- `trackerIcon` must be a drawable resource name.
+- `android.style` cannot be combined with `progress.segments`, because `ProgressStyle` occupies the notification style slot.
+
+If `shortCriticalText` is an empty string, Notifee still forwards it to Android. Android treats
+that as an intentional request for the promoted ongoing chip to have no text. Omit
+`shortCriticalText` instead when you want Android to fall back to other compact metadata.
+
+On Android versions below 16, segmented progress automatically falls back to the existing linear
+`setProgress(max, current, indeterminate)` behavior, using the sum of segment lengths as the
+fallback max.
+
 ## Updating a progress indicator
 
 In most cases, you'll want to handle the progress "complete" status of a notification.
