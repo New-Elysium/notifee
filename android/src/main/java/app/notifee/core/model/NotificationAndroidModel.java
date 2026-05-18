@@ -483,13 +483,72 @@ public class NotificationAndroidModel {
       Bundle progressBundle =
           Objects.requireNonNull(mNotificationAndroidBundle.getBundle("progress"));
 
+      ArrayList<AndroidProgressSegment> segments = null;
+      if (progressBundle.containsKey("segments")) {
+        ArrayList<Bundle> segmentBundles =
+            Objects.requireNonNull(progressBundle.getParcelableArrayList("segments"));
+        segments = new ArrayList<>(segmentBundles.size());
+
+        for (Bundle segmentBundle : segmentBundles) {
+          segments.add(
+              new AndroidProgressSegment(
+                  ObjectUtils.getInt(segmentBundle.get("length")),
+                  Color.parseColor(Objects.requireNonNull(segmentBundle.getString("color")))));
+        }
+      }
+
+      ArrayList<AndroidProgressPoint> points = null;
+      if (progressBundle.containsKey("points")) {
+        ArrayList<Bundle> pointBundles =
+            Objects.requireNonNull(progressBundle.getParcelableArrayList("points"));
+        points = new ArrayList<>(pointBundles.size());
+
+        for (Bundle pointBundle : pointBundles) {
+          points.add(
+              new AndroidProgressPoint(
+                  ObjectUtils.getInt(pointBundle.get("position")),
+                  Color.parseColor(Objects.requireNonNull(pointBundle.getString("color")))));
+        }
+      }
+
+      Boolean styledByProgress = null;
+      if (progressBundle.containsKey("styledByProgress")) {
+        styledByProgress = progressBundle.getBoolean("styledByProgress");
+      }
+
       return new AndroidProgress(
           ObjectUtils.getInt(progressBundle.get("max")),
           ObjectUtils.getInt(progressBundle.get("current")),
-          progressBundle.getBoolean("indeterminate", false));
+          progressBundle.getBoolean("indeterminate", false),
+          segments,
+          points,
+          styledByProgress,
+          progressBundle.getString("trackerIcon"));
     }
 
     return null;
+  }
+
+  /**
+   * Gets the compact short critical text for promoted ongoing notifications.
+   *
+   * @return String
+   */
+  public @Nullable String getShortCriticalText() {
+    if (!mNotificationAndroidBundle.containsKey("shortCriticalText")) {
+      return null;
+    }
+
+    return mNotificationAndroidBundle.getString("shortCriticalText");
+  }
+
+  /**
+   * Gets whether the notification requests promoted ongoing rendering.
+   *
+   * @return Boolean
+   */
+  public Boolean getPromotedOngoing() {
+    return mNotificationAndroidBundle.getBoolean("promotedOngoing", false);
   }
 
   /**
@@ -672,11 +731,26 @@ public class NotificationAndroidModel {
     int max;
     int current;
     boolean indeterminate;
+    ArrayList<AndroidProgressSegment> segments;
+    ArrayList<AndroidProgressPoint> points;
+    Boolean styledByProgress;
+    String trackerIcon;
 
-    AndroidProgress(int max, int current, boolean indeterminate) {
+    AndroidProgress(
+        int max,
+        int current,
+        boolean indeterminate,
+        @Nullable ArrayList<AndroidProgressSegment> segments,
+        @Nullable ArrayList<AndroidProgressPoint> points,
+        @Nullable Boolean styledByProgress,
+        @Nullable String trackerIcon) {
       this.max = max;
       this.current = current;
       this.indeterminate = indeterminate;
+      this.segments = segments;
+      this.points = points;
+      this.styledByProgress = styledByProgress;
+      this.trackerIcon = trackerIcon;
     }
 
     public int getMax() {
@@ -689,6 +763,58 @@ public class NotificationAndroidModel {
 
     public boolean getIndeterminate() {
       return indeterminate;
+    }
+
+    public @Nullable ArrayList<AndroidProgressSegment> getSegments() {
+      return segments;
+    }
+
+    public @Nullable ArrayList<AndroidProgressPoint> getPoints() {
+      return points;
+    }
+
+    public @Nullable Boolean getStyledByProgress() {
+      return styledByProgress;
+    }
+
+    public @Nullable String getTrackerIcon() {
+      return trackerIcon;
+    }
+  }
+
+  public static class AndroidProgressSegment {
+    int length;
+    int color;
+
+    AndroidProgressSegment(int length, int color) {
+      this.length = length;
+      this.color = color;
+    }
+
+    public int getLength() {
+      return length;
+    }
+
+    public int getColor() {
+      return color;
+    }
+  }
+
+  public static class AndroidProgressPoint {
+    int position;
+    int color;
+
+    AndroidProgressPoint(int position, int color) {
+      this.position = position;
+      this.color = color;
+    }
+
+    public int getPosition() {
+      return position;
+    }
+
+    public int getColor() {
+      return color;
     }
   }
 }

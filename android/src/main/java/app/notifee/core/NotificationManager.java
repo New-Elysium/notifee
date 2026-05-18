@@ -90,6 +90,103 @@ class NotificationManager {
   private static final int NOTIFICATION_TYPE_DISPLAYED = 1;
   private static final int NOTIFICATION_TYPE_TRIGGER = 2;
 
+  private static int getSegmentedProgressTotalLength(
+      @NonNull ArrayList<NotificationAndroidModel.AndroidProgressSegment> segments) {
+    int totalLength = 0;
+
+    for (NotificationAndroidModel.AndroidProgressSegment segment : segments) {
+      totalLength += segment.getLength();
+    }
+
+    return totalLength;
+  }
+
+  private static void applyCompatNotificationExtras(
+      @NonNull NotificationCompat.Builder builder, @NonNull NotificationAndroidModel androidModel) {
+    Bundle extras = new Bundle();
+
+    if (androidModel.getShortCriticalText() != null) {
+      builder.setShortCriticalText(androidModel.getShortCriticalText());
+      extras.putString(
+          NotificationCompat.EXTRA_SHORT_CRITICAL_TEXT, androidModel.getShortCriticalText());
+    }
+
+    if (androidModel.getPromotedOngoing()) {
+      builder.setRequestPromotedOngoing(true);
+      extras.putBoolean(NotificationCompat.EXTRA_REQUEST_PROMOTED_ONGOING, true);
+    }
+
+    if (!extras.isEmpty()) {
+      builder.addExtras(extras);
+    }
+  }
+
+  private static void applyProgress(
+      @NonNull NotificationCompat.Builder builder, @NonNull NotificationAndroidModel androidModel) {
+    NotificationAndroidModel.AndroidProgress progress = androidModel.getProgress();
+    if (progress == null) {
+      return;
+    }
+
+    ArrayList<NotificationAndroidModel.AndroidProgressSegment> segments = progress.getSegments();
+    if (segments == null) {
+      builder.setProgress(progress.getMax(), progress.getCurrent(), progress.getIndeterminate());
+      return;
+    }
+
+    if (Build.VERSION.SDK_INT >= 36) {
+      NotificationCompat.ProgressStyle progressStyle =
+          new NotificationCompat.ProgressStyle()
+              .setProgressIndeterminate(progress.getIndeterminate());
+
+      if (!progress.getIndeterminate()) {
+        progressStyle.setProgress(progress.getCurrent());
+      }
+
+      if (progress.getStyledByProgress() != null) {
+        progressStyle.setStyledByProgress(progress.getStyledByProgress());
+      }
+
+      if (progress.getTrackerIcon() != null) {
+        int trackerIconId = ResourceUtils.getImageResourceId(progress.getTrackerIcon());
+        if (trackerIconId != 0) {
+          progressStyle.setProgressTrackerIcon(
+              IconCompat.createWithResource(getApplicationContext(), trackerIconId));
+        } else {
+          Logger.w(
+              TAG,
+              String.format(
+                  "Notification progress tracker icon '%s' could not be resolved; skipping"
+                      + " tracker icon.",
+                  progress.getTrackerIcon()));
+        }
+      }
+
+      for (NotificationAndroidModel.AndroidProgressSegment segment : segments) {
+        progressStyle.addProgressSegment(
+            new NotificationCompat.ProgressStyle.Segment(segment.getLength())
+                .setColor(segment.getColor()));
+      }
+
+      ArrayList<NotificationAndroidModel.AndroidProgressPoint> points = progress.getPoints();
+      if (points != null) {
+        for (NotificationAndroidModel.AndroidProgressPoint point : points) {
+          progressStyle.addProgressPoint(
+              new NotificationCompat.ProgressStyle.Point(point.getPosition())
+                  .setColor(point.getColor()));
+        }
+      }
+
+      builder.setStyle(progressStyle);
+      return;
+    }
+
+    builder.setProgress(
+        getSegmentedProgressTotalLength(segments),
+        progress.getIndeterminate() ? 0 : progress.getCurrent(),
+        progress.getIndeterminate());
+  }
+
   private static ListenableFuture<NotificationCompat.Builder> notificationBundleToBuilder(
       NotificationModel notificationModel) {
     final NotificationAndroidModel androidModel = notificationModel.getAndroid();
@@ -173,6 +270,7 @@ class NotificationManager {
           }
 
           builder.setColorized(androidModel.getColorized());
+          applyCompatNotificationExtras(builder, androidModel);
 
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             builder.setChronometerCountDown(androidModel.getChronometerCountDown());
@@ -232,11 +330,7 @@ class NotificationManager {
             }
           }
 
-          NotificationAndroidModel.AndroidProgress progress = androidModel.getProgress();
-          if (progress != null) {
-            builder.setProgress(
-                progress.getMax(), progress.getCurrent(), progress.getIndeterminate());
-          }
+          applyProgress(builder, androidModel);
 
           if (androidModel.getShortcutId() != null) {
             builder.setShortcutId(androidModel.getShortcutId());
@@ -467,6 +561,11 @@ class NotificationManager {
         builder ->
             LISTENING_CACHED_THREAD_POOL.submit(
                 () -> {
+                  if (androidModel.getProgress() != null
+                      && androidModel.getProgress().getSegments() != null) {
+                    return builder;
+                  }
+
                   NotificationAndroidStyleModel androidStyleBundle = androidModel.getStyle();
                   if (androidStyleBundle == null) {
                     return builder;
