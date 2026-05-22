@@ -13,8 +13,9 @@ describe('Validate IOS Notification', () => {
         critical: true,
         criticalVolume: 0,
         threadId: 'threadId',
-        summaryArgument: 'summaryArgument',
-        summaryArgumentCount: 1,
+        relevanceScore: 0.5,
+        filterCriteria: 'filterCriteria',
+        contentType: 'contentType',
         targetContentId: 'targetContentId',
       };
 
@@ -27,8 +28,9 @@ describe('Validate IOS Notification', () => {
       expect($.critical).toEqual(true);
       expect($.criticalVolume).toEqual(0);
       expect($.threadId).toEqual('threadId');
-      expect($.summaryArgument).toEqual('summaryArgument');
-      expect($.summaryArgumentCount).toEqual(1);
+      expect($.relevanceScore).toEqual(0.5);
+      expect($.filterCriteria).toEqual('filterCriteria');
+      expect($.contentType).toEqual('contentType');
       //   expect($.targetContentId).toEqual('targetContentId');
     });
 
@@ -164,16 +166,6 @@ describe('Validate IOS Notification', () => {
       );
     });
 
-    test('returns invalid when an invalid summaryArgument property is provided', () => {
-      const notification: NotificationIOS = {
-        summaryArgument: {} as any,
-      };
-
-      expect(() => validateIOSNotification(notification)).toThrow(
-        "'notification.ios.summaryArgument' expected a string value.",
-      );
-    });
-
     test('returns invalid when an invalid launchImageName property is provided', () => {
       const notification: NotificationIOS = {
         launchImageName: {} as any,
@@ -181,6 +173,36 @@ describe('Validate IOS Notification', () => {
 
       expect(() => validateIOSNotification(notification)).toThrow(
         "'notification.ios.launchImageName' expected a string value.",
+      );
+    });
+
+    test('returns invalid when an invalid relevanceScore property is provided', () => {
+      expect(() => validateIOSNotification({ relevanceScore: {} as any })).toThrow(
+        "'notification.ios.relevanceScore' expected a number value between 0.0 and 1.0.",
+      );
+
+      expect(() => validateIOSNotification({ relevanceScore: 1.1 })).toThrow(
+        "'notification.ios.relevanceScore' expected a number value between 0.0 and 1.0.",
+      );
+    });
+
+    test('returns invalid when an invalid filterCriteria property is provided', () => {
+      const notification: NotificationIOS = {
+        filterCriteria: {} as any,
+      };
+
+      expect(() => validateIOSNotification(notification)).toThrow(
+        "'notification.ios.filterCriteria' expected a string value.",
+      );
+    });
+
+    test('returns invalid when an invalid contentType property is provided', () => {
+      const notification: NotificationIOS = {
+        contentType: {} as any,
+      };
+
+      expect(() => validateIOSNotification(notification)).toThrow(
+        "'notification.ios.contentType' expected a string value.",
       );
     });
 

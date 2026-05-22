@@ -10,7 +10,6 @@ export default function validateIOSPermissions(
     sound: true,
     carPlay: true,
     provisional: false,
-    announcement: false,
     criticalAlert: false,
   };
 
@@ -56,14 +55,6 @@ export default function validateIOSPermissions(
     }
 
     out.provisional = permissions.provisional;
-  }
-
-  if (objectHasProperty(permissions, 'announcement')) {
-    if (!isBoolean(permissions.announcement)) {
-      throw new Error("'announcement' expected a boolean value.");
-    }
-
-    out.announcement = permissions.announcement;
   }
 
   if (objectHasProperty(permissions, 'criticalAlert')) {

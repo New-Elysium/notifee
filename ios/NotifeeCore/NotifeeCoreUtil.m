@@ -408,13 +408,7 @@
   NSMutableArray<NSNumber *> *intentIdentifiers = [[NSMutableArray alloc] init];
 
   for (NSString *identifier in identifiers) {
-    if ([identifier isEqualToString:INStartAudioCallIntentIdentifier]) {
-      // IOSIntentIdentifier.START_AUDIO_CALL
-      [intentIdentifiers addObject:@0];
-    } else if ([identifier isEqualToString:INStartVideoCallIntentIdentifier]) {
-      // IOSIntentIdentifier.START_VIDEO_CALL
-      [intentIdentifiers addObject:@1];
-    } else if ([identifier isEqualToString:INSearchCallHistoryIntentIdentifier]) {
+    if ([identifier isEqualToString:INSearchCallHistoryIntentIdentifier]) {
       // IOSIntentIdentifier.SEARCH_CALL_HISTORY
       [intentIdentifiers addObject:@2];
     } else if ([identifier isEqualToString:INSetAudioSourceInCarIntentIdentifier]) {
@@ -483,6 +477,9 @@
     } else if ([identifier isEqualToString:INGetRideStatusIntentIdentifier]) {
       // IOSIntentIdentifier.GET_RIDE_STATUS
       [intentIdentifiers addObject:@24];
+    } else if ([identifier isEqualToString:INStartCallIntentIdentifier]) {
+      // IOSIntentIdentifier.START_CALL
+      [intentIdentifiers addObject:@25];
     }
   }
 
@@ -494,13 +491,7 @@
   NSMutableArray<NSString *> *intentIdentifiers = [[NSMutableArray alloc] init];
 
   for (NSNumber *identifier in identifiers) {
-    if ([identifier isEqualToNumber:@0]) {
-      // IOSIntentIdentifier.START_AUDIO_CALL
-      [intentIdentifiers addObject:INStartAudioCallIntentIdentifier];
-    } else if ([identifier isEqualToNumber:@1]) {
-      // IOSIntentIdentifier.START_VIDEO_CALL
-      [intentIdentifiers addObject:INStartVideoCallIntentIdentifier];
-    } else if ([identifier isEqualToNumber:@2]) {
+    if ([identifier isEqualToNumber:@2]) {
       // IOSIntentIdentifier.SEARCH_CALL_HISTORY
       [intentIdentifiers addObject:INSearchCallHistoryIntentIdentifier];
     } else if ([identifier isEqualToNumber:@3]) {
@@ -569,6 +560,9 @@
     } else if ([identifier isEqualToNumber:@24]) {
       // IOSIntentIdentifier.GET_RIDE_STATUS
       [intentIdentifiers addObject:INGetRideStatusIntentIdentifier];
+    } else if ([identifier isEqualToNumber:@25]) {
+      // IOSIntentIdentifier.START_CALL
+      [intentIdentifiers addObject:INStartCallIntentIdentifier];
     }
   }
 
@@ -678,6 +672,26 @@
   if (@available(iOS 13.0, macOS 10.15, macCatalyst 13.0, tvOS 13.0, watchOS 6.0, *)) {
     if (content.targetContentIdentifier != nil) {
       iosDict[@"targetContentId"] = content.targetContentIdentifier;
+    }
+  }
+
+  // relevanceScore
+  if (@available(iOS 15.0, *)) {
+    iosDict[@"relevanceScore"] = @(content.relevanceScore);
+  }
+
+  // filterCriteria
+  if (@available(iOS 16.0, *)) {
+    if (content.filterCriteria != nil) {
+      iosDict[@"filterCriteria"] = content.filterCriteria;
+    }
+  }
+
+  // contentType
+  if ([content respondsToSelector:NSSelectorFromString(@"contentType")]) {
+    id contentType = [content valueForKey:@"contentType"];
+    if ([contentType isKindOfClass:[NSString class]]) {
+      iosDict[@"contentType"] = contentType;
     }
   }
 

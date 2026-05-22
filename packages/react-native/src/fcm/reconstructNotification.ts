@@ -164,5 +164,23 @@ function buildIosConfig(raw: Record<string, unknown>): NotificationIOS {
       });
   }
 
+  if (typeof raw.relevanceScore === 'number') {
+    if (raw.relevanceScore >= 0 && raw.relevanceScore <= 1) {
+      ios.relevanceScore = raw.relevanceScore;
+    } else {
+      console.warn(
+        `${PREFIX} ios.relevanceScore '${raw.relevanceScore}' is out of range [0.0, 1.0]. Ignored.`,
+      );
+    }
+  }
+
+  if (typeof raw.filterCriteria === 'string') {
+    ios.filterCriteria = raw.filterCriteria;
+  }
+
+  if (typeof raw.contentType === 'string') {
+    ios.contentType = raw.contentType;
+  }
+
   return ios;
 }

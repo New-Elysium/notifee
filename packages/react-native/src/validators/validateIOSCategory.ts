@@ -37,17 +37,6 @@ export default function validateIOSCategory(
   };
 
   /**
-   * summaryFormat
-   */
-  if (objectHasProperty(category, 'summaryFormat')) {
-    if (!isString(category.summaryFormat)) {
-      throw new Error("'category.summaryFormat' expected a string value.");
-    }
-
-    out.summaryFormat = category.summaryFormat;
-  }
-
-  /**
    * allowInCarPlay
    */
   if (objectHasProperty(category, 'allowInCarPlay')) {
@@ -92,7 +81,7 @@ export default function validateIOSCategory(
   }
 
   /**
-   * summaryFormat
+   * hiddenPreviewsBodyPlaceholder
    */
   if (objectHasProperty(category, 'hiddenPreviewsBodyPlaceholder')) {
     if (!isString(category.hiddenPreviewsBodyPlaceholder)) {

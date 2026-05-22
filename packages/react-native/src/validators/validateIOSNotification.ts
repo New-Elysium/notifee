@@ -164,30 +164,6 @@ export default function validateIOSNotification(ios?: NotificationIOS): Notifica
   }
 
   /**
-   * summaryArgument
-   */
-  if (objectHasProperty(ios, 'summaryArgument')) {
-    if (!isString(ios.summaryArgument)) {
-      throw new Error("'notification.ios.summaryArgument' expected a string value.");
-    }
-
-    out.summaryArgument = ios.summaryArgument;
-  }
-
-  /**
-   * summaryArgumentCount
-   */
-  if (objectHasProperty(ios, 'summaryArgumentCount')) {
-    if (!isNumber(ios.summaryArgumentCount) || ios.summaryArgumentCount <= 0) {
-      throw new Error(
-        "'notification.ios.summaryArgumentCount' expected a positive number greater than 0.",
-      );
-    }
-
-    out.summaryArgumentCount = ios.summaryArgumentCount;
-  }
-
-  /**
    * launchImageName
    */
   if (objectHasProperty(ios, 'launchImageName')) {
@@ -196,6 +172,41 @@ export default function validateIOSNotification(ios?: NotificationIOS): Notifica
     }
 
     out.launchImageName = ios.launchImageName;
+  }
+
+  /**
+   * relevanceScore
+   */
+  if (objectHasProperty(ios, 'relevanceScore')) {
+    if (!isNumber(ios.relevanceScore) || ios.relevanceScore < 0 || ios.relevanceScore > 1) {
+      throw new Error(
+        "'notification.ios.relevanceScore' expected a number value between 0.0 and 1.0.",
+      );
+    }
+
+    out.relevanceScore = ios.relevanceScore;
+  }
+
+  /**
+   * filterCriteria
+   */
+  if (objectHasProperty(ios, 'filterCriteria')) {
+    if (!isString(ios.filterCriteria)) {
+      throw new Error("'notification.ios.filterCriteria' expected a string value.");
+    }
+
+    out.filterCriteria = ios.filterCriteria;
+  }
+
+  /**
+   * contentType
+   */
+  if (objectHasProperty(ios, 'contentType')) {
+    if (!isString(ios.contentType)) {
+      throw new Error("'notification.ios.contentType' expected a string value.");
+    }
+
+    out.contentType = ios.contentType;
   }
 
   /**

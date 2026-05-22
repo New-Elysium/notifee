@@ -11,8 +11,7 @@ describe('Validate IOS Input', () => {
         sound: false,
         carPlay: false,
         provisional: false,
-        announcement: false,
-      };
+              };
 
       const $ = validateIOSPermissions(permissions);
 
@@ -22,7 +21,6 @@ describe('Validate IOS Input', () => {
       expect($.sound).toEqual(false);
       expect($.carPlay).toEqual(false);
       expect($.provisional).toEqual(false);
-      expect($.announcement).toEqual(false);
     });
 
     test('returns valid when no value is provided', () => {
@@ -34,7 +32,6 @@ describe('Validate IOS Input', () => {
       expect($.sound).toEqual(true);
       expect($.carPlay).toEqual(true);
       expect($.provisional).toEqual(false);
-      expect($.announcement).toEqual(false);
     });
 
     test('returns invalid when an invalid critical property is provided', () => {
@@ -87,24 +84,6 @@ describe('Validate IOS Input', () => {
       );
     });
 
-    test('returns invalid when an invalid announcement property is provided', () => {
-      const notification: IOSNotificationPermissions = {
-        announcement: [] as any,
-      };
 
-      expect(() => validateIOSPermissions(notification)).toThrow(
-        "'announcement' expected a boolean value.",
-      );
-    });
-
-    test('returns invalid when an invalid criticalAlert property is provided', () => {
-      const notification: IOSNotificationPermissions = {
-        criticalAlert: [] as any,
-      };
-
-      expect(() => validateIOSPermissions(notification)).toThrow(
-        "'criticalAlert' expected a boolean value.",
-      );
-    });
   });
 });

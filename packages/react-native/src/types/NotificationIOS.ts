@@ -79,29 +79,6 @@ export interface NotificationIOS {
   threadId?: string;
 
   /**
-   * The argument that is inserted in the IOSCategory.summaryFormat for this notification.
-   *
-   * See `IOSCategory.summaryFormat`.
-   *
-   * @platform ios iOS >= 12
-   */
-  summaryArgument?: string;
-
-  /**
-   * A number that indicates how many items in the summary are being represented.
-   *
-   * For example if a messages app sends one notification for 3 new messages in a group chat,
-   * the summaryArgument could be the name of the group chat and the summaryArgumentCount should be 3.
-   *
-   * If set, value cannot be 0 or less.
-   *
-   * See `IOSCategory.summaryFormat`.
-   *
-   * @platform ios iOS >= 12
-   */
-  summaryArgumentCount?: number;
-
-  /**
    * The identifier for the window to be opened when the user taps a notification.
    *
    * This value determines the window brought forward when the user taps this notification on iPadOS.
@@ -123,6 +100,31 @@ export interface NotificationIOS {
    * @platform ios iOS >= 15
    */
   communicationInfo?: IOSCommunicationInfo;
+
+  /**
+   * The score the system uses to determine if the notification is the summary's featured notification.
+   *
+   * A value between 0.0 and 1.0. Higher values indicate higher relevance.
+   *
+   * @platform ios iOS >= 15
+   */
+  relevanceScore?: number;
+
+  /**
+   * The criteria the system evaluates to determine if it displays the notification in the current Focus.
+   *
+   * @platform ios iOS >= 16
+   */
+  filterCriteria?: string;
+
+  /**
+   * The type of content the notification contains.
+   *
+   * This property is applied only when supported by the iOS runtime.
+   *
+   * @platform ios
+   */
+  contentType?: string;
 }
 
 /**
@@ -252,15 +254,6 @@ export interface IOSNotificationPermissions {
    * @platform ios iOS >= 12
    */
   provisional?: boolean;
-
-  /**
-   * Request permission for Siri to automatically read out notification messages over AirPods.
-   *
-   * Defaults to false.
-   *
-   * @platform ios iOS >= 13
-   */
-  announcement?: boolean;
 
   // TODO later version
   // /**
@@ -407,10 +400,6 @@ export interface IOSNotificationSettings {
  * @platform ios
  */
 export enum IOSIntentIdentifier {
-  START_AUDIO_CALL = 0,
-
-  START_VIDEO_CALL = 1,
-
   SEARCH_CALL_HISTORY = 2,
 
   SET_AUDIO_SOURCE_IN_CAR = 3,
@@ -456,6 +445,8 @@ export enum IOSIntentIdentifier {
   REQUEST_RIDE = 23,
 
   GET_RIDE_STATUS = 24,
+
+  START_CALL = 25,
 }
 
 /**
@@ -472,13 +463,6 @@ export interface IOSNotificationCategory {
    * The unique ID for the category.
    */
   id: string;
-
-  /**
-   * Specify a custom format for the summary text, which is visible when notifications are grouped together.
-   *
-   * View the [Summary Text](/react-native/ios/categories#category-summary-text) documentation to learn more.
-   */
-  summaryFormat?: string;
 
   /**
    * Allow notifications in this category to be displayed in a CarPlay environment.

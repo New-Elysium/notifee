@@ -447,23 +447,31 @@
     content.threadIdentifier = iosDict[@"threadId"];
   }
 
-  if (@available(iOS 12.0, *)) {
-    // summaryArgument
-    if (iosDict[@"summaryArgument"] != nil) {
-      content.summaryArgument = iosDict[@"summaryArgument"];
-    }
-
-    // summaryArgumentCount
-    if (iosDict[@"summaryArgumentCount"] != nil) {
-      content.summaryArgumentCount = [iosDict[@"summaryArgumentCount"] unsignedIntValue];
-    }
-  }
-
   if (@available(iOS 13.0, *)) {
     // targetContentId
     if (iosDict[@"targetContentId"] != nil) {
       content.targetContentIdentifier = iosDict[@"targetContentId"];
     }
+  }
+
+  if (@available(iOS 15.0, *)) {
+    // relevanceScore
+    if (iosDict[@"relevanceScore"] != nil) {
+      content.relevanceScore = [iosDict[@"relevanceScore"] doubleValue];
+    }
+  }
+
+  if (@available(iOS 16.0, *)) {
+    // filterCriteria
+    if (iosDict[@"filterCriteria"] != nil && iosDict[@"filterCriteria"] != [NSNull null]) {
+      content.filterCriteria = iosDict[@"filterCriteria"];
+    }
+  }
+
+  // contentType
+  if (iosDict[@"contentType"] != nil && iosDict[@"contentType"] != [NSNull null] &&
+      [content respondsToSelector:NSSelectorFromString(@"setContentType:")]) {
+    [content setValue:iosDict[@"contentType"] forKey:@"contentType"];
   }
 
   // Ignore downloading attachments here if remote notifications via NSE
@@ -513,12 +521,6 @@
         categoryDictionary[@"hiddenPreviewsShowSubtitle"] = @(NO);
       }
 
-      if (@available(iOS 12.0, *)) {
-        if (notificationCategory.categorySummaryFormat != nil) {
-          categoryDictionary[@"summaryFormat"] = notificationCategory.categorySummaryFormat;
-        }
-      }
-
       if (@available(iOS 13.0, *)) {
         categoryDictionary[@"allowAnnouncement"] = @(
             ((notificationCategory.options & UNNotificationCategoryOptionAllowAnnouncement) != 0));
@@ -553,7 +555,6 @@
     UNNotificationCategory *category;
 
     NSString *id = categoryDictionary[@"id"];
-    NSString *summaryFormat = categoryDictionary[@"summaryFormat"];
     NSString *bodyPlaceHolder = categoryDictionary[@"hiddenPreviewsBodyPlaceholder"];
 
     NSArray<UNNotificationAction *> *actions =
@@ -588,7 +589,6 @@
                                                         actions:actions
                                               intentIdentifiers:intentIdentifiers
                                   hiddenPreviewsBodyPlaceholder:bodyPlaceHolder
-                                          categorySummaryFormat:summaryFormat
                                                         options:options];
     } else if (@available(iOS 11.0, *)) {
       category = [UNNotificationCategory categoryWithIdentifier:id
@@ -645,12 +645,6 @@
   if ([permissions[@"provisional"] isEqual:@(YES)]) {
     if (@available(iOS 12.0, *)) {
       options |= UNAuthorizationOptionProvisional;
-    }
-  }
-
-  if ([permissions[@"announcement"] isEqual:@(YES)]) {
-    if (@available(iOS 13.0, *)) {
-      options |= UNAuthorizationOptionAnnouncement;
     }
   }
 

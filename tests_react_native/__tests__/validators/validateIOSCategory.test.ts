@@ -6,7 +6,6 @@ describe('Validate IOS Category', () => {
     test('returns valid ', () => {
       const category: IOSNotificationCategory = {
         id: 'id',
-        summaryFormat: 'summaryFormat',
         allowInCarPlay: false,
         allowAnnouncement: false,
         hiddenPreviewsShowTitle: false,
@@ -16,7 +15,6 @@ describe('Validate IOS Category', () => {
 
       const $ = validateIOSCategory(category);
       expect($.id).toEqual('id');
-      expect($.summaryFormat).toEqual('summaryFormat');
       expect($.allowInCarPlay).toEqual(false);
       expect($.allowAnnouncement).toEqual(false);
       expect($.hiddenPreviewsShowTitle).toEqual(false);
@@ -27,17 +25,13 @@ describe('Validate IOS Category', () => {
     test('throws an error with an invalid category', () => {
       const category: IOSNotificationCategory = [] as any;
 
-      expect(() => validateIOSCategory(category)).toThrow(
-        "'category' expected an object value.",
-      );
+      expect(() => validateIOSCategory(category)).toThrow("'category' expected an object value.");
     });
 
     test('throws an error with an invalid category id', () => {
       const category: IOSNotificationCategory = { id: [] as any };
 
-      expect(() => validateIOSCategory(category)).toThrow(
-        "'category.id' expected a string value.",
-      );
+      expect(() => validateIOSCategory(category)).toThrow("'category.id' expected a string value.");
     });
 
     test('throws an error when category id is an empty string', () => {
@@ -45,14 +39,6 @@ describe('Validate IOS Category', () => {
 
       expect(() => validateIOSCategory(category)).toThrow(
         "'category.id' expected a valid string id.",
-      );
-    });
-
-    test('throws an error with an invalid summaryFormat param', () => {
-      const category: IOSNotificationCategory = { id: 'id', summaryFormat: [] as any };
-
-      expect(() => validateIOSCategory(category)).toThrow(
-        "'category.summaryFormat' expected a string value.",
       );
     });
 
