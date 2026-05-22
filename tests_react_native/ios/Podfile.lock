@@ -2574,7 +2574,7 @@ PODS:
     - RNFBApp
     - SocketRocket
     - Yoga
-  - RNNotifee (9.3.0):
+  - RNNotifee (9.3.2):
     - boost
     - DoubleConversion
     - fast_float
@@ -2603,7 +2603,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNNotifeeCore (9.3.0):
+  - RNNotifeeCore (9.3.2):
     - NotifeeCore
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
@@ -2965,8 +2965,8 @@ SPEC CHECKSUMS:
   ReactCommon: 169ac94d8f9ce6e2549c97b7f68999a605e24945
   RNFBApp: 0c7f6663ca9ae2169967b36fc48ae043f9396fb7
   RNFBMessaging: 1e46a1ade3647bc3148c3be203e70e98bb15415e
-  RNNotifee: a6484358f477d830b0ac628784283c58a18b9917
-  RNNotifeeCore: e2c7413117b006ba9a68cce456c30ff601bf930d
+  RNNotifee: 0006e4dfa589499a774c27503e3b79d7553e583b
+  RNNotifeeCore: 3406a85759578fa45c1b30a62b8ff113ff884a91
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: b73469916992acf4c6e8315d03ae0379bd9bd6e4
 

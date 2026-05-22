@@ -1,7 +1,7 @@
 # Notifee Project Overview
 
 ## Purpose
-Notifee is a feature-rich notifications library for React Native, supporting Android and iOS. The published npm package is `@psync/notifee` (v9.3.0).
+Notifee is a feature-rich notifications library for React Native, supporting Android and iOS. The published npm package is `@psync/notifee` (v9.3.2).
 
 ## Tech Stack
 - **TypeScript** (strict mode) for the JS/TS layer
