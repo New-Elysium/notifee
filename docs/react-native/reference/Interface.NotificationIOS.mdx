@@ -59,13 +59,29 @@ appropriate actions to display for the notification.
 
 > `optional` **communicationInfo?**: [`IOSCommunicationInfo`](react-native/reference/Interface.IOSCommunicationInfo)
 
-Defined in: [packages/react-native/src/types/NotificationIOS.ts:125](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L125)
+Defined in: [packages/react-native/src/types/NotificationIOS.ts:102](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L102)
 
 Optional property for communication notifications
 
 #### Platform
 
 ios iOS >= 15
+
+***
+
+### contentType?
+
+> `optional` **contentType?**: `string`
+
+Defined in: [packages/react-native/src/types/NotificationIOS.ts:127](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L127)
+
+The type of content the notification contains.
+
+This property is applied only when supported by the iOS runtime.
+
+#### Platform
+
+ios
 
 ***
 
@@ -100,11 +116,25 @@ ios iOS >= 12
 
 ***
 
+### filterCriteria?
+
+> `optional` **filterCriteria?**: `string`
+
+Defined in: [packages/react-native/src/types/NotificationIOS.ts:118](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L118)
+
+The criteria the system evaluates to determine if it displays the notification in the current Focus.
+
+#### Platform
+
+ios iOS >= 16
+
+***
+
 ### foregroundPresentationOptions?
 
 > `optional` **foregroundPresentationOptions?**: [`IOSForegroundPresentationOptions`](react-native/reference/Interface.IOSForegroundPresentationOptions)
 
-Defined in: [packages/react-native/src/types/NotificationIOS.ts:118](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L118)
+Defined in: [packages/react-native/src/types/NotificationIOS.ts:95](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L95)
 
 Optional property to customise how notifications are presented when the app is in the foreground.
 
@@ -136,6 +166,22 @@ The launch image that will be used when the app is opened from this notification
 
 ***
 
+### relevanceScore?
+
+> `optional` **relevanceScore?**: `number`
+
+Defined in: [packages/react-native/src/types/NotificationIOS.ts:111](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L111)
+
+The score the system uses to determine if the notification is the summary's featured notification.
+
+A value between 0.0 and 1.0. Higher values indicate higher relevance.
+
+#### Platform
+
+ios iOS >= 15
+
+***
+
 ### sound?
 
 > `optional` **sound?**: `string`
@@ -151,48 +197,11 @@ Use 'default' to use the default system sound.
 
 ***
 
-### summaryArgument?
-
-> `optional` **summaryArgument?**: `string`
-
-Defined in: [packages/react-native/src/types/NotificationIOS.ts:88](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L88)
-
-The argument that is inserted in the IOSCategory.summaryFormat for this notification.
-
-See `IOSCategory.summaryFormat`.
-
-#### Platform
-
-ios iOS >= 12
-
-***
-
-### summaryArgumentCount?
-
-> `optional` **summaryArgumentCount?**: `number`
-
-Defined in: [packages/react-native/src/types/NotificationIOS.ts:102](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L102)
-
-A number that indicates how many items in the summary are being represented.
-
-For example if a messages app sends one notification for 3 new messages in a group chat,
-the summaryArgument could be the name of the group chat and the summaryArgumentCount should be 3.
-
-If set, value cannot be 0 or less.
-
-See `IOSCategory.summaryFormat`.
-
-#### Platform
-
-ios iOS >= 12
-
-***
-
 ### targetContentId?
 
 > `optional` **targetContentId?**: `string`
 
-Defined in: [packages/react-native/src/types/NotificationIOS.ts:111](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L111)
+Defined in: [packages/react-native/src/types/NotificationIOS.ts:88](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationIOS.ts#L88)
 
 The identifier for the window to be opened when the user taps a notification.
 
