@@ -82,11 +82,10 @@ export default {
               path: './assets/notifications/message_chime.mp3',
             },
           ],
+          androidNotificationColor: '#ffffff',
           backgroundModes: ['remote-notification'],
+          enableNotificationServiceExtension: true,
           iosSoundFiles: ['./assets/notifications/chime.wav'],
-          notificationServiceExtension: {
-            enabled: true,
-          },
         },
       ],
     ],
@@ -101,8 +100,10 @@ Supported plugin options:
 - `enableCommunicationNotifications?: boolean`
 - `androidIcons?: Array<{ name: string; path: string; type: 'small' | 'large' }>`
 - `androidSoundFiles?: Array<{ name: string; path: string }>`
+- `androidNotificationColor?: string` — hex color (e.g. `'#ffffff'`). Writes the `notification_icon_color` resource into `values/colors.xml`, the same resource name `expo-notifications` generated, so FCM manifest metadata like `com.google.firebase.messaging.default_notification_color` keeps resolving after removing `expo-notifications`. Notifee does not read the Expo `notification.color` config; if `expo-notifications` is also installed, list `@psync/notifee` after it in the `plugins` array so this value takes precedence.
 - `iosSoundFiles?: string[]`
-- `notificationServiceExtension?: { enabled?: boolean; name?: string; bundleIdentifier?: string; deploymentTarget?: string; appGroupName?: string; customSourceFilePath?: string; entitlements?: Record<string, unknown>; infoPlist?: Record<string, unknown> }`
+- `enableNotificationServiceExtension?: boolean`
+- `serviceExtensionSettings?: { name?: string; bundleIdentifier?: string; deploymentTarget?: string; appGroupName?: string; customSourceFilePath?: string; entitlements?: Record<string, unknown>; infoPlist?: Record<string, unknown> }`
 - `appleDevTeamId?: string`
 - `verbose?: boolean`
 
@@ -112,11 +113,12 @@ Notes:
 - `backgroundModes` is opt-in. The plugin does not add `remote-notification` unless you set it.
 - `androidSoundFiles` copies local files into `android/app/src/main/res/raw`. At runtime, reference the resource name you configured, for example `sound: 'message_chime'`.
 - Android accepts a broader range of notification sound containers than iOS. In practice, `.mp3`, `.wav`, and `.ogg` are the most predictable Android choices, while iOS notification sounds must remain `.wav`, `.aif`, `.aiff`, or `.caf`.
-- `notificationServiceExtension.deploymentTarget` only changes the generated Notification Service Extension target. Set the main app deployment target with `expo-build-properties` or your native project settings.
+- The extension is enabled with the top-level `enableNotificationServiceExtension` option. Additional settings live under `serviceExtensionSettings`; the former `notificationServiceExtension` object (including its `enabled` key) is no longer accepted.
+- `serviceExtensionSettings.deploymentTarget` only changes the generated Notification Service Extension target. Set the main app deployment target with `expo-build-properties` or your native project settings.
 - `appleDevTeamId` is usually unnecessary if `expo.ios.appleTeamId` is already set in your Expo config.
-- Flat legacy aliases remain supported for backward compatibility: `enableNotificationServiceExtension`, `notificationServiceExtensionName`, `notificationServiceExtensionBundleIdentifier`, `iosDeploymentTarget`, `customNotificationServiceFilePath`, `appGroupName`, `notificationServiceExtensionEntitlements`, and `notificationServiceExtensionInfoPlist`.
+- Flat legacy aliases remain supported for backward compatibility: `notificationServiceExtensionName`, `notificationServiceExtensionBundleIdentifier`, `iosDeploymentTarget`, `customNotificationServiceFilePath`, `appGroupName`, `notificationServiceExtensionEntitlements`, and `notificationServiceExtensionInfoPlist`.
 
-When the notification service extension is enabled (`notificationServiceExtension.enabled` or the legacy `enableNotificationServiceExtension` alias), the plugin will:
+When the notification service extension is enabled (`enableNotificationServiceExtension: true`), the plugin will:
 
 - create an iOS Notification Service Extension target,
 - add the required `RNNotifeeCore` Podfile target with `$NotifeeExtension = true`,

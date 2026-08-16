@@ -32,10 +32,13 @@ function isValidAndroidResourceName(name) {
   return /^[a-z0-9_]+$/.test(name);
 }
 
+function isValidAndroidColor(value) {
+  // #RGB, #RGBA, #RRGGBB or #AARRGGBB — the formats Android color resources accept as literals.
+  return /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(value);
+}
+
 function getExtensionConfig(options) {
-  return isPlainObject(options.notificationServiceExtension)
-    ? options.notificationServiceExtension
-    : {};
+  return isPlainObject(options.serviceExtensionSettings) ? options.serviceExtensionSettings : {};
 }
 
 function normalizeProps(config, props) {
@@ -46,10 +49,7 @@ function normalizeProps(config, props) {
     extensionConfig.name || options.notificationServiceExtensionName || DEFAULT_EXTENSION_NAME;
   const bundleIdentifier = ios.bundleIdentifier || null;
   const appleDevTeamId = options.appleDevTeamId || ios.appleTeamId;
-  const enableNotificationServiceExtension =
-    extensionConfig.enabled !== undefined
-      ? extensionConfig.enabled === true
-      : options.enableNotificationServiceExtension === true;
+  const enableNotificationServiceExtension = options.enableNotificationServiceExtension === true;
   const extensionBundleIdentifier =
     extensionConfig.bundleIdentifier ||
     options.notificationServiceExtensionBundleIdentifier ||
@@ -60,6 +60,7 @@ function normalizeProps(config, props) {
     (bundleIdentifier ? `group.${bundleIdentifier}.notifee` : null);
 
   return {
+    androidNotificationColor: options.androidNotificationColor || null,
     apsEnvMode: options.apsEnvMode,
     androidIcons: options.androidIcons || [],
     androidSoundFiles: options.androidSoundFiles || [],
@@ -90,6 +91,7 @@ function normalizeProps(config, props) {
 function validateProps(normalizedProps, rawProps = {}) {
   const {
     androidIcons,
+    androidNotificationColor,
     androidSoundFiles,
     apsEnvMode,
     appleDevTeamId,
@@ -163,6 +165,16 @@ function validateProps(normalizedProps, rawProps = {}) {
     }
   }
 
+  if (
+    androidNotificationColor !== undefined &&
+    androidNotificationColor !== null &&
+    (typeof androidNotificationColor !== 'string' || !isValidAndroidColor(androidNotificationColor))
+  ) {
+    throwPluginError(
+      "'androidNotificationColor' must be a hex color string (e.g. '#ffffff' or '#ffffffff'), which is written to the 'notification_icon_color' Android color resource.",
+    );
+  }
+
   if (androidIcons !== undefined && !Array.isArray(androidIcons)) {
     throwPluginError("'androidIcons' must be an array.");
   }
@@ -216,10 +228,22 @@ function validateProps(normalizedProps, rawProps = {}) {
   }
 
   if (
-    rawProps.notificationServiceExtension !== undefined &&
-    !isPlainObject(rawProps.notificationServiceExtension)
+    rawProps.serviceExtensionSettings !== undefined &&
+    !isPlainObject(rawProps.serviceExtensionSettings)
   ) {
-    throwPluginError("'notificationServiceExtension' must be an object when provided.");
+    throwPluginError("'serviceExtensionSettings' must be an object when provided.");
+  }
+
+  if (rawProps.serviceExtensionSettings && 'enabled' in rawProps.serviceExtensionSettings) {
+    throwPluginError(
+      "'serviceExtensionSettings.enabled' is not supported. Enable the extension with the top-level 'enableNotificationServiceExtension: true' option.",
+    );
+  }
+
+  if (rawProps.notificationServiceExtension !== undefined) {
+    throwPluginError(
+      "'notificationServiceExtension' has been renamed to 'serviceExtensionSettings'. Enable the extension with the top-level 'enableNotificationServiceExtension: true' option.",
+    );
   }
 
   if (
@@ -232,6 +256,7 @@ function validateProps(normalizedProps, rawProps = {}) {
 
 module.exports = {
   isPlainObject,
+  isValidAndroidColor,
   isValidAndroidResourceName,
   log,
   normalizeProps,

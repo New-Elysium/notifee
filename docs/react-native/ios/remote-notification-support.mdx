@@ -64,10 +64,8 @@ Example:
         "@psync/notifee",
         {
           "backgroundModes": ["remote-notification"],
-          "iosSoundFiles": ["./assets/notifications/chime.wav"],
-          "notificationServiceExtension": {
-            "enabled": true
-          }
+          "enableNotificationServiceExtension": true,
+          "iosSoundFiles": ["./assets/notifications/chime.wav"]
         }
       ]
     ]
@@ -77,7 +75,7 @@ Example:
 
 If your remote notifications use a custom iOS sound, prefer `iosSoundFiles` so the sound is copied into both the app target and the generated Notification Service Extension during prebuild.
 
-If you need to customize the generated extension further, the plugin also supports `notificationServiceExtension.name`, `bundleIdentifier`, `deploymentTarget`, `appGroupName`, `customSourceFilePath`, `entitlements`, and `infoPlist`.
+If you need to customize the generated extension further, the plugin also supports `serviceExtensionSettings.name`, `bundleIdentifier`, `deploymentTarget`, `appGroupName`, `customSourceFilePath`, `entitlements`, and `infoPlist`.
 
 If you prefer to manage the native iOS project manually, the steps below still work.
 

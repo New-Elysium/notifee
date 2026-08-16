@@ -114,9 +114,7 @@ Then add both plugins to your Expo config:
             }
           ],
           "iosSoundFiles": ["./assets/notifications/chime.wav"],
-          "notificationServiceExtension": {
-            "enabled": true
-          }
+          "enableNotificationServiceExtension": true
         }
       ]
     ]
@@ -133,19 +131,22 @@ Then add both plugins to your Expo config:
 | `enableCommunicationNotifications` | `boolean`                   | Enables iOS communication-notification capability.                                                                           |
 | `androidIcons`                     | `Array<{name, path, type}>` | Android notification icon resources. `type` is `"small"` or `"large"`.                                                       |
 | `androidSoundFiles`                | `Array<{name, path}>`       | Copies sound files into `android/app/src/main/res/raw`.                                                                      |
+| `androidNotificationColor`         | `string`                    | Hex color (e.g. `"#ffffff"`) written to the `notification_icon_color` resource in `values/colors.xml`.                      |
 | `iosSoundFiles`                    | `string[]`                  | Copies iOS notification sounds (`.wav`, `.aif`, `.aiff`, `.caf`) into both app and extension targets.                        |
-| `notificationServiceExtension`     | `object`                    | `{ enabled?, name?, bundleIdentifier?, deploymentTarget?, appGroupName?, customSourceFilePath?, entitlements?, infoPlist? }` |
+| `enableNotificationServiceExtension` | `boolean`                 | Enables the generated iOS Notification Service Extension.                                                                   |
+| `serviceExtensionSettings`         | `object`                    | `{ name?, bundleIdentifier?, deploymentTarget?, appGroupName?, customSourceFilePath?, entitlements?, infoPlist? }`           |
 | `appleDevTeamId`                   | `string`                    | Usually unnecessary if `expo.ios.appleTeamId` is already set.                                                                |
 
 Notes:
 
 - `androidSoundFiles` copies local files into `android/app/src/main/res/raw`. At runtime, reference the configured resource name such as `sound: "message_chime"` on your channel or notification.
 - Android accepts a broader range of notification sound containers than iOS. In practice, `.mp3`, `.wav`, and `.ogg` are the most predictable Android choices, while iOS notification sounds must stay `.wav`, `.aif`, `.aiff`, or `.caf`.
-- `notificationServiceExtension.deploymentTarget` in the Notifee plugin only changes the generated Notification Service Extension target. Set the main app deployment target with `expo-build-properties` or your native project settings.
+- The extension is enabled with the top-level `enableNotificationServiceExtension` option. Additional settings live under `serviceExtensionSettings`; the former `notificationServiceExtension` object (including its `enabled` key) is no longer accepted.
+- `serviceExtensionSettings.deploymentTarget` in the Notifee plugin only changes the generated Notification Service Extension target. Set the main app deployment target with `expo-build-properties` or your native project settings.
 - If `expo.ios.appleTeamId` is already present in your Expo config, you usually do not need to also set `appleDevTeamId` in the Notifee plugin options.
-- When `iosSoundFiles` and `notificationServiceExtension.enabled` are both enabled, the plugin wires those sounds into both the main app target and the extension during the same prebuild pass.
+- When `iosSoundFiles` and `enableNotificationServiceExtension` are both enabled, the plugin wires those sounds into both the main app target and the extension during the same prebuild pass.
 - Small icons should be transparent, monochrome status-bar assets (PNG). The plugin warns when a small icon source is not a PNG or when an icon source is not square.
-- Flat legacy aliases remain supported for backward compatibility: `enableNotificationServiceExtension`, `notificationServiceExtensionName`, `notificationServiceExtensionBundleIdentifier`, `iosDeploymentTarget`, `customNotificationServiceFilePath`, `appGroupName`, `notificationServiceExtensionEntitlements`, and `notificationServiceExtensionInfoPlist`.
+- Flat legacy aliases remain supported for backward compatibility: `notificationServiceExtensionName`, `notificationServiceExtensionBundleIdentifier`, `iosDeploymentTarget`, `customNotificationServiceFilePath`, `appGroupName`, `notificationServiceExtensionEntitlements`, and `notificationServiceExtensionInfoPlist`.
 
 Finally, ensure you run `npx expo prebuild` and rebuild your app as described in [Add custom native code](https://docs.expo.dev/workflow/customizing/) and [Continuous Native Generation](https://docs.expo.dev/workflow/prebuild/).
 

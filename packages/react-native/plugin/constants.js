@@ -3,6 +3,7 @@ const DEFAULT_APP_VERSION = '1.0.0';
 const DEFAULT_IOS_BUILD_NUMBER = '1';
 const DEFAULT_EXTENSION_NAME = 'NotifeeNotificationService';
 const DEFAULT_NOTIFICATION_SERVICE_FILE = 'NotificationService.m';
+const NOTIFICATION_COLOR_NAME = 'notification_icon_color';
 const RAW_RES_PATH = 'android/app/src/main/res/raw';
 const IOS_SOUNDS_DIR = 'NotifeeSounds';
 const PACKAGE_NAME = '@psync/notifee';
@@ -37,6 +38,7 @@ module.exports = {
   DEFAULT_NOTIFICATION_SERVICE_FILE,
   IOS_SOUNDS_DIR,
   LARGE_ICON_SIZES,
+  NOTIFICATION_COLOR_NAME,
   PACKAGE_NAME,
   RAW_RES_PATH,
   RECOMMENDED_ANDROID_SOUND_EXTENSIONS,

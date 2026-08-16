@@ -2,9 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const { imageSize: getImageSize } = require('image-size');
 const { generateImageAsync } = require('@expo/image-utils');
-const { withDangerousMod } = require('@expo/config-plugins');
+const { withAndroidColors, withDangerousMod } = require('@expo/config-plugins');
+const { assignColorValue } = require('@expo/config-plugins/build/android/Colors');
 const {
   LARGE_ICON_SIZES,
+  NOTIFICATION_COLOR_NAME,
   RAW_RES_PATH,
   RECOMMENDED_ANDROID_SOUND_EXTENSIONS,
   RES_PATH,
@@ -107,7 +109,31 @@ function saveSound(projectRoot, sound) {
   fs.copyFileSync(resolvedPath, path.join(destinationDir, `${sound.name}${extension}`));
 }
 
+function setNotificationIconColor(xml, color) {
+  return assignColorValue(xml, { name: NOTIFICATION_COLOR_NAME, value: color });
+}
+
+function withNotificationColor(config, props) {
+  return withAndroidColors(config, modConfig => {
+    modConfig.modResults = setNotificationIconColor(
+      modConfig.modResults,
+      props.androidNotificationColor,
+    );
+    log(
+      `Set Android notification color resource '${NOTIFICATION_COLOR_NAME}' to '${props.androidNotificationColor}'.`,
+      props.verbose,
+    );
+    return modConfig;
+  });
+}
+
 const withNotifeeAndroid = (config, props) => {
+  let nextConfig = config;
+
+  if (props.androidNotificationColor) {
+    nextConfig = withNotificationColor(nextConfig, props);
+  }
+
   const icons = Array.isArray(props.androidIcons) ? props.androidIcons.slice() : [];
   const sounds = Array.isArray(props.androidSoundFiles) ? props.androidSoundFiles.slice() : [];
 
@@ -123,10 +149,10 @@ const withNotifeeAndroid = (config, props) => {
   }
 
   if (!icons.length && !sounds.length) {
-    return config;
+    return nextConfig;
   }
 
-  return withDangerousMod(config, [
+  return withDangerousMod(nextConfig, [
     'android',
     async modConfig => {
       for (const icon of icons) {
@@ -145,5 +171,6 @@ const withNotifeeAndroid = (config, props) => {
 };
 
 module.exports = {
+  setNotificationIconColor,
   withNotifeeAndroid,
 };

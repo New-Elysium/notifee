@@ -124,11 +124,10 @@ export default {
               path: './assets/notifications/message_chime.mp3',
             },
           ],
+          androidNotificationColor: '#ffffff',
           backgroundModes: ['remote-notification'],
+          enableNotificationServiceExtension: true,
           iosSoundFiles: ['./assets/notifications/chime.wav'],
-          notificationServiceExtension: {
-            enabled: true,
-          },
         },
       ],
     ],
@@ -136,7 +135,9 @@ export default {
 };
 ```
 
-The plugin only applies the native changes you opt into. It does not add iOS background modes unless you set `backgroundModes`, and when `iosSoundFiles` plus `notificationServiceExtension.enabled` are both set it wires those files into the app and extension during the same prebuild. Android sound files are packaged separately through `androidSoundFiles`, because Android accepts a broader range of audio formats than iOS notification sounds do.
+The plugin only applies the native changes you opt into. It does not add iOS background modes unless you set `backgroundModes`, and when `iosSoundFiles` plus `enableNotificationServiceExtension` are both set it wires those files into the app and extension during the same prebuild. Android sound files are packaged separately through `androidSoundFiles`, because Android accepts a broader range of audio formats than iOS notification sounds do.
+
+`androidNotificationColor` writes the `notification_icon_color` color resource into `android/app/src/main/res/values/colors.xml` — the same resource name `expo-notifications` used to generate. Reference it from manifest metadata such as `com.google.firebase.messaging.default_notification_color` with `@color/notification_icon_color`. If `expo-notifications` is also installed, list `@psync/notifee` after it in the `plugins` array so this value takes precedence.
 
 See the [package README](./packages/react-native/README.md#expo-config-plugin) for all supported options.
 
