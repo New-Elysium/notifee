@@ -114,6 +114,8 @@ Then add both plugins to your Expo config:
             }
           ],
           "iosSoundFiles": ["./assets/notifications/chime.wav"],
+          "androidNotificationColor": "#ffffff",
+          "androidNotificationIcon": "./assets/notifications/ic_notification.png",
           "enableNotificationServiceExtension": true
         }
       ]
@@ -132,6 +134,7 @@ Then add both plugins to your Expo config:
 | `androidIcons`                     | `Array<{name, path, type}>` | Android notification icon resources. `type` is `"small"` or `"large"`.                                                       |
 | `androidSoundFiles`                | `Array<{name, path}>`       | Copies sound files into `android/app/src/main/res/raw`.                                                                      |
 | `androidNotificationColor`         | `string`                    | Hex color (e.g. `"#ffffff"`) written to the `notification_icon_color` resource in `values/colors.xml`.                      |
+| `androidNotificationIcon`          | `string`                    | Path to a transparent monochrome PNG. Generates the `notification_icon` drawable and FCM `default_notification_icon` metadata (Android 8.0+). |
 | `iosSoundFiles`                    | `string[]`                  | Copies iOS notification sounds (`.wav`, `.aif`, `.aiff`, `.caf`) into both app and extension targets.                        |
 | `enableNotificationServiceExtension` | `boolean`                 | Enables the generated iOS Notification Service Extension.                                                                   |
 | `serviceExtensionSettings`         | `object`                    | `{ name?, bundleIdentifier?, deploymentTarget?, appGroupName?, customSourceFilePath?, entitlements?, infoPlist? }`           |
@@ -145,6 +148,7 @@ Notes:
 - `serviceExtensionSettings.deploymentTarget` in the Notifee plugin only changes the generated Notification Service Extension target. Set the main app deployment target with `expo-build-properties` or your native project settings.
 - If `expo.ios.appleTeamId` is already present in your Expo config, you usually do not need to also set `appleDevTeamId` in the Notifee plugin options.
 - When `iosSoundFiles` and `enableNotificationServiceExtension` are both enabled, the plugin wires those sounds into both the main app target and the extension during the same prebuild pass.
+- Migrating from `expo-notifications`: remove the top-level `notification` property from your app config (Expo SDK 55+ fails prebuild when it exists and `expo-notifications` is not installed) and map values to the plugin options — `notification.color` → `androidNotificationColor`, `notification.icon` → `androidNotificationIcon`, `sounds` → `androidSoundFiles` / `iosSoundFiles`. For local notifications, set `android.smallIcon: "notification_icon"` in your notification payloads.
 - Small icons should be transparent, monochrome status-bar assets (PNG). The plugin warns when a small icon source is not a PNG or when an icon source is not square.
 - Flat legacy aliases remain supported for backward compatibility: `notificationServiceExtensionName`, `notificationServiceExtensionBundleIdentifier`, `iosDeploymentTarget`, `customNotificationServiceFilePath`, `appGroupName`, `notificationServiceExtensionEntitlements`, and `notificationServiceExtensionInfoPlist`.
 

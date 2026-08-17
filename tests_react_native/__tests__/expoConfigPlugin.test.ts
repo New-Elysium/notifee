@@ -51,7 +51,10 @@ jest.mock(
 
 const withNotifee = require('../../packages/react-native/app.plugin');
 const { normalizeProps, validateProps } = require('../../packages/react-native/plugin/utils');
-const { setNotificationIconColor } = require('../../packages/react-native/plugin/android');
+const {
+  setNotificationIconColor,
+  setNotificationIconMetaData,
+} = require('../../packages/react-native/plugin/android');
 
 describe('Expo config plugin', () => {
   test('exports a plugin function', () => {
@@ -201,6 +204,68 @@ describe('Expo config plugin', () => {
     expect(result.resources.color).toEqual([
       { $: { name: 'notification_icon_color' }, _: '#ffffff' },
     ]);
+  });
+
+  test('resolves android notification icon from plugin props only', () => {
+    const fromProps = normalizeProps({ ios: {} }, { androidNotificationIcon: './assets/icon.png' });
+    expect(fromProps.androidNotificationIcon).toBe('./assets/icon.png');
+
+    const unset = normalizeProps({ ios: {} }, {});
+    expect(unset.androidNotificationIcon).toBe(null);
+  });
+
+  test('rejects non-string android notification icons', () => {
+    expect(() =>
+      validateProps(
+        normalizeProps(
+          { ios: { bundleIdentifier: 'dev.psync.notifee' } },
+          { androidNotificationIcon: 123 as any },
+        ),
+      ),
+    ).toThrow(/androidNotificationIcon/);
+  });
+
+  test('adds FCM default notification icon meta-data to the manifest', () => {
+    const manifest = {
+      manifest: { application: [{ $: { 'android:name': '.MainApplication' } }] },
+    };
+
+    const result = setNotificationIconMetaData(manifest, '@drawable/notification_icon');
+
+    expect(result.manifest.application[0]['meta-data']).toEqual([
+      {
+        $: {
+          'android:name': 'com.google.firebase.messaging.default_notification_icon',
+          'android:resource': '@drawable/notification_icon',
+        },
+      },
+    ]);
+  });
+
+  test('replaces an existing FCM notification icon meta-data item in place', () => {
+    const manifest = {
+      manifest: {
+        application: [
+          {
+            $: { 'android:name': '.MainApplication' },
+            'meta-data': [
+              {
+                $: {
+                  'android:name': 'com.google.firebase.messaging.default_notification_icon',
+                  'android:resource': '@drawable/old_icon',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const result = setNotificationIconMetaData(manifest, '@drawable/notification_icon');
+    const items = result.manifest.application[0]['meta-data'];
+
+    expect(items).toHaveLength(1);
+    expect(items[0].$['android:resource']).toBe('@drawable/notification_icon');
   });
 
   test('keeps explicit background modes opt-in', () => {

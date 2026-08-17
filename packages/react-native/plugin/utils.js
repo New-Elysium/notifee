@@ -61,6 +61,7 @@ function normalizeProps(config, props) {
 
   return {
     androidNotificationColor: options.androidNotificationColor || null,
+    androidNotificationIcon: options.androidNotificationIcon || null,
     apsEnvMode: options.apsEnvMode,
     androidIcons: options.androidIcons || [],
     androidSoundFiles: options.androidSoundFiles || [],
@@ -92,6 +93,7 @@ function validateProps(normalizedProps, rawProps = {}) {
   const {
     androidIcons,
     androidNotificationColor,
+    androidNotificationIcon,
     androidSoundFiles,
     apsEnvMode,
     appleDevTeamId,
@@ -173,6 +175,14 @@ function validateProps(normalizedProps, rawProps = {}) {
     throwPluginError(
       "'androidNotificationColor' must be a hex color string (e.g. '#ffffff' or '#ffffffff'), which is written to the 'notification_icon_color' Android color resource.",
     );
+  }
+
+  if (
+    androidNotificationIcon !== undefined &&
+    androidNotificationIcon !== null &&
+    typeof androidNotificationIcon !== 'string'
+  ) {
+    throwPluginError("'androidNotificationIcon' must be a string file path.");
   }
 
   if (androidIcons !== undefined && !Array.isArray(androidIcons)) {

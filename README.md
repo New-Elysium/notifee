@@ -125,6 +125,7 @@ export default {
             },
           ],
           androidNotificationColor: '#ffffff',
+          androidNotificationIcon: './assets/notifications/ic_notification.png',
           backgroundModes: ['remote-notification'],
           enableNotificationServiceExtension: true,
           iosSoundFiles: ['./assets/notifications/chime.wav'],
@@ -138,6 +139,10 @@ export default {
 The plugin only applies the native changes you opt into. It does not add iOS background modes unless you set `backgroundModes`, and when `iosSoundFiles` plus `enableNotificationServiceExtension` are both set it wires those files into the app and extension during the same prebuild. Android sound files are packaged separately through `androidSoundFiles`, because Android accepts a broader range of audio formats than iOS notification sounds do.
 
 `androidNotificationColor` writes the `notification_icon_color` color resource into `android/app/src/main/res/values/colors.xml` — the same resource name `expo-notifications` used to generate. Reference it from manifest metadata such as `com.google.firebase.messaging.default_notification_color` with `@color/notification_icon_color`. If `expo-notifications` is also installed, list `@psync/notifee` after it in the `plugins` array so this value takes precedence.
+
+`androidNotificationIcon` is required for correct icon display on Android 8.0+. It generates the `notification_icon` drawable (24–96 px, all densities) and wires the `com.google.firebase.messaging.default_notification_icon` manifest metadata to `@drawable/notification_icon`, which FCM uses for notifications displayed while the app is backgrounded or killed. Use a transparent, monochrome (alpha-only) PNG — opaque or colored icons render as a white block in the status bar. The source asset should be square.
+
+**Migrating from `expo-notifications` / the `notification` config property:** Expo SDK 55+ rejects the top-level `notification` property in app config when `expo-notifications` is not installed — remove the property from your app config. Then map your configuration to the plugin options: `notification.color` → `androidNotificationColor`, `notification.icon` → `androidNotificationIcon`, and notification sounds → `androidSoundFiles` / `iosSoundFiles`. For local notifications built with notifee, also set `android.smallIcon: 'notification_icon'` (or another generated icon name) in your notification payloads.
 
 See the [package README](./packages/react-native/README.md#expo-config-plugin) for all supported options.
 
