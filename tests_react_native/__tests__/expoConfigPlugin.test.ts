@@ -80,7 +80,7 @@ describe('Expo config plugin', () => {
     expect(normalized.extensionBundleIdentifier).toBe(
       'dev.psync.notifee.NotifeeNotificationService',
     );
-    expect(normalized.appGroupName).toBe('group.dev.psync.notifee.notifee');
+    expect(normalized.appGroupName).toBe('group.dev.psync.notifee');
     expect(normalized.iosSoundFiles).toEqual([]);
   });
 
@@ -266,6 +266,63 @@ describe('Expo config plugin', () => {
 
     expect(items).toHaveLength(1);
     expect(items[0].$['android:resource']).toBe('@drawable/notification_icon');
+  });
+
+  test('warns when the derived app group is not declared in ios.entitlements', () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    try {
+      withNotifee(
+        {
+          ios: { bundleIdentifier: 'dev.psync.notifee' },
+        },
+        { enableNotificationServiceExtension: true },
+      );
+
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      expect(warnSpy.mock.calls[0][0]).toContain('group.dev.psync.notifee');
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  test('does not warn when the app group is declared in ios.entitlements', () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    try {
+      withNotifee(
+        {
+          ios: {
+            bundleIdentifier: 'dev.psync.notifee',
+            entitlements: {
+              'com.apple.security.application-groups': ['group.dev.psync.notifee'],
+            },
+          },
+        },
+        { enableNotificationServiceExtension: true },
+      );
+
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  test('does not warn about app groups when the extension is disabled', () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    try {
+      withNotifee(
+        {
+          ios: { bundleIdentifier: 'dev.psync.notifee' },
+        },
+        {},
+      );
+
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   test('keeps explicit background modes opt-in', () => {

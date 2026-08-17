@@ -1,6 +1,6 @@
 {
   "name": "@psync/notifee",
-  "version": "9.5.0",
+  "version": "9.5.1do",
   "author": "Psync <oss@psync.dev> (https://psync.club)",
   "description": "Notifee - a feature rich notifications library for React Native.",
   "main": "dist/index.js",

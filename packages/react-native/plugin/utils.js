@@ -57,7 +57,7 @@ function normalizeProps(config, props) {
   const appGroupName =
     extensionConfig.appGroupName ||
     options.appGroupName ||
-    (bundleIdentifier ? `group.${bundleIdentifier}.notifee` : null);
+    (bundleIdentifier ? `group.${bundleIdentifier}` : null);
 
   return {
     androidNotificationColor: options.androidNotificationColor || null,
