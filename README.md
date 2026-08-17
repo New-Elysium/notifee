@@ -144,6 +144,8 @@ The plugin only applies the native changes you opt into. It does not add iOS bac
 
 **Migrating from `expo-notifications` / the `notification` config property:** Expo SDK 55+ rejects the top-level `notification` property in app config when `expo-notifications` is not installed — remove the property from your app config. Then map your configuration to the plugin options: `notification.color` → `androidNotificationColor`, `notification.icon` → `androidNotificationIcon`, and notification sounds → `androidSoundFiles` / `iosSoundFiles`. For local notifications built with notifee, also set `android.smallIcon: 'notification_icon'` (or another generated icon name) in your notification payloads.
 
+**iOS App Groups & EAS:** when the Notification Service Extension is enabled, the plugin injects an App Group entitlement (`group.<bundle.id>` by default). EAS only registers groups declared in app config `ios.entitlements` and syncs credentials before prebuild — declare the group there or the iOS build fails with a provisioning profile mismatch (prebuild warns when it is missing). See the [package README](./packages/react-native/README.md#ios-app-groups--eas-builds) for details.
+
 See the [package README](./packages/react-native/README.md#expo-config-plugin) for all supported options.
 
 ## Expo Support TODOs

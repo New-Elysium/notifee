@@ -126,19 +126,20 @@ Then add both plugins to your Expo config:
 
 **Supported plugin options:**
 
-| Option                             | Type                        | Description                                                                                                                  |
-| ---------------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `apsEnvMode`                       | `string`                    | `"development"` or `"production"`. Usually unnecessary if `expo-notifications` plugin sets this.                             |
-| `backgroundModes`                  | `string[]`                  | Opt-in. The plugin does not add `remote-notification` unless set.                                                            |
-| `enableCommunicationNotifications` | `boolean`                   | Enables iOS communication-notification capability.                                                                           |
-| `androidIcons`                     | `Array<{name, path, type}>` | Android notification icon resources. `type` is `"small"` or `"large"`.                                                       |
-| `androidSoundFiles`                | `Array<{name, path}>`       | Copies sound files into `android/app/src/main/res/raw`.                                                                      |
-| `androidNotificationColor`         | `string`                    | Hex color (e.g. `"#ffffff"`) written to the `notification_icon_color` resource in `values/colors.xml`.                      |
-| `androidNotificationIcon`          | `string`                    | Path to a transparent monochrome PNG. Generates the `notification_icon` drawable and FCM `default_notification_icon` metadata (Android 8.0+). |
-| `iosSoundFiles`                    | `string[]`                  | Copies iOS notification sounds (`.wav`, `.aif`, `.aiff`, `.caf`) into both app and extension targets.                        |
-| `enableNotificationServiceExtension` | `boolean`                 | Enables the generated iOS Notification Service Extension.                                                                   |
-| `serviceExtensionSettings`         | `object`                    | `{ name?, bundleIdentifier?, deploymentTarget?, appGroupName?, customSourceFilePath?, entitlements?, infoPlist? }`           |
-| `appleDevTeamId`                   | `string`                    | Usually unnecessary if `expo.ios.appleTeamId` is already set.                                                                |
+| Option                               | Type                        | Description                                                                                                                                       |
+| ------------------------------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apsEnvMode`                         | `string`                    | `"development"` or `"production"`. Usually unnecessary if `expo-notifications` plugin sets this.                                                  |
+| `backgroundModes`                    | `string[]`                  | Opt-in. The plugin does not add `remote-notification` unless set.                                                                                 |
+| `enableCommunicationNotifications`   | `boolean`                   | Enables iOS communication-notification capability.                                                                                                |
+| `androidIcons`                       | `Array<{name, path, type}>` | Android notification icon resources. `type` is `"small"` or `"large"`.                                                                            |
+| `androidSoundFiles`                  | `Array<{name, path}>`       | Copies sound files into `android/app/src/main/res/raw`.                                                                                           |
+| `androidNotificationColor`           | `string`                    | Hex color (e.g. `"#ffffff"`) written to the `notification_icon_color` resource in `values/colors.xml`.                                            |
+| `androidNotificationIcon`            | `string`                    | Path to a transparent monochrome PNG. Generates the `notification_icon` drawable and FCM `default_notification_icon` metadata (Android 8.0+).     |
+| `iosSoundFiles`                      | `string[]`                  | Copies iOS notification sounds (`.wav`, `.aif`, `.aiff`, `.caf`) into both app and extension targets.                                             |
+| `enableNotificationServiceExtension` | `boolean`                   | Enables the generated iOS Notification Service Extension.                                                                                         |
+| `serviceExtensionSettings`           | `object`                    | `{ name?, bundleIdentifier?, deploymentTarget?, appGroupName?, customSourceFilePath?, entitlements?, infoPlist? }`                                |
+| `appGroupName`                       | `string`                    | App Group shared by app and Notification Service Extension. Defaults to `group.<bundle.id>`; must also be declared in `ios.entitlements` for EAS. |
+| `appleDevTeamId`                     | `string`                    | Usually unnecessary if `expo.ios.appleTeamId` is already set.                                                                                     |
 
 Notes:
 
@@ -149,6 +150,7 @@ Notes:
 - If `expo.ios.appleTeamId` is already present in your Expo config, you usually do not need to also set `appleDevTeamId` in the Notifee plugin options.
 - When `iosSoundFiles` and `enableNotificationServiceExtension` are both enabled, the plugin wires those sounds into both the main app target and the extension during the same prebuild pass.
 - Migrating from `expo-notifications`: remove the top-level `notification` property from your app config (Expo SDK 55+ fails prebuild when it exists and `expo-notifications` is not installed) and map values to the plugin options — `notification.color` → `androidNotificationColor`, `notification.icon` → `androidNotificationIcon`, `sounds` → `androidSoundFiles` / `iosSoundFiles`. For local notifications, set `android.smallIcon: "notification_icon"` in your notification payloads.
+- **App Groups & EAS:** when the Notification Service Extension is enabled, the plugin injects the App Group entitlement (`group.<bundle.id>` by default). EAS only registers groups declared in app config `ios.entitlements` and syncs credentials **before** prebuild — declare the group there or your iOS build will fail with a provisioning profile mismatch. Prebuild warns when the group is missing. To keep a custom name, set `appGroupName` (and declare that name instead).
 - Small icons should be transparent, monochrome status-bar assets (PNG). The plugin warns when a small icon source is not a PNG or when an icon source is not square.
 - Flat legacy aliases remain supported for backward compatibility: `notificationServiceExtensionName`, `notificationServiceExtensionBundleIdentifier`, `iosDeploymentTarget`, `customNotificationServiceFilePath`, `appGroupName`, `notificationServiceExtensionEntitlements`, and `notificationServiceExtensionInfoPlist`.
 

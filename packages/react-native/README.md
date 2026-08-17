@@ -106,6 +106,7 @@ Supported plugin options:
 - `iosSoundFiles?: string[]`
 - `enableNotificationServiceExtension?: boolean`
 - `serviceExtensionSettings?: { name?: string; bundleIdentifier?: string; deploymentTarget?: string; appGroupName?: string; customSourceFilePath?: string; entitlements?: Record<string, unknown>; infoPlist?: Record<string, unknown> }`
+- `appGroupName?: string` — App Group shared by the app and the Notification Service Extension. Defaults to `group.<your.bundle.id>`.
 - `appleDevTeamId?: string`
 - `verbose?: boolean`
 
@@ -135,6 +136,28 @@ Android icon notes:
 - small icons should be transparent, monochrome status-bar assets,
 - the plugin now warns when a small icon source is not a PNG, and
 - the plugin warns when an icon source is not square.
+
+### iOS App Groups & EAS Builds
+
+The plugin adds an App Group entitlement for sharing data between your app and the Notification Service Extension. By default it uses `group.<your.bundle.id>`.
+
+Apple requires the group to be registered and included in your provisioning profile. On EAS, credentials are synced **before** prebuild runs, and EAS only registers groups declared in your app config — groups injected by third-party plugins are invisible to it. **You must declare the group in `app.json`:**
+
+```json
+"ios": {
+  "entitlements": {
+    "com.apple.security.application-groups": ["group.your.bundle.id"]
+  }
+}
+```
+
+Or override the name via the plugin option (e.g. to share a group with your widget extension):
+
+```json
+["@psync/notifee", { "appGroupName": "group.your.bundle.id" }]
+```
+
+Prebuild warns if the resolved app group (default or override) is not declared in `ios.entitlements` while the extension is enabled — treat that warning as a build failure waiting to happen.
 
 ## Documentation
 

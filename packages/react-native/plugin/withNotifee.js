@@ -14,8 +14,7 @@ function warnIfAppGroupNotDeclared(config, props) {
     return;
   }
 
-  const declaredGroups =
-    config.ios?.entitlements?.['com.apple.security.application-groups'];
+  const declaredGroups = config.ios?.entitlements?.['com.apple.security.application-groups'];
   if (Array.isArray(declaredGroups) && declaredGroups.includes(props.appGroupName)) {
     return;
   }
