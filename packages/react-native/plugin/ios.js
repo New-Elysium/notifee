@@ -300,8 +300,111 @@ function ensureSoundFile(projectRoot, soundPath) {
   return resolvedPath;
 }
 
-function addResourceFileToTarget(project, filePath, target) {
-  project.addResourceFile(filePath, { target: target.uuid });
+function unquote(value) {
+  return typeof value === 'string' ? value.replace(/^"+|"+$/g, '') : value;
+}
+
+function findObjectKeyByComment(section, name) {
+  if (!section || !name) {
+    return null;
+  }
+
+  const suffix = '_comment';
+  const wanted = unquote(name);
+  for (const key of Object.keys(section)) {
+    if (!key.endsWith(suffix)) continue;
+    if (section[key] === name || unquote(section[key]) === wanted) {
+      return key.slice(0, -suffix.length);
+    }
+  }
+
+  return null;
+}
+
+function findFileReferenceKeyByPath(section, filePath) {
+  if (!section) {
+    return null;
+  }
+
+  for (const key of Object.keys(section)) {
+    if (key.endsWith('_comment')) continue;
+    if (unquote(section[key].path) === filePath && unquote(section[key].sourceTree) === '<group>') {
+      return key;
+    }
+  }
+
+  return null;
+}
+
+function addResourceFileToTarget(project, filePath, target, groupName) {
+  const objects = project.hash.project.objects;
+  const targetName = target && target.name;
+  const fileName = path.basename(filePath);
+
+  // xcode's pbxTargetByName() does not expose the resolved object's uuid key
+  const targetKey = findObjectKeyByComment(objects.PBXNativeTarget, targetName);
+  if (!targetKey) {
+    throwPluginError(`Could not find Xcode target '${targetName}'.`);
+  }
+
+  // Resolve the Resources build phase belonging to this specific target;
+  // buildPhase() returns "<phaseUuid>_comment"
+  const phaseCommentKey = project.buildPhase('Resources', targetKey);
+  if (!phaseCommentKey) {
+    throwPluginError(`Xcode target '${targetName}' has no Resources build phase.`);
+  }
+  const phase = objects.PBXResourcesBuildPhase[phaseCommentKey.replace(/_comment$/, '')];
+
+  // Ensure the named group exists and hangs off the main group so its
+  // relative path resolves from the ios/ directory
+  let groupKey = null;
+  if (groupName) {
+    groupKey = findObjectKeyByComment(objects.PBXGroup, groupName);
+    if (!groupKey) {
+      const created = project.addPbxGroup([], groupName, groupName, '"<group>"');
+      groupKey = created.uuid;
+      project.addToPbxGroup(groupKey, getMainGroupUuid(project));
+    }
+  }
+
+  // Reuse an existing bundle-root file reference across targets; sounds are
+  // referenced by filename only at runtime
+  let fileRefKey = findFileReferenceKeyByPath(objects.PBXFileReference, fileName);
+  if (!fileRefKey) {
+    fileRefKey = project.generateUuid();
+    objects.PBXFileReference[fileRefKey] = {
+      isa: 'PBXFileReference',
+      name: `"${fileName}"`,
+      path: `"${fileName}"`,
+      sourceTree: '"<group>"',
+    };
+    objects.PBXFileReference[`${fileRefKey}_comment`] = fileName;
+
+    if (groupKey) {
+      objects.PBXGroup[groupKey].children.push({ value: fileRefKey, comment: fileName });
+    }
+  }
+
+  // Link the file into this target's Resources phase (idempotent). A shared
+  // PBXBuildFile cannot be reused because membership is per target and
+  // xcode's addResourceFile() deduplicates by path, skipping other targets.
+  const alreadyLinked = (phase.files || []).some(entry => {
+    const entryKey = typeof entry === 'object' ? entry.value : entry;
+    const buildFile = objects.PBXBuildFile[entryKey];
+    return buildFile && buildFile.fileRef === fileRefKey;
+  });
+  if (alreadyLinked) {
+    return;
+  }
+
+  const buildFileKey = project.generateUuid();
+  const buildFileComment = `${fileName} in Resources`;
+  objects.PBXBuildFile[buildFileKey] = {
+    isa: 'PBXBuildFile',
+    fileRef: fileRefKey,
+  };
+  objects.PBXBuildFile[`${buildFileKey}_comment`] = buildFileComment;
+  phase.files.push({ value: buildFileKey, comment: buildFileComment });
 }
 
 function copyIOSSoundFiles(config, props) {
@@ -322,15 +425,6 @@ function copyIOSSoundFiles(config, props) {
         const fileName = path.basename(sourcePath);
         fs.copyFileSync(sourcePath, path.join(mainSoundsDir, fileName));
 
-        if (props.enableNotificationServiceExtension) {
-          const extensionSoundsDir = path.join(
-            getExtensionDir(projectRoot, props.extensionName),
-            IOS_SOUNDS_DIR,
-          );
-          fs.mkdirSync(extensionSoundsDir, { recursive: true });
-          fs.copyFileSync(sourcePath, path.join(extensionSoundsDir, fileName));
-        }
-
         log(`Copied iOS notification sound '${fileName}'.`, props.verbose);
       }
 
@@ -347,16 +441,12 @@ function copyIOSSoundFiles(config, props) {
 
     for (const soundPath of props.iosSoundFiles) {
       const fileName = path.basename(soundPath);
-      addResourceFileToTarget(project, `${IOS_SOUNDS_DIR}/${fileName}`, appTarget);
+      addResourceFileToTarget(project, fileName, appTarget, IOS_SOUNDS_DIR);
 
       if (props.enableNotificationServiceExtension) {
         const extensionTarget = project.pbxTargetByName(props.extensionName);
         if (extensionTarget) {
-          addResourceFileToTarget(
-            project,
-            `${props.extensionName}/${IOS_SOUNDS_DIR}/${fileName}`,
-            extensionTarget,
-          );
+          addResourceFileToTarget(project, fileName, extensionTarget, IOS_SOUNDS_DIR);
         }
       }
     }
@@ -580,5 +670,6 @@ function withNotifeeIos(config, props) {
 }
 
 module.exports = {
+  addResourceFileToTarget,
   withNotifeeIos,
 };

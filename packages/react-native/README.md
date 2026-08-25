@@ -129,7 +129,7 @@ When the notification service extension is enabled (`enableNotificationServiceEx
 - add application-group entitlements for the app and extension, and
 - register the extension in `expo.extra.eas.build.experimental.ios.appExtensions`.
 
-When `iosSoundFiles` is set, the plugin will copy supported iOS notification sound assets (`.wav`, `.aif`, `.aiff`, `.caf`) into the generated native iOS project, and also into the Notification Service Extension target when extension automation is enabled, during the same prebuild pass. MP3 files are not supported here; convert them to one of the supported formats first.
+When `iosSoundFiles` is set, the plugin copies supported iOS notification sound assets (`.wav`, `.aif`, `.aiff`, `.caf`) into the generated native iOS project and adds them to both the app target and the Notification Service Extension target during the same prebuild pass. The files are placed at the app bundle root, so at runtime reference them by filename only, for example `sound: 'chime.wav'`. MP3 files are not supported here; convert them to one of the supported formats first.
 
 Android icon notes:
 

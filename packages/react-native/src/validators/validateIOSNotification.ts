@@ -126,7 +126,7 @@ export default function validateIOSNotification(ios?: NotificationIOS): Notifica
     if (isString(ios.sound)) {
       out.sound = ios.sound;
     } else {
-      throw new Error("'notification.sound' must be a string value if specified.");
+      throw new Error("'notification.ios.sound' must be a string value if specified.");
     }
   }
 
@@ -207,17 +207,6 @@ export default function validateIOSNotification(ios?: NotificationIOS): Notifica
     }
 
     out.contentType = ios.contentType;
-  }
-
-  /**
-   * sound
-   */
-  if (objectHasProperty(ios, 'sound')) {
-    if (!isString(ios.sound)) {
-      throw new Error("'notification.ios.sound' expected a string value.");
-    }
-
-    out.sound = ios.sound;
   }
 
   /**
