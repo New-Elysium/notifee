@@ -221,6 +221,7 @@ const withNotifeeAndroid = (config, props) => {
 };
 
 module.exports = {
+  saveIcon,
   setNotificationIconColor,
   setNotificationIconMetaData,
   withNotifeeAndroid,

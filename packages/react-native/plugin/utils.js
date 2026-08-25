@@ -29,7 +29,9 @@ function isPlainObject(value) {
 }
 
 function isValidAndroidResourceName(name) {
-  return /^[a-z0-9_]+$/.test(name);
+  // Must be a valid Java identifier too, since it becomes an R.drawable/R.raw
+  // constant: no leading digit.
+  return /^[a-z_][a-z0-9_]*$/.test(name);
 }
 
 function isValidAndroidColor(value) {
@@ -200,6 +202,12 @@ function validateProps(normalizedProps, rawProps = {}) {
 
     if (typeof icon.name !== 'string' || icon.name.length === 0) {
       throwPluginError("Each Android icon must include a non-empty string 'name'.");
+    }
+
+    if (!isValidAndroidResourceName(icon.name)) {
+      throwPluginError(
+        `Android icon '${icon.name}' must use only lowercase letters, numbers, and underscores, because the name becomes the generated drawable resource name.`,
+      );
     }
 
     if (typeof icon.path !== 'string' || icon.path.length === 0) {
