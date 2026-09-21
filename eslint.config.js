@@ -94,7 +94,7 @@ export default [
       'ios/build/**',
       'packages/react-native/dist/**',
       'packages/react-native/TEMP/**',
-      'packages/react-native/example/**',
+      'example/**',
       'tests_react_native/**',
       'docs/**',
     ],

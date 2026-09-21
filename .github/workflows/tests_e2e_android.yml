@@ -120,7 +120,7 @@ jobs:
           timeout_minutes: 10
           retry_wait_seconds: 60
           max_attempts: 3
-          command: bun run tests_rn:android:build
+          command: bun run e2e:build:android
 
       - name: Prepare test index file
         # For some reason, in CI, the test file is never running. So let's make all index files the test file.
@@ -136,7 +136,7 @@ jobs:
       - name: Pre-fetch Javascript bundle
         # Prebuild the bundle so that's fast when the app starts.
         run: |
-          nohup sh -c "bun run tests_rn:packager > packager.log 2>&1 &"
+          nohup sh -c "bun run e2e:start > packager.log 2>&1 &"
           printf 'Waiting for packager to come online'
           until curl --output /dev/null --silent --head --fail http://localhost:8081/status; do
             printf '.'
@@ -163,7 +163,7 @@ jobs:
             $ANDROID_HOME/platform-tools/adb devices
             nohup sh -c "$ANDROID_HOME/platform-tools/adb logcat '*:D' > adb-log.txt" &
             nohup sh -c 'adb shell "screenrecord /data/local/tmp/emulator1.mp4; screenrecord /data/local/tmp/emulator2.mp4; screenrecord /data/local/tmp/emulator3.mp4; screenrecord /data/local/tmp/emulator4.mp4" &'
-            bun run tests_rn:android:test || touch tests-failed.out # even on failure do not exit yet...
+            bun run e2e:android || touch tests-failed.out # even on failure do not exit yet...
             adb pull /data/local/tmp/emulator1.mp4 || true       # ...because we want to download our videos...
             adb pull /data/local/tmp/emulator2.mp4 || true       # ...and we need the emulator up to fetch them
             adb pull /data/local/tmp/emulator3.mp4 || true

@@ -36,9 +36,9 @@ jobs:
       - name: Install dependencies
         run: bun install
       - name: Lint javascript
-        run: bun run validate:all:js
-      - name: Lint Native - validate:all:check
-        run: bun run format:all:check
+        run: bun run lint
+      - name: Lint Native - format:check
+        run: bun run format:check
 
   typescript:
     name: TypeScript Build Validation
@@ -59,7 +59,7 @@ jobs:
       - name: Install dependencies
         run: bun install
       - name: Lint
-        run: bun run validate:all:ts
+        run: bun run typecheck
 
   typedoc:
     name: TypeDoc Generation
@@ -80,4 +80,4 @@ jobs:
       - name: Install dependencies
         run: bun install
       - name: Generate TypeDoc
-        run: bun run gen:reference
+        run: bun run docs

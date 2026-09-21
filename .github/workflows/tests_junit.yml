@@ -60,4 +60,4 @@ jobs:
           command: bun run build:core:android
 
       - name: Run JUnit Tests
-        run: bun run test:core:android
+        run: bun run test:android

@@ -31,7 +31,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Run tests
-        run: bun run tests_rn:test
+        run: bun run test
 
       - name: Build
         run: bun run build:rn

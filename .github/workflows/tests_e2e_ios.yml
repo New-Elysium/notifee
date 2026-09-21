@@ -30,6 +30,11 @@ jobs:
         with:
           fetch-depth: 50
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -48,16 +53,14 @@ jobs:
       - name: Set workflow variables
         id: workflow-variables
         run: |
-          echo "yarn-cache=$(yarn cache dir)" >> $GITHUB_OUTPUT
           echo "metro-cache=$HOME/.metro" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v4
-        name: Yarn Cache
-        id: yarn-cache
+        name: Bun Cache
         with:
-          path: ${{ steps.workflow-variables.outputs.yarn-cache }}
-          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('package.json', 'packages/react-native/package.json', 'tests_react_native/package.json') }}
-          restore-keys: ${{ runner.os }}-yarn-v1
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-v1-${{ hashFiles('bun.lock', 'package.json', 'packages/react-native/package.json', 'tests_react_native/package.json') }}
+          restore-keys: ${{ runner.os }}-bun-v1
 
       - uses: actions/cache@v4
         name: Cache Pods
@@ -79,13 +82,13 @@ jobs:
           max_attempts: 3
           command: gem update cocoapods xcodeproj
 
-      - name: Yarn Install
+      - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 15
           retry_wait_seconds: 60
           max_attempts: 4
-          command: yarn --no-audit --prefer-offline && npm i -g cavy-cli
+          command: bun install && npm i -g cavy-cli
 
       - name: Install applesimutils
         uses: nick-fields/retry@v3
@@ -108,7 +111,7 @@ jobs:
 
       - name: Pre-fetch Javascript bundle
         run: |
-          nohup sh -c "yarn tests_rn:packager > packager.log 2>&1 &"
+          nohup sh -c "bun run e2e:start > packager.log 2>&1 &"
           printf 'Waiting for packager to come online'
           until curl --output /dev/null --silent --head --fail http://localhost:8081/status; do
             printf '.'
@@ -144,7 +147,7 @@ jobs:
           export CCACHE_DEPEND=true
           export CCACHE_INODECACHE=true
           ccache -s
-          yarn tests_rn:ios:test
+          bun run e2e:ios
           ccache -s
 
       - name: Stop App Video

@@ -45,7 +45,7 @@ jobs:
       - name: Generate artifacts before release
         run: |
           bun run build:core
-          bun run gen:reference
+          bun run docs
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

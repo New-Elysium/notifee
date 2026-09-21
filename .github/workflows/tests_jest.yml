@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: bun install
       - name: Jest
-        run: bun run tests_rn:test
+        run: bun run test
       - uses: codecov/codecov-action@v4
         with:
           verbose: true

@@ -26,8 +26,9 @@ cd notifee/
 bun install
 ```
 
-Note: During this step, the `package.json` script `prepare` is called, which includes a call to `build:core:ios`.
-During that step, the current "NotifeeCore" iOS files are copied into `packages/react-native/ios/...`. If you modify
+Note: During this step, the `package.json` script `prepare` is called, which builds the React Native
+TypeScript package (`build:rn`). The current "NotifeeCore" iOS files are copied into `packages/react-native/ios/...`
+by `bun run build:core:ios` (part of `bun run build`). If you modify
 iOS core code and want to test it you will want to re-run that step, or temporarily modify `packages/react-native/RNNotifee.podspec`
 to contain `$NotifeeCoreFromSources=true` so that the up to date source files are actually incorporated in the final build.
 
@@ -37,7 +38,7 @@ changes to take effect.
 ## Step 3: Start React Native packager
 
 ```bash
-bun run tests_rn:packager
+bun run e2e:start
 ```
 
 ## Step 4: Watch for TypeScript changes
@@ -54,9 +55,9 @@ bun run build:rn:watch
 
 The following package scripts are exported to help you run tests:
 
-- `bun run tests_rn:test` - run Jest tests once and exit.
-- `bun run tests_rn:jest-watch` - run Jest tests in interactive mode and watch for changes.
-- `bun run tests_rn:jest-coverage` - run Jest tests with coverage. Coverage is output to `./coverage`.
+- `bun run test` - run Jest tests once and exit.
+- `bun run test:watch` - run Jest tests in interactive mode and watch for changes.
+- `bun run test:coverage` - run Jest tests with coverage. Coverage is output to `./coverage`.
 
 ### End-to-end Testing
 
@@ -64,16 +65,24 @@ Tests can be found in the `tests_react_native/specs` directory.
 
 To run tests, use these commands:
 
-- **Android**: `bun run tests_rn:android:test`
-- **iOS**: `bun run tests_rn:ios:test`
+- **Android**: `bun run e2e:android`
+- **iOS**: `bun run e2e:ios`
+
+### Smoke Testing
+
+The `example/` app (npm-managed, outside the Bun workspace) launches on a simulator/emulator for manual verification:
+
+- `bun run smoke:setup` - one-time: npm install + pod install for `example/`
+- `bun run smoke:ios` - launch on iOS simulator (override device with `IOS_SIMULATOR`)
+- `bun run smoke:android` - launch on Android
 
 ### Linting & type checking files
 
 Runs ESLint and respective type checks on project files:
 
 ```bash
-bun run validate:all:js
-bun run validate:all:ts
+bun run lint
+bun run typecheck
 ```
 
 ## Publishing
