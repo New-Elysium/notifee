@@ -14,7 +14,7 @@ const {
   USER_ACTIVITY_TYPES,
   VALID_IOS_SOUND_EXTENSIONS,
 } = require('./constants');
-const { isValidIOSSoundFileExtension, log, throwPluginError } = require('./utils');
+const { isValidIOSSoundFileExtension, log, throwPluginError, warn } = require('./utils');
 
 function getExtensionDir(projectRoot, extensionName) {
   return path.join(projectRoot, 'ios', extensionName);
@@ -304,6 +304,56 @@ function unquote(value) {
   return typeof value === 'string' ? value.replace(/^"+|"+$/g, '') : value;
 }
 
+/**
+ * Resolves the main app target's key in the pbxproj.
+ *
+ * Expo's mod compiler does NOT put the native target name on `modConfig.name` —
+ * that field is the app config's display name (app.json `name`), which frequently
+ * differs from the Xcode target (e.g. name: "My App" vs target "MyApp"). The
+ * idiomatic field is `modConfig.modRequest.projectName` (the ios/ folder name,
+ * which matches the RN template target name) — with `getFirstTarget()` as a
+ * final fallback for projects whose target was renamed to something else.
+ *
+ * Every Xcode mod that needs the app target must go through this helper;
+ * resolving by display name silently misses and the mod becomes a no-op.
+ */
+function resolveAppTargetKey(project, modConfig) {
+  const objects = project.hash.project.objects;
+  const candidates = [
+    modConfig.modRequest?.projectName,
+    modConfig.name,
+  ].filter(candidate => typeof candidate === 'string' && candidate.length > 0);
+
+  for (const candidate of candidates) {
+    const key = findObjectKeyByComment(objects.PBXNativeTarget, candidate);
+    if (key) {
+      return { key, uuid: key, name: unquote(objects.PBXNativeTarget[`${key}_comment`]) };
+    }
+  }
+
+  let firstTarget = null;
+  try {
+    firstTarget = project.getFirstTarget();
+  } catch {
+    // getFirstTarget() throws on projects with zero targets
+    firstTarget = null;
+  }
+  if (firstTarget && firstTarget.firstTarget) {
+    return {
+      key: firstTarget.uuid,
+      uuid: firstTarget.uuid,
+      name: unquote(firstTarget.firstTarget.name) || undefined,
+    };
+  }
+
+  return null;
+}
+
+function resolveExtensionTargetKey(project, extensionName) {
+  const key = findObjectKeyByComment(project.hash.project.objects.PBXNativeTarget, extensionName);
+  return key ? { key, uuid: key, name: extensionName } : null;
+}
+
 function findObjectKeyByComment(section, name) {
   if (!section || !name) {
     return null;
@@ -434,8 +484,12 @@ function copyIOSSoundFiles(config, props) {
 
   return withXcodeProject(updatedConfig, modConfig => {
     const project = modConfig.modResults;
-    const appTarget = project.pbxTargetByName(modConfig.name);
+    const appTarget = resolveAppTargetKey(project, modConfig);
     if (!appTarget) {
+      warn(
+        'Could not resolve the main app Xcode target; iOS notification sounds were copied to '
+          + `${IOS_SOUNDS_DIR}/ but NOT added to the app bundle. Re-run prebuild or link them manually.`,
+      );
       return modConfig;
     }
 
@@ -444,9 +498,14 @@ function copyIOSSoundFiles(config, props) {
       addResourceFileToTarget(project, fileName, appTarget, IOS_SOUNDS_DIR);
 
       if (props.enableNotificationServiceExtension) {
-        const extensionTarget = project.pbxTargetByName(props.extensionName);
+        const extensionTarget = resolveExtensionTargetKey(project, props.extensionName);
         if (extensionTarget) {
           addResourceFileToTarget(project, fileName, extensionTarget, IOS_SOUNDS_DIR);
+        } else {
+          warn(
+            `Notification service extension target '${props.extensionName}' was not found; ` +
+              'notification sounds were not linked into it.',
+          );
         }
       }
     }
@@ -537,12 +596,14 @@ function signTargets(config, props) {
 
   return withXcodeProject(config, modConfig => {
     const project = modConfig.modResults;
-    const mainTarget = project.pbxTargetByName(modConfig.name);
+    const mainTarget = resolveAppTargetKey(project, modConfig);
     if (mainTarget) {
       project.addTargetAttribute('DevelopmentTeam', props.appleDevTeamId, mainTarget);
+    } else {
+      warn('Could not resolve the main app Xcode target; DevelopmentTeam was not set on it.');
     }
 
-    const extensionTarget = project.pbxTargetByName(props.extensionName);
+    const extensionTarget = resolveExtensionTargetKey(project, props.extensionName);
     if (extensionTarget) {
       project.addTargetAttribute('DevelopmentTeam', props.appleDevTeamId, extensionTarget);
     }
@@ -671,5 +732,7 @@ function withNotifeeIos(config, props) {
 
 module.exports = {
   addResourceFileToTarget,
+  resolveAppTargetKey,
+  resolveExtensionTargetKey,
   withNotifeeIos,
 };
