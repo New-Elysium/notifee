@@ -1,8 +1,12 @@
-# Task Completion Checklist
+# Task Completion Checklist (Post-Restructure)
 
-1. Run `bun run validate:all` — ESLint, tsc, and TypeDoc reference generation (note: typedoc may fail on doc-link issues; `validate:all:js` + `validate:all:ts` cover lint/typecheck alone)
-2. Run `bun run format:all:check` to verify formatting (google-java-format for Android, clang-format Google style for iOS, Prettier for JS/TS)
-3. Run `bun run test:all` when applicable — note it includes E2E (cavy) targets that need devices/simulators; `bun run test:core:android` + `bun run tests_rn:test` are the unit-test subset
-4. If native code changed: `bun run build:core` (Android needs JAVA_HOME/ANDROID_HOME/NDK set; iOS needs Xcode 16.2+)
-5. If TS API changed: `bun run build:rn` and consider `bun run gen:reference` to refresh docs
-6. Commits must follow Conventional Commits (`feat|fix|docs|chore|refactor|test|ci|perf(scope): description`) — required for semantic-release
+1. Run `bun run lint` and `bun run typecheck` — ESLint + TypeScript project check
+2. Run `bun run format:check` to verify formatting (google-java-format for Android, clang-format Google style for iOS, Prettier for JS/TS)
+3. Run `bun run test` for Jest unit tests (in `tests_react_native/`)
+4. Run `bun run test:android` for Android JUnit tests (if native Android code changed)
+5. Run `bun run docs` to regenerate TypeDoc API reference (if TS API changed)
+6. If native code changed: `bun run build:core` (Android needs JAVA_HOME/ANDROID_HOME/NDK; iOS needs Xcode 16.2+)
+7. If TS API changed: `bun run build:rn` (generates version + compiles to dist/)
+8. For smoke testing: `bun run smoke:ios` (works on this machine), `bun run smoke:android` (requires CI/HVF hardware)
+9. Commits must follow Conventional Commits (`feat|fix|docs|chore|refactor|test|ci|perf(scope): description`) — required for semantic-release
+10. Before publishing: `cd packages/react-native && bun run build:watch` then `NPM_ACCESS_TOKEN=... bun publish`
