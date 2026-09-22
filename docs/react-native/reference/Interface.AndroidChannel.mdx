@@ -6,7 +6,7 @@
 
 # Interface: AndroidChannel
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:941](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L941)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:955](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L955)
 
 An interface for describing an Android Channel.
 
@@ -29,7 +29,7 @@ android
 
 > `optional` **badge?**: `boolean`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:964](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L964)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:978](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L978)
 
 Sets whether badges are enabled for the channel.
 
@@ -45,7 +45,7 @@ This setting cannot be overridden once the channel is created.
 
 > `optional` **bypassDnd?**: `boolean`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:976](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L976)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:990](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L990)
 
 Sets whether or not notifications posted to this channel can interrupt the user in
 'Do Not Disturb' mode.
@@ -64,7 +64,7 @@ android API Level >= 29
 
 > `optional` **description?**: `string`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:987](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L987)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1001](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1001)
 
 Sets the user visible description of this channel.
 
@@ -82,7 +82,7 @@ android API Level >= 28
 
 > `optional` **groupId?**: `string`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1014](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1014)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1028](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1028)
 
 Sets what group this channel belongs to. Group information is only used for presentation, not for behavior.
 
@@ -96,7 +96,7 @@ This setting cannot be overridden once the channel is created.
 
 > **id**: `string`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:945](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L945)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:959](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L959)
 
 The unique channel ID.
 
@@ -106,7 +106,7 @@ The unique channel ID.
 
 > `optional` **importance?**: [`AndroidImportance`](react-native/reference/Enumeration.AndroidImportance)
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1023](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1023)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1037](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1037)
 
 Sets the level of interruption of this notification channel.
 
@@ -120,7 +120,7 @@ This setting can only be set to a lower importance level once set.
 
 > `optional` **lightColor?**: `string`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1031](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1031)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1045](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1045)
 
 If lights are enabled (via `lights`), sets/overrides the light color for notifications
 posted to this channel.
@@ -133,7 +133,7 @@ This setting cannot be overridden once the channel is created.
 
 > `optional` **lights?**: `boolean`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:996](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L996)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1010](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1010)
 
 Sets whether notifications posted to this channel should display notification lights, on devices that support that feature.
 
@@ -147,7 +147,7 @@ This setting cannot be overridden once the channel is created.
 
 > **name**: `string`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:953](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L953)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:967](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L967)
 
 The channel name. This is shown to the user so must be descriptive and relate to the notifications
 which will be delivered under this channel.
@@ -160,7 +160,7 @@ This setting can be updated after creation.
 
 > `optional` **sound?**: `string`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1059](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1059)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1073](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1073)
 
 Overrides the sound the notification is displayed with.
 
@@ -174,7 +174,7 @@ This setting cannot be overridden once the channel is created.
 
 > `optional` **soundURI?**: `string`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1066](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1066)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1080](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1080)
 
 The URI of the notification sound associated with the channel, if any.
 
@@ -186,7 +186,7 @@ This is a read-only value, and is under user control after the channel is create
 
 > `optional` **vibration?**: `boolean`
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1005](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1005)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1019](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1019)
 
 Sets whether notification posted to this channel should vibrate.
 
@@ -200,7 +200,7 @@ This setting cannot be overridden once the channel is created.
 
 > `optional` **vibrationPattern?**: `number`\[]
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1050](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1050)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1064](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1064)
 
 Sets/overrides the vibration pattern for notifications posted to this channel.
 
@@ -214,7 +214,7 @@ This setting cannot be overridden once the channel is created.
 
 > `optional` **visibility?**: [`AndroidVisibility`](react-native/reference/Enumeration.AndroidVisibility)
 
-Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1041](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1041)
+Defined in: [packages/react-native/src/types/NotificationAndroid.ts:1055](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/NotificationAndroid.ts#L1055)
 
 Sets whether notifications posted to this channel appear on the lockscreen or not,
 and if so, whether they appear in a redacted form.

@@ -1,38 +1,22 @@
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+import { join } from 'node:path';
+// eslint-disable-next-line @typescript-eslint/no-var-requires, import/no-extraneous-dependencies
+const xcode = require(
+  require.resolve('xcode', { paths: [join(__dirname, '..', '..', 'packages', 'react-native')] }),
+);
 
-// 'xcode' is a devDependency of the RN package, not of the test workspace —
-// resolve it from there explicitly.
-const xcode = require(require.resolve('xcode', {
-  paths: [path.join(__dirname, '..', '..', 'packages', 'react-native')], // eslint-disable-line import/no-dynamic-require
-}));
-
-const {
+import {
   addResourceFileToTarget,
   resolveAppTargetKey,
   resolveExtensionTargetKey,
-} = require('../../packages/react-native/plugin/ios'); // eslint-disable-line import/no-dynamic-require
+} from '../../packages/react-native/plugin/ios';
 
 // The example app's real project file — a known-good pbxproj whose single
 // native target is named "example". Tests simulate the common CNG mismatch:
 // app.json `name` (display name) differs from the Xcode target name.
-const EXAMPLE_PBXPROJ = path.join(
-  __dirname,
-  '..',
-  '..',
-  'example',
-  'ios',
-  'example.xcodeproj',
-  'project.pbxproj',
-);
+const EXAMPLE_PBXPROJ = join(__dirname, '..', '..', 'example', 'ios', 'example.xcodeproj', 'project.pbxproj');
 
 function loadProject() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'notifee-plugin-'));
-  const projectPath = path.join(dir, 'project.pbxproj');
-  fs.copyFileSync(EXAMPLE_PBXPROJ, projectPath);
-
-  const project = new xcode.project(projectPath);
+  const project = new xcode.project(EXAMPLE_PBXPROJ);
   project.parseSync();
   return project;
 }
@@ -48,7 +32,7 @@ describe('plugin/ios target resolution', () => {
       });
 
       expect(resolved).not.toBeNull();
-      expect(resolved.name).toBe('example');
+      expect(resolved!.name).toBe('example');
     });
 
     it('resolves via the mod config display name when it matches the target', () => {
@@ -60,7 +44,7 @@ describe('plugin/ios target resolution', () => {
       });
 
       expect(resolved).not.toBeNull();
-      expect(resolved.name).toBe('example');
+      expect(resolved!.name).toBe('example');
     });
 
     it('falls back to the first target when neither name matches (renamed targets)', () => {
@@ -72,7 +56,7 @@ describe('plugin/ios target resolution', () => {
       });
 
       expect(resolved).not.toBeNull();
-      expect(resolved.name).toBe('example');
+      expect(resolved!.name).toBe('example');
     });
 
     it('returns null when the project has no targets', () => {
@@ -102,7 +86,7 @@ describe('plugin/ios target resolution', () => {
       const resolved = resolveExtensionTargetKey(project, 'example');
 
       expect(resolved).not.toBeNull();
-      expect(resolved.name).toBe('example');
+      expect(resolved!.name).toBe('example');
     });
 
     it('returns null when the target does not exist', () => {
@@ -125,9 +109,9 @@ describe('plugin/ios target resolution', () => {
       const resourcesPhase = project.buildPhaseObject(
         'PBXResourcesBuildPhase',
         'Resources',
-        appTarget.key,
+        appTarget!.key,
       );
-      const linked = resourcesPhase.files.some(entry => {
+      const linked = (resourcesPhase.files as Array<{ value: string }>).some(entry => {
         const buildFile = project.hash.project.objects.PBXBuildFile[entry.value];
         if (!buildFile) return false;
         const fileRef = project.hash.project.objects.PBXFileReference[buildFile.fileRef];
@@ -149,9 +133,9 @@ describe('plugin/ios target resolution', () => {
       const resourcesPhase = project.buildPhaseObject(
         'PBXResourcesBuildPhase',
         'Resources',
-        appTarget.key,
+        appTarget!.key,
       );
-      const linkedEntries = resourcesPhase.files.filter(entry => {
+      const linkedEntries = (resourcesPhase.files as Array<{ value: string }>).filter(entry => {
         const buildFile = project.hash.project.objects.PBXBuildFile[entry.value];
         if (!buildFile) return false;
         const fileRef = project.hash.project.objects.PBXFileReference[buildFile.fileRef];

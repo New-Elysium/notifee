@@ -125,25 +125,72 @@ const trigger: TimestampTrigger = {
 };
 ```
 
-On Android, you have the option to create your trigger notification with Android's AlarmManager API:
+### Repeat intervals and monthly recurrence
+
+Use [`RepeatFrequency`](/react-native/reference/Enumeration.RepeatFrequency) together with an optional `repeatInterval` multiplier to control how a repeating trigger advances:
 
 ```js
+// Every 2 days
 const trigger: TimestampTrigger = {
-  //...
-  alarmManager: true, // uses android's `AlarmManagerCompat.setExact`
+  type: TriggerType.TIMESTAMP,
+  timestamp: Date.now() + 60_000,
+  repeatFrequency: RepeatFrequency.DAILY,
+  repeatInterval: 2, // every 2 days
+};
+
+// Every 3 months (uses calendar semantics — Jan 31 → Feb 28/29)
+const trigger: TimestampTrigger = {
+  type: TriggerType.TIMESTAMP,
+  timestamp: Date.now() + 60_000,
+  repeatFrequency: RepeatFrequency.MONTHLY,
+  repeatInterval: 3,
 };
 ```
 
-If you want to allow the notification to display when in low-power idle modes, use `type` property:
+- `repeatInterval` must be a positive integer. It defaults to `1` when `repeatFrequency` is set and `repeatInterval` is omitted.
+- `MONTHLY` uses native calendar semantics — dates that don't exist in a target month are adjusted to the last valid day (e.g. `Jan 31 + 1 month → Feb 28/29`).
+- `repeatInterval` and `MONTHLY` are **Android-only** for now. iOS rejects them with a clear error at create time so you don't silently get a non-repeating trigger.
+
+### AlarmManager on Android
+
+On Android, timestamp triggers now default to scheduling through Android's [`AlarmManager`](https://developer.android.com/reference/android/app/AlarmManager) — chosen for reliable delivery when the app is killed (the previous WorkManager default could be deferred or dropped by Doze mode and OEM power management). The default alarm type is `AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE`, which also wakes the device when it's in low-power idle mode:
 
 ```js
 const trigger: TimestampTrigger = {
-  //...
+  type: TriggerType.TIMESTAMP,
+  timestamp: Date.now() + 60_000,
+};
+```
+
+To opt out and use WorkManager (battery-friendly, but Doze-sensitive), set `alarmManager: false`:
+
+```js
+const trigger: TimestampTrigger = {
+  type: TriggerType.TIMESTAMP,
+  timestamp: Date.now() + 60_000,
+  alarmManager: false,
+};
+```
+
+`MONTHLY` requires AlarmManager — combining `repeatFrequency: MONTHLY` with `alarmManager: false` throws at create time.
+
+To choose a specific [`AlarmType`](/react-native/reference/Enumeration.AlarmType) — for example `SET_ALARM_CLOCK` for a true alarm-clock primitive that's respected by OEM aggressive-kill policies — pass an object:
+
+```js
+import { AlarmType } from '@psync/notifee';
+
+const trigger: TimestampTrigger = {
+  type: TriggerType.TIMESTAMP,
+  timestamp: Date.now() + 60_000,
   alarmManager: {
-    type: AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE,
+    type: AlarmType.SET_ALARM_CLOCK,
   },
 };
 ```
+
+When `alarmManager` is a plain boolean, it is treated as `{ allowWhileIdle: true }` (deprecated — use `type` instead).
+
+> The unit guard on `trigger.timestamp` catches common mistakes: passing seconds-since-epoch (`1.7e9`) instead of milliseconds (`1.7e12+`), or `date.getDate()` (a day-of-month `1`–`31`) instead of `date.getTime()`. Each case produces a targeted error message rather than a notification that fires 56 years in the past.
 
 #### Maximum TimestampTrigger Count
 

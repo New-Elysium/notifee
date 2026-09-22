@@ -14,6 +14,26 @@ Defined in: [packages/react-native/src/types/Module.ts:19](https://github.com/Ne
 
 ## Methods
 
+### buildFcmNotification()
+
+> **buildFcmNotification**(`remoteMessage`): [`Notification`](react-native/reference/Interface.Notification) | `null`
+
+Defined in: [packages/react-native/src/types/Module.ts:196](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L196)
+
+Displays a notification from an FCM remote message using notifee-compatible payload fields.
+
+#### Parameters
+
+##### remoteMessage
+
+[`FcmRemoteMessage`](react-native/reference/TypeAlias.FcmRemoteMessage)
+
+#### Returns
+
+[`Notification`](react-native/reference/Interface.Notification) | `null`
+
+***
+
 ### cancelAllNotifications()
 
 > **cancelAllNotifications**(`notificationIds?`, `tag?`): `Promise`<`void`>
@@ -319,7 +339,7 @@ android
 
 > **createTriggerNotification**(`notification`, `trigger`): `Promise`<`string`>
 
-Defined in: [packages/react-native/src/types/Module.ts:223](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L223)
+Defined in: [packages/react-native/src/types/Module.ts:225](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L225)
 
 API used to create a trigger notification.
 
@@ -353,7 +373,7 @@ to create a trigger.
 
 > **decrementBadgeCount**(`decrementBy?`): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:549](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L549)
+Defined in: [packages/react-native/src/types/Module.ts:551](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L551)
 
 Decrements the badge count for this application on the current device by a specified
 value.
@@ -476,7 +496,7 @@ to create a notification for both Android & iOS.
 
 > **getBadgeCount**(): `Promise`<`number`>
 
-Defined in: [packages/react-native/src/types/Module.ts:515](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L515)
+Defined in: [packages/react-native/src/types/Module.ts:517](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L517)
 
 Get the current badge count value for this application on the current device.
 
@@ -496,7 +516,7 @@ ios
 
 > **getChannel**(`channelId`): `Promise`<[`NativeAndroidChannel`](react-native/reference/Interface.NativeAndroidChannel) | `null`>
 
-Defined in: [packages/react-native/src/types/Module.ts:258](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L258)
+Defined in: [packages/react-native/src/types/Module.ts:260](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L260)
 
 API used to return a channel on supported Android devices.
 
@@ -532,7 +552,7 @@ android
 
 > **getChannelGroup**(`channelGroupId`): `Promise`<[`NativeAndroidChannelGroup`](react-native/reference/Interface.NativeAndroidChannelGroup) | `null`>
 
-Defined in: [packages/react-native/src/types/Module.ts:310](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L310)
+Defined in: [packages/react-native/src/types/Module.ts:312](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L312)
 
 API used to return a channel group on supported Android devices.
 
@@ -568,7 +588,7 @@ android
 
 > **getChannelGroups**(): `Promise`<[`NativeAndroidChannelGroup`](react-native/reference/Interface.NativeAndroidChannelGroup)\[]>
 
-Defined in: [packages/react-native/src/types/Module.ts:326](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L326)
+Defined in: [packages/react-native/src/types/Module.ts:328](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L328)
 
 API used to return all channel groups on supported Android devices.
 
@@ -595,7 +615,7 @@ android
 
 > **getChannels**(): `Promise`<[`NativeAndroidChannel`](react-native/reference/Interface.NativeAndroidChannel)\[]>
 
-Defined in: [packages/react-native/src/types/Module.ts:292](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L292)
+Defined in: [packages/react-native/src/types/Module.ts:294](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L294)
 
 API used to return all channels on supported Android devices.
 
@@ -622,7 +642,7 @@ android
 
 > **getDisplayedNotifications**(): `Promise`<[`DisplayedNotification`](react-native/reference/Interface.DisplayedNotification)\[]>
 
-Defined in: [packages/react-native/src/types/Module.ts:235](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L235)
+Defined in: [packages/react-native/src/types/Module.ts:237](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L237)
 
 API used to return the notifications that are displayed.
 
@@ -636,7 +656,7 @@ API used to return the notifications that are displayed.
 
 > **getInitialNotification**(): `Promise`<[`InitialNotification`](react-native/reference/Interface.InitialNotification) | `null`>
 
-Defined in: [packages/react-native/src/types/Module.ts:343](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L343)
+Defined in: [packages/react-native/src/types/Module.ts:345](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L345)
 
 API used to fetch the notification which causes the application to open.
 
@@ -662,7 +682,7 @@ but you will also receive a `onForegroundEvent`
 
 > **getNotificationCategories**(): `Promise`<[`IOSNotificationCategory`](react-native/reference/Interface.IOSNotificationCategory)\[]>
 
-Defined in: [packages/react-native/src/types/Module.ts:499](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L499)
+Defined in: [packages/react-native/src/types/Module.ts:501](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L501)
 
 Gets the currently set notification categories on this Apple device.
 
@@ -682,7 +702,7 @@ ios
 
 > **getNotificationSettings**(): `Promise`<[`NotificationSettings`](react-native/reference/Interface.NotificationSettings)>
 
-Defined in: [packages/react-native/src/types/Module.ts:506](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L506)
+Defined in: [packages/react-native/src/types/Module.ts:508](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L508)
 
 Get the current notification settings for this application on the current device.
 On Android, `authorizationStatus` will return only either `AuthorizationStatus.DENIED` or `AuthorizationStatus.AUTHORIZED`
@@ -698,7 +718,7 @@ and all of the properties on the `IOSNotificationSettings` interface response re
 
 > **getPowerManagerInfo**(): `Promise`<[`PowerManagerInfo`](react-native/reference/Interface.PowerManagerInfo)>
 
-Defined in: [packages/react-native/src/types/Module.ts:599](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L599)
+Defined in: [packages/react-native/src/types/Module.ts:601](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L601)
 
 API used to get information about the device and its power manager settings, including manufacturer, model, version and activity.
 
@@ -736,7 +756,7 @@ android
 
 > **getTriggerNotificationIds**(): `Promise`<`string`\[]>
 
-Defined in: [packages/react-native/src/types/Module.ts:230](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L230)
+Defined in: [packages/react-native/src/types/Module.ts:232](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L232)
 
 API used to return the ids of trigger notifications that are pending.
 
@@ -752,7 +772,7 @@ View the [Triggers](/react-native/triggers) documentation for more information.
 
 > **getTriggerNotifications**(): `Promise`<[`TriggerNotification`](react-native/reference/Interface.TriggerNotification)\[]>
 
-Defined in: [packages/react-native/src/types/Module.ts:240](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L240)
+Defined in: [packages/react-native/src/types/Module.ts:242](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L242)
 
 API used to return the trigger notifications that are pending.
 
@@ -766,9 +786,7 @@ API used to return the trigger notifications that are pending.
 
 > **handleFcmMessage**(`remoteMessage`): `Promise`<`string` | `null`>
 
-Defined in: [packages/react-native/src/types/Module.ts:196](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L196)
-
-Displays a notification from an FCM remote message using notifee-compatible payload fields.
+Defined in: [packages/react-native/src/types/Module.ts:198](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L198)
 
 #### Parameters
 
@@ -786,7 +804,7 @@ Displays a notification from an FCM remote message using notifee-compatible payl
 
 > **hideNotificationDrawer**(): `void`
 
-Defined in: [packages/react-native/src/types/Module.ts:645](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L645)
+Defined in: [packages/react-native/src/types/Module.ts:647](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L647)
 
 API used to hide the notification drawer, for example,
 when the user presses one of the quick actions on the notification, you may wish to hide the drawer.
@@ -819,7 +837,7 @@ android
 
 > **incrementBadgeCount**(`incrementBy?`): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:539](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L539)
+Defined in: [packages/react-native/src/types/Module.ts:541](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L541)
 
 Increments the badge count for this application on the current device by a specified
 value.
@@ -848,7 +866,7 @@ ios
 
 > **isBatteryOptimizationEnabled**(): `Promise`<`boolean`>
 
-Defined in: [packages/react-native/src/types/Module.ts:572](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L572)
+Defined in: [packages/react-native/src/types/Module.ts:574](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L574)
 
 API used to check if battery optimization is enabled for your application.
 
@@ -870,7 +888,7 @@ android
 
 > **isChannelBlocked**(`channelId`): `Promise`<`boolean`>
 
-Defined in: [packages/react-native/src/types/Module.ts:276](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L276)
+Defined in: [packages/react-native/src/types/Module.ts:278](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L278)
 
 API used to check if a channel is blocked.
 
@@ -896,7 +914,7 @@ android
 
 > **isChannelCreated**(`channelId`): `Promise`<`boolean`>
 
-Defined in: [packages/react-native/src/types/Module.ts:267](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L267)
+Defined in: [packages/react-native/src/types/Module.ts:269](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L269)
 
 API used to check if a channel is created.
 
@@ -922,7 +940,7 @@ android
 
 > **onBackgroundEvent**(`observer`): `void`
 
-Defined in: [packages/react-native/src/types/Module.ts:360](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L360)
+Defined in: [packages/react-native/src/types/Module.ts:362](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L362)
 
 API used to handle events when the application is in a background state.
 
@@ -954,7 +972,7 @@ is in a background state.
 
 > **onForegroundEvent**(`observer`): () => `void`
 
-Defined in: [packages/react-native/src/types/Module.ts:377](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L377)
+Defined in: [packages/react-native/src/types/Module.ts:379](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L379)
 
 API used to handle events when the application is in a foreground state.
 
@@ -986,7 +1004,7 @@ is in a foreground state.
 
 > **openAlarmPermissionSettings**(): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:208](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L208)
+Defined in: [packages/react-native/src/types/Module.ts:210](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L210)
 
 API used to open the Android Alarm special access settings for the application.
 
@@ -1009,7 +1027,7 @@ android
 
 > **openBatteryOptimizationSettings**(): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:561](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L561)
+Defined in: [packages/react-native/src/types/Module.ts:563](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L563)
 
 API used to open the Android System settings for the application.
 
@@ -1032,7 +1050,7 @@ android
 
 > **openNotificationSettings**(`channelId?`): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:398](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L398)
+Defined in: [packages/react-native/src/types/Module.ts:400](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L400)
 
 API used to open the Android System settings for the application.
 
@@ -1072,7 +1090,7 @@ android
 
 > **openPowerManagerSettings**(): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:624](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L624)
+Defined in: [packages/react-native/src/types/Module.ts:626](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L626)
 
 API used to navigate to the appropriate Android System settings for the device.
 
@@ -1108,7 +1126,7 @@ android
 
 > **registerForegroundService**(`task`): `void`
 
-Defined in: [packages/react-native/src/types/Module.ts:415](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L415)
+Defined in: [packages/react-native/src/types/Module.ts:417](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L417)
 
 API used to register a foreground service on Android devices.
 
@@ -1143,7 +1161,7 @@ android
 
 > **requestPermission**(`permissions?`): `Promise`<[`NotificationSettings`](react-native/reference/Interface.NotificationSettings)>
 
-Defined in: [packages/react-native/src/types/Module.ts:453](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L453)
+Defined in: [packages/react-native/src/types/Module.ts:455](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L455)
 
 Request specific notification permissions for your application on the current device.
 
@@ -1186,7 +1204,7 @@ and all of the properties on the `ios` interface response return as `AUTHORIZED`
 
 > **setBadgeCount**(`count`): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:527](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L527)
+Defined in: [packages/react-native/src/types/Module.ts:529](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L529)
 
 Set the badge count value for this application on the current device.
 
@@ -1215,7 +1233,7 @@ ios
 
 > **setFcmConfig**(`config`): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:458](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L458)
+Defined in: [packages/react-native/src/types/Module.ts:460](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L460)
 
 Configures defaults used by `handleFcmMessage`.
 
@@ -1235,7 +1253,7 @@ Configures defaults used by `handleFcmMessage`.
 
 > **setNotificationCategories**(`categories`): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:490](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L490)
+Defined in: [packages/react-native/src/types/Module.ts:492](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L492)
 
 Set the notification categories to be used on this Apple device.
 
@@ -1259,7 +1277,7 @@ ios
 
 > **setNotificationConfig**(`config`): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:481](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L481)
+Defined in: [packages/react-native/src/types/Module.ts:483](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L483)
 
 Configures how Notifee handles notifications at a global level.
 
@@ -1297,7 +1315,7 @@ The [NotificationConfig](react-native/reference/Interface.NotificationConfig) ob
 
 > **stopForegroundService**(): `Promise`<`void`>
 
-Defined in: [packages/react-native/src/types/Module.ts:423](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L423)
+Defined in: [packages/react-native/src/types/Module.ts:425](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Module.ts#L425)
 
 Call this to stop the foreground service that is running
 

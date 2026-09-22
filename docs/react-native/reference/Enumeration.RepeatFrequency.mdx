@@ -6,9 +6,11 @@
 
 # Enumeration: RepeatFrequency
 
-Defined in: [packages/react-native/src/types/Trigger.ts:77](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L77)
+Defined in: [packages/react-native/src/types/Trigger.ts:102](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L102)
 
 An interface representing the different frequencies which can be used with `TimestampTrigger.repeatFrequency`.
+Supported timestamp repeat frequencies are hourly, daily, weekly, and monthly.
+Yearly recurrence is not supported.
 
 View the [Triggers](/react-native/triggers) documentation to learn more.
 
@@ -18,7 +20,9 @@ View the [Triggers](/react-native/triggers) documentation to learn more.
 
 > **DAILY**: `1`
 
-Defined in: [packages/react-native/src/types/Trigger.ts:80](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L80)
+Defined in: [packages/react-native/src/types/Trigger.ts:114](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L114)
+
+Repeat every calendar day from the timestamp.
 
 ***
 
@@ -26,7 +30,24 @@ Defined in: [packages/react-native/src/types/Trigger.ts:80](https://github.com/N
 
 > **HOURLY**: `0`
 
-Defined in: [packages/react-native/src/types/Trigger.ts:79](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L79)
+Defined in: [packages/react-native/src/types/Trigger.ts:110](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L110)
+
+Repeat every calendar hour from the timestamp.
+
+***
+
+### MONTHLY
+
+> **MONTHLY**: `3`
+
+Defined in: [packages/react-native/src/types/Trigger.ts:127](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L127)
+
+Repeat every calendar month from the timestamp.
+
+Use `TimestampTrigger.repeatInterval` for intervals such as every 3 months.
+Monthly repeats use native calendar semantics; dates that do not exist in a
+target month are adjusted by the platform calendar. Requires AlarmManager
+(the default on Android); not supported with `alarmManager: false`.
 
 ***
 
@@ -34,7 +55,9 @@ Defined in: [packages/react-native/src/types/Trigger.ts:79](https://github.com/N
 
 > **NONE**: `-1`
 
-Defined in: [packages/react-native/src/types/Trigger.ts:78](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L78)
+Defined in: [packages/react-native/src/types/Trigger.ts:106](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L106)
+
+Do not repeat. `TimestampTrigger.repeatInterval` cannot be used with `NONE`.
 
 ***
 
@@ -42,4 +65,6 @@ Defined in: [packages/react-native/src/types/Trigger.ts:78](https://github.com/N
 
 > **WEEKLY**: `2`
 
-Defined in: [packages/react-native/src/types/Trigger.ts:81](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L81)
+Defined in: [packages/react-native/src/types/Trigger.ts:118](https://github.com/New-Elysium/notifee/blob/main/packages/react-native/src/types/Trigger.ts#L118)
+
+Repeat every calendar week from the timestamp.

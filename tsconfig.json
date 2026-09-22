@@ -20,7 +20,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["jest"],
+    "types": ["jest", "node"],
     "lib": ["ES2017"],
   },
   "exclude": [
@@ -28,5 +28,6 @@
     "babel.config.js",
     "metro.config.js",
     "tests_react_native/jest.config.js",
+    "tests_react_native/__tests__/expoPluginIosTargets.test.ts"
   ],
 }

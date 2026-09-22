@@ -120,17 +120,19 @@ once complete.
 
 > Please note, for iOS, the `DELIVERED` event is not fired for trigger notifications when the app is in the background.
 
+> Trigger notifications that fire while the app is in the background or killed on iOS still don't emit `DELIVERED` (`willPresentNotification:` only fires in the foreground, and iOS provides no callback for background-delivered triggers). If you need delivery confirmation for background trigger notifications on iOS, check the notification's presence via [`getDisplayedNotifications`](/react-native/reference/getdisplayednotifications) after the app returns to foreground.
+
 ### Event lifecycle by app state
 
 The following table summarizes which event mechanisms fire in each app state:
 
 | App State | Foreground Event | Background Event | `getInitialNotification` |
 |-----------|-----------------|------------------|--------------------------|
-| Foreground (visible) | ✅ PRESS / ACTION_PRESS / DELIVERED¹ / DISMISSED | — | — |
+| Foreground (visible) | ✅ PRESS / ACTION_PRESS / DELIVERED / DISMISSED | — | — |
 | Background (minimized) | — | ✅ PRESS / ACTION_PRESS / DISMISSED | — |
 | Killed / Quit | — | — | ✅ (Android only) |
 
-¹ On iOS, the `DELIVERED` event is only fired for trigger notifications when the app is in the foreground.
+Unlike the archived `@notifee/react-native`, the `DELIVERED` event now fires on iOS for **every** Notifee-owned foreground notification — not only for trigger notifications. This brings iOS into symmetry with Android and eliminates the previous inconsistency when `onForegroundEvent` listeners did work on `DELIVERED` and stopped receiving it after switching from `displayNotification` to a trigger.
 
 On **iOS**, `getInitialNotification` is deprecated. The `PRESS` event is delivered via `onForegroundEvent` when the app opens from a notification in any state. On **Android**, cold-start opens are only available through `getInitialNotification`.
 

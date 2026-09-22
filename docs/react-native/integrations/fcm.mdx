@@ -371,6 +371,31 @@ messaging().onMessage(onMessageReceived);
 messaging().setBackgroundMessageHandler(onMessageReceived);
 ```
 
+### Build-only flow with `buildFcmMessage`
+
+When you need to inspect or patch the reconstructed notification before display — for example to apply a custom Android image, modify the title per-user, or attach a `categoryId` based on the payload — use `buildFcmMessage` to build the `Notification` object without displaying it, then call `displayNotification` yourself:
+
+```js
+import notifee from '@psync/notifee';
+
+async function onMessageReceived(remoteMessage) {
+  const notification = notifee.buildFcmMessage(remoteMessage);
+  if (!notification) return; // fallbackBehavior was 'ignore' and no payload
+
+  // Modify freely — the returned object has not been validated yet
+  notification.title = `${notification.title} for ${remoteMessage.data.userName}`;
+  notification.android = {
+    ...notification.android,
+    category: 'chat-message',
+    actions: [{ title: 'Reply', pressAction: { id: 'reply' } }],
+  };
+
+  await notifee.displayNotification(notification);
+}
+```
+
+Do not call `handleFcmMessage` for the same message after building it this way — that would display twice.
+
 ### Server-side payload structure
 
 Notifee recognizes a special `notifee_options` key in the FCM data payload. This key contains a

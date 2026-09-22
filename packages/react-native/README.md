@@ -159,6 +159,10 @@ Or override the name via the plugin option (e.g. to share a group with your widg
 
 Prebuild warns if the resolved app group (default or override) is not declared in `ios.entitlements` while the extension is enabled — treat that warning as a build failure waiting to happen.
 
+### `iosSoundFiles` not landing in the bundle?
+
+If prebuild prints `Copied iOS notification sound 'chime.wav'` but the sound is silent on a real device (the file is at `ios/NotifeeSounds/chime.wav` but not in the app bundle), the host app Xcode target could not be resolved against your app config. The plugin resolves the app target in this order: `modRequest.projectName` (the `ios/` folder name), then `name` (your app config display name), then the project's first target. The common failure case is a `name` in `app.json` that does not match the native target (e.g. `"My App"` vs target `MyApp`). Fix by either matching `name` to the Xcode target or renaming the target to match `name`. Re-run `npx expo prebuild --clean` after the change.
+
 ## Documentation
 
 - [Overview](https://notifee.app/react-native/docs/overview)
