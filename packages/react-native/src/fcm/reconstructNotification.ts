@@ -2,6 +2,7 @@ import { Notification } from '../types/Notification';
 import { NotificationAndroid, AndroidStyle } from '../types/NotificationAndroid';
 import { NotificationIOS } from '../types/NotificationIOS';
 import { isAndroid, isIOS } from '../utils';
+import { isValidTimestamp } from '../validators/validate';
 import type { FcmConfig, FcmRemoteMessage } from './types';
 import type { ParsedPayload } from './parseFcmPayload';
 
@@ -25,10 +26,12 @@ export function reconstructNotification(
     parsed?.title ?? remoteMessage.notification?.title ?? remoteMessage.data?.title ?? '';
   const body = parsed?.body ?? remoteMessage.notification?.body ?? remoteMessage.data?.body ?? '';
 
+  const id =
+    ((parsed as Record<string, unknown> | null)?.id as string | undefined) ??
+    remoteMessage.messageId;
+
   const notification: Notification = {
-    id:
-      ((parsed as Record<string, unknown> | null)?.id as string | undefined) ??
-      remoteMessage.messageId,
+    ...(id === undefined || id === null ? {} : { id }),
     title,
     body,
   };
@@ -98,6 +101,12 @@ function buildAndroidConfig(
   if (typeof raw?.smallIcon === 'string') android.smallIcon = raw.smallIcon;
   if (typeof raw?.largeIcon === 'string') android.largeIcon = raw.largeIcon;
   if (typeof raw?.color === 'string') android.color = raw.color;
+
+  // Timestamp fields — preserve only values accepted by the canonical Android validator
+  if (typeof raw?.showTimestamp === 'boolean') android.showTimestamp = raw.showTimestamp;
+  if (typeof raw?.timestamp === 'number' && isValidTimestamp(raw.timestamp)) {
+    android.timestamp = raw.timestamp;
+  }
 
   if (Array.isArray(raw?.actions)) {
     android.actions = raw.actions as NotificationAndroid['actions'];

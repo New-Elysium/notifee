@@ -185,3 +185,91 @@ describe('handleFcmMessage', () => {
     warn.mockRestore();
   });
 });
+
+describe('buildFcmNotification', () => {
+  beforeEach(() => {
+    setPlatform('android');
+  });
+
+  afterEach(async () => {
+    await apiModule.setFcmConfig({});
+  });
+
+  it('builds a notification without displaying it', () => {
+    const displaySpy = jest.spyOn(apiModule, 'displayNotification');
+
+    const notification = apiModule.buildFcmNotification(makeMessage());
+
+    expect(notification).toMatchObject({ id: 'msg-1', title: 'Hello', body: 'World' });
+    expect(displaySpy).not.toHaveBeenCalled();
+
+    displaySpy.mockRestore();
+  });
+
+  it('returns null for fallback messages when configured to ignore', async () => {
+    await apiModule.setFcmConfig({ fallbackBehavior: 'ignore' });
+
+    expect(
+      apiModule.buildFcmNotification({ messageId: 'fb-1', notification: { title: 'T', body: 'B' } }),
+    ).toBeNull();
+  });
+
+  it('applies configured defaults to the built notification', async () => {
+    await apiModule.setFcmConfig({
+      defaultChannelId: 'default-channel',
+      defaultPressAction: { id: 'default', launchActivity: 'default' },
+    });
+
+    const notification = apiModule.buildFcmNotification({ messageId: 'fb-2' });
+
+    expect(notification?.android).toMatchObject({
+      channelId: 'default-channel',
+      pressAction: { id: 'default', launchActivity: 'default' },
+    });
+  });
+
+  it('preserves android timestamp fields from the payload', () => {
+    const notification = apiModule.buildFcmNotification(
+      makeMessage({
+        data: {
+          notifee_options: JSON.stringify({
+            _v: 1,
+            title: 'a',
+            body: 'b',
+            android: {
+              channelId: 'default',
+              showTimestamp: true,
+              timestamp: 1735689600000,
+            },
+          }),
+        },
+      }),
+    );
+
+    expect(notification?.android?.showTimestamp).toBe(true);
+    expect(notification?.android?.timestamp).toBe(1735689600000);
+  });
+
+  it('drops invalid android timestamp values', () => {
+    const notification = apiModule.buildFcmNotification(
+      makeMessage({
+        data: {
+          notifee_options: JSON.stringify({
+            _v: 1,
+            title: 'a',
+            body: 'b',
+            android: { channelId: 'default', timestamp: -5 },
+          }),
+        },
+      }),
+    );
+
+    expect(notification?.android?.timestamp).toBeUndefined();
+  });
+
+  it('throws when remoteMessage is not an object', () => {
+    expect(() => apiModule.buildFcmNotification(null as any)).toThrow(
+      "notifee.buildFcmNotification(*) 'remoteMessage' expected an object.",
+    );
+  });
+});

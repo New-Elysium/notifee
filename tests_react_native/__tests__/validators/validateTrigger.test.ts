@@ -6,7 +6,9 @@ import {
   IntervalTrigger,
   TimeUnit,
   AlarmType,
+  RepeatFrequency,
 } from '../../../packages/react-native/src/types/Trigger';
+import { setPlatform } from '../testSetup';
 
 describe('Validate Trigger', () => {
   describe('validateTrigger()', () => {
@@ -87,7 +89,7 @@ describe('Validate Trigger', () => {
           type: TriggerType.TIMESTAMP,
           timestamp: date.getTime(),
           // @ts-ignore
-          repeatFrequency: 3,
+          repeatFrequency: 4,
         };
 
         expect(() => validateTrigger(trigger)).toThrow(
@@ -164,7 +166,7 @@ describe('Validate Trigger', () => {
           // expect($.).toEqual(date.getTime());
           expect($.repeatFrequency).toEqual(2);
           expect($.timestamp).toEqual(date.getTime());
-          expect($.alarmManager).toEqual({ type: AlarmType.SET_EXACT });
+          expect($.alarmManager).toEqual({ type: AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE });
         });
 
         test('parses deprecated property to an object with proper alarm type set', () => {
@@ -207,6 +209,166 @@ describe('Validate Trigger', () => {
           expect($.repeatFrequency).toEqual(2);
           expect($.timestamp).toEqual(date.getTime());
           expect($.alarmManager).toEqual({ type: AlarmType.SET_ALARM_CLOCK });
+        });
+
+        test('defaults to AlarmManager when unspecified', () => {
+          const date = new Date(Date.now());
+          date.setSeconds(date.getSeconds() + 10);
+
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+          };
+
+          const $ = validateTrigger(trigger) as TimestampTrigger;
+
+          expect($.alarmManager).toEqual({ type: AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE });
+        });
+
+        test('respects alarmManager: false opt-out (WorkManager)', () => {
+          const date = new Date(Date.now());
+          date.setSeconds(date.getSeconds() + 10);
+
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+            alarmManager: false,
+          };
+
+          const $ = validateTrigger(trigger) as TimestampTrigger;
+
+          expect($.alarmManager).toBeUndefined();
+        });
+
+        test('rejects MONTHLY when alarmManager is disabled', () => {
+          setPlatform('android');
+          const date = new Date(Date.now());
+          date.setSeconds(date.getSeconds() + 10);
+
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+            repeatFrequency: RepeatFrequency.MONTHLY,
+            alarmManager: false,
+          };
+
+          expect(() => validateTrigger(trigger)).toThrow(
+            "'trigger.repeatFrequency' MONTHLY is not supported when 'trigger.alarmManager' is false.",
+          );
+        });
+
+        test('accepts MONTHLY with AlarmManager on Android', () => {
+          setPlatform('android');
+          const date = new Date(Date.now());
+          date.setSeconds(date.getSeconds() + 10);
+
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+            repeatFrequency: RepeatFrequency.MONTHLY,
+          };
+
+          const $ = validateTrigger(trigger) as TimestampTrigger;
+
+          expect($.repeatFrequency).toEqual(RepeatFrequency.MONTHLY);
+          expect($.repeatInterval).toEqual(1);
+          expect($.alarmManager).toEqual({ type: AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE });
+        });
+
+        test('rejects MONTHLY on iOS (not yet supported)', () => {
+          setPlatform('ios');
+          const date = new Date(Date.now());
+          date.setSeconds(date.getSeconds() + 10);
+
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+            repeatFrequency: RepeatFrequency.MONTHLY,
+          };
+
+          expect(() => validateTrigger(trigger)).toThrow(
+            "'trigger.repeatFrequency' MONTHLY is not yet supported on iOS.",
+          );
+        });
+
+        test('defaults repeatInterval to 1 for repeating triggers', () => {
+          const date = new Date(Date.now());
+          date.setSeconds(date.getSeconds() + 10);
+
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+            repeatFrequency: RepeatFrequency.DAILY,
+          };
+
+          const $ = validateTrigger(trigger) as TimestampTrigger;
+
+          expect($.repeatInterval).toEqual(1);
+        });
+
+        test('accepts custom repeatInterval multipliers', () => {
+          setPlatform('android');
+          const date = new Date(Date.now());
+          date.setSeconds(date.getSeconds() + 10);
+
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+            repeatFrequency: RepeatFrequency.WEEKLY,
+            repeatInterval: 2,
+          };
+
+          const $ = validateTrigger(trigger) as TimestampTrigger;
+
+          expect($.repeatInterval).toEqual(2);
+        });
+
+        test('throws if repeatInterval is used without repeatFrequency', () => {
+          const date = new Date(Date.now());
+          date.setSeconds(date.getSeconds() + 10);
+
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+            // @ts-ignore
+            repeatInterval: 2,
+          };
+
+          expect(() => validateTrigger(trigger)).toThrow(
+            "'trigger.repeatInterval' requires a repeatFrequency value.",
+          );
+        });
+
+        test('throws if repeatInterval is not a positive integer', () => {
+          const date = new Date(Date.now());
+          date.setSeconds(date.getSeconds() + 10);
+
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: date.getTime(),
+            repeatFrequency: RepeatFrequency.DAILY,
+            repeatInterval: 1.5,
+          };
+
+          expect(() => validateTrigger(trigger)).toThrow(
+            "'trigger.repeatInterval' expected a positive integer value.",
+          );
+        });
+
+        test('gives helpful errors for likely timestamp unit mistakes', () => {
+          const trigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: 15,
+          };
+
+          expect(() => validateTrigger(trigger)).toThrow(/day-of-month/);
+
+          const secondsTrigger: TimestampTrigger = {
+            type: TriggerType.TIMESTAMP,
+            timestamp: 1735689600,
+          };
+
+          expect(() => validateTrigger(secondsTrigger)).toThrow(/seconds since epoch/);
         });
       });
     });

@@ -193,6 +193,8 @@ export interface Module {
   /**
    * Displays a notification from an FCM remote message using notifee-compatible payload fields.
    */
+  buildFcmNotification(remoteMessage: FcmRemoteMessage): Notification | null;
+
   handleFcmMessage(remoteMessage: FcmRemoteMessage): Promise<string | null>;
 
   /**

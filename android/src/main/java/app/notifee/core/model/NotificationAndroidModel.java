@@ -37,8 +37,11 @@ import java.util.Objects;
 @Keep
 public class NotificationAndroidModel {
   private static final String TAG = "NotificationAndroidModel";
-  // Defined locally for AndroidX core:1.6.0 compatibility (not available until core:1.7.0)
-  private static final int FOREGROUND_SERVICE_IMMEDIATE = 0;
+  // Defined locally for AndroidX core:1.6.0 compatibility (not available until core:1.7.0).
+  // Values match the platform Notification.ForegroundServiceBehavior constants:
+  // 0 = DEFAULT (system decides), 1 = IMMEDIATE, 2 = DEFERRED.
+  private static final int FOREGROUND_SERVICE_DEFAULT = 0;
+  private static final int FOREGROUND_SERVICE_IMMEDIATE = 1;
   private Bundle mNotificationAndroidBundle;
 
   private NotificationAndroidModel(Bundle bundle) {
@@ -372,8 +375,12 @@ public class NotificationAndroidModel {
   }
 
   public int getForegroundServiceBehavior() {
+    // Default to DEFAULT(0) — the JS validator explicitly sets IMMEDIATE for
+    // foreground service notifications; 0 preserves system-default behavior for
+    // paths that bypass validation (e.g. trigger bundles rehydrated from the DB
+    // that predate the JS-side default).
     return mNotificationAndroidBundle.getInt(
-        "foregroundServiceBehavior", FOREGROUND_SERVICE_IMMEDIATE);
+        "foregroundServiceBehavior", FOREGROUND_SERVICE_DEFAULT);
   }
 
   /**

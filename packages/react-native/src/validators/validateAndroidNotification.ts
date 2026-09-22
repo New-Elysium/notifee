@@ -20,6 +20,7 @@ import {
   AndroidBadgeIconType,
   AndroidCategory,
   AndroidDefaults,
+  AndroidForegroundServiceBehavior,
   AndroidForegroundServiceType,
   AndroidFlags,
   AndroidGroupAlertBehavior,
@@ -103,6 +104,13 @@ export default function validateAndroidNotification(
       throw new Error(`'notification.android.actions' invalid AndroidAction. ${e.message}.`);
     }
 
+    const pressActionIds = new Set<string>(actions.map(action => action.pressAction.id));
+    if (pressActionIds.size !== actions.length) {
+      throw new Error(
+        "'notification.android.actions' pressAction IDs must be unique within the notification.",
+      );
+    }
+
     if (actions.length) {
       out.actions = actions;
     }
@@ -117,6 +125,26 @@ export default function validateAndroidNotification(
     }
 
     out.asForegroundService = android.asForegroundService;
+  }
+
+  /**
+   * foregroundServiceBehavior
+   */
+  if (
+    objectHasProperty(android, 'foregroundServiceBehavior') &&
+    !isUndefined(android.foregroundServiceBehavior)
+  ) {
+    if (
+      !Object.values(AndroidForegroundServiceBehavior).includes(
+        android.foregroundServiceBehavior,
+      )
+    ) {
+      throw new Error(
+        "'notification.android.foregroundServiceBehavior' expected a valid AndroidForegroundServiceBehavior.",
+      );
+    }
+
+    out.foregroundServiceBehavior = android.foregroundServiceBehavior;
   }
 
   /**
@@ -898,6 +926,30 @@ export default function validateAndroidNotification(
     }
 
     out.sound = android.sound;
+  }
+
+  /**
+   * Auto-set ongoing for foreground service notifications.
+   * On Android 13+, foreground service notifications are dismissible by default.
+   * Setting ongoing: true restores pre-Android 13 behavior (#1248).
+   */
+  if (out.asForegroundService && !objectHasProperty(android, 'ongoing')) {
+    out.ongoing = true;
+  }
+
+  /**
+   * Auto-set foregroundServiceBehavior to IMMEDIATE for foreground service
+   * notifications, eliminating the up-to-10-second display delay on Android 12+
+   * (#272, #1242). Only set when asForegroundService is true and no explicit
+   * value was provided; strip the property otherwise since it has no effect on
+   * non-FGS notifications.
+   */
+  if (out.asForegroundService) {
+    if (!objectHasProperty(android, 'foregroundServiceBehavior')) {
+      out.foregroundServiceBehavior = AndroidForegroundServiceBehavior.IMMEDIATE;
+    }
+  } else {
+    delete out.foregroundServiceBehavior;
   }
 
   return out;

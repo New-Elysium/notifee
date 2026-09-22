@@ -23,7 +23,6 @@ import app.notifee.core.utility.ObjectUtils;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 public class TimestampTriggerModel {
@@ -33,15 +32,16 @@ public class TimestampTriggerModel {
   private Boolean mWithAlarmManager = false;
   private AlarmType mAlarmType = AlarmType.SET_EXACT;
   private String mRepeatFrequency = null;
+  private int mRepeatInterval = 1;
   private Long mTimestamp = null;
 
   public static final String HOURLY = "HOURLY";
   public static final String DAILY = "DAILY";
   public static final String WEEKLY = "WEEKLY";
+  public static final String MONTHLY = "MONTHLY";
 
   private static final int MINUTES_IN_MS = 60 * 1000;
   private static final long HOUR_IN_MS = 60 * MINUTES_IN_MS;
-  private static final long DAY_IN_MS = 24 * HOUR_IN_MS;
 
   private static final String TAG = "TimeTriggerModel";
 
@@ -49,9 +49,9 @@ public class TimestampTriggerModel {
     mTimeTriggerBundle = bundle;
 
     // set initial values
-    TimeUnit timeUnit = null;
     if (mTimeTriggerBundle.containsKey("repeatFrequency")) {
       int repeatFrequency = ObjectUtils.getInt(mTimeTriggerBundle.get("repeatFrequency"));
+      mRepeatInterval = getRepeatInterval(mTimeTriggerBundle.get("repeatInterval"));
       mTimestamp = ObjectUtils.getLong(mTimeTriggerBundle.get("timestamp"));
 
       switch (repeatFrequency) {
@@ -59,20 +59,25 @@ public class TimestampTriggerModel {
           // default value for one-time trigger
           break;
         case 0:
-          mInterval = 1;
+          mInterval = mRepeatInterval;
           mTimeUnit = TimeUnit.HOURS;
           mRepeatFrequency = HOURLY;
           break;
         case 1:
-          mInterval = 1;
+          mInterval = mRepeatInterval;
           mTimeUnit = TimeUnit.DAYS;
           mRepeatFrequency = DAILY;
           break;
         case 2:
           // weekly, 7 days
-          mInterval = 7;
+          mInterval = 7 * mRepeatInterval;
           mTimeUnit = TimeUnit.DAYS;
           mRepeatFrequency = WEEKLY;
+          break;
+        case 3:
+          // monthly repeats are only supported via AlarmManager; the JS validator
+          // rejects MONTHLY when alarmManager is disabled
+          mRepeatFrequency = MONTHLY;
           break;
       }
     }
@@ -88,7 +93,8 @@ public class TimestampTriggerModel {
       if (typeObj != null) {
         type = ObjectUtils.getInt(typeObj);
       } else {
-        type = 2;
+        // default to SET_EXACT_AND_ALLOW_WHILE_IDLE for Doze compatibility
+        type = 3;
       }
 
       // this is for the deprecated `alarmManager.allowWhileIdle` option
@@ -104,16 +110,16 @@ public class TimestampTriggerModel {
         case 1:
           mAlarmType = AlarmType.SET_AND_ALLOW_WHILE_IDLE;
           break;
-        // default behavior when alarmManager is true:
-        default:
         case 2:
           mAlarmType = AlarmType.SET_EXACT;
           break;
-        case 3:
-          mAlarmType = AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE;
-          break;
         case 4:
           mAlarmType = AlarmType.SET_ALARM_CLOCK;
+          break;
+        case 3:
+        default:
+          // default behavior when alarmManager is enabled
+          mAlarmType = AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE;
           break;
       }
     } else if (mTimeTriggerBundle.containsKey("allowWhileIdle")) {
@@ -152,9 +158,9 @@ public class TimestampTriggerModel {
 
     long timestamp = getTimestamp();
 
-    // For HOURLY, fixed millisecond interval is correct (not affected by DST)
-    if (mRepeatFrequency == TimestampTriggerModel.HOURLY) {
-      long interval = HOUR_IN_MS;
+    // For HOURLY, a fixed millisecond interval is correct (not affected by DST)
+    if (HOURLY.equals(mRepeatFrequency)) {
+      long interval = HOUR_IN_MS * mRepeatInterval;
       while (timestamp < System.currentTimeMillis()) {
         timestamp += interval;
       }
@@ -162,22 +168,31 @@ public class TimestampTriggerModel {
       return;
     }
 
-    // For DAILY and WEEKLY, use java.time to preserve wall-clock time across DST boundaries (#875)
+    // For DAILY, WEEKLY and MONTHLY, use java.time to preserve wall-clock time
+    // across DST boundaries (#875) and calendar month lengths (MONTHLY clamps
+    // e.g. Jan 31 + 1 month to Feb 28/29, matching platform calendar semantics)
     ZoneId zoneId = ZoneId.systemDefault();
     ZonedDateTime scheduledTime = Instant.ofEpochMilli(timestamp).atZone(zoneId);
     ZonedDateTime now = ZonedDateTime.now(zoneId);
 
     switch (mRepeatFrequency) {
-      case TimestampTriggerModel.DAILY:
+      case DAILY:
         // Advance day-by-day preserving the original local time until we're in the future
         while (!scheduledTime.isAfter(now)) {
-          scheduledTime = scheduledTime.plusDays(1);
+          scheduledTime = scheduledTime.plusDays(mRepeatInterval);
         }
         break;
-      case TimestampTriggerModel.WEEKLY:
+      case WEEKLY:
         // Advance week-by-week preserving the original local time until we're in the future
         while (!scheduledTime.isAfter(now)) {
-          scheduledTime = scheduledTime.plusWeeks(1);
+          scheduledTime = scheduledTime.plusWeeks(mRepeatInterval);
+        }
+        break;
+      case MONTHLY:
+        // Advance month-by-month; plusMonths clamps to the last valid day of
+        // shorter months (Jan 31 -> Feb 28/29)
+        while (!scheduledTime.isAfter(now)) {
+          scheduledTime = scheduledTime.plusMonths(mRepeatInterval);
         }
         break;
     }
@@ -213,7 +228,31 @@ public class TimestampTriggerModel {
     return mRepeatFrequency;
   }
 
+  private static int getRepeatInterval(Object repeatInterval) {
+    if (!(repeatInterval instanceof Number)) {
+      return 1;
+    }
+
+    double interval = ((Number) repeatInterval).doubleValue();
+    if (Double.isNaN(interval)
+        || Double.isInfinite(interval)
+        || interval <= 0
+        || interval % 1 != 0
+        || interval > Integer.MAX_VALUE) {
+      return 1;
+    }
+
+    return (int) interval;
+  }
+
   public Bundle toBundle() {
-    return (Bundle) mTimeTriggerBundle.clone();
+    Bundle bundle = (Bundle) mTimeTriggerBundle.clone();
+    // Persist the (possibly advanced) timestamp so rehydrated triggers — e.g.
+    // reboot recovery or WorkManager re-scheduling — carry the next fire time
+    // instead of a stale one (#601, #1063).
+    if (mTimestamp != null) {
+      bundle.putLong("timestamp", mTimestamp);
+    }
+    return bundle;
   }
 }

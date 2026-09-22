@@ -63,6 +63,19 @@ function cloneFcmConfig(config: FcmConfig): FcmConfig {
   };
 }
 
+function buildFcmNotificationFromConfig(
+  remoteMessage: FcmRemoteMessage,
+  config: FcmConfig,
+): Notification | null {
+  const parsed = parseFcmPayload(remoteMessage.data);
+
+  if (parsed === null && config.fallbackBehavior === 'ignore') {
+    return null;
+  }
+
+  return reconstructNotification(parsed, remoteMessage, config);
+}
+
 /**
  * Returns the current notification configuration set via `setNotificationConfig()`.
  * This is primarily intended for internal use and for consumers who need to check
@@ -429,21 +442,35 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     return Promise.resolve('');
   };
 
+  /**
+   * Builds a Notifee notification from an FCM remote message without displaying it.
+   * The returned object has not been passed through display validation — inspect or
+   * modify it, then call `displayNotification()` yourself. Do not also call
+   * `handleFcmMessage()` for the same message.
+   */
+  public buildFcmNotification = (remoteMessage: FcmRemoteMessage): Notification | null => {
+    if (remoteMessage == null || typeof remoteMessage !== 'object') {
+      throw new Error("notifee.buildFcmNotification(*) 'remoteMessage' expected an object.");
+    }
+
+    return buildFcmNotificationFromConfig(remoteMessage, cloneFcmConfig(fcmConfig));
+  };
+
   public handleFcmMessage = async (remoteMessage: FcmRemoteMessage): Promise<string | null> => {
     if (remoteMessage == null || typeof remoteMessage !== 'object') {
       throw new Error("notifee.handleFcmMessage(*) 'remoteMessage' expected an object.");
     }
 
+    // Snapshot config at entry — mid-flight setFcmConfig won't affect this call.
     const config = cloneFcmConfig(fcmConfig);
+    const notification = buildFcmNotificationFromConfig(remoteMessage, config);
 
-    const parsed = parseFcmPayload(remoteMessage.data);
-
-    if (parsed === null && config.fallbackBehavior === 'ignore') {
+    if (notification === null) {
       return null;
     }
 
-    const notification = reconstructNotification(parsed, remoteMessage, config);
-
+    // iOS background/killed no-op — the system/NSE has already displayed (or will
+    // display) the notification; displaying again from JS would duplicate it.
     if (isIOS) {
       if (AppState.currentState !== 'active') {
         return null;
@@ -466,6 +493,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       );
     }
 
+    // Android always displays; iOS foreground displays
     return this.displayNotification(notification);
   };
 

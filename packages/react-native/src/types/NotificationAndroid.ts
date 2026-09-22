@@ -300,6 +300,20 @@ export interface NotificationAndroid {
   foregroundServiceTypes?: AndroidForegroundServiceType[];
 
   /**
+   * Controls when the foreground service notification is shown on Android 12+.
+   *
+   * When `asForegroundService` is true and no explicit value is provided, this
+   * defaults to `AndroidForegroundServiceBehavior.IMMEDIATE` — the notification
+   * is shown immediately instead of being deferred by up to 10 seconds by the
+   * system.
+   *
+   * Set to `AndroidForegroundServiceBehavior.DEFERRED` to opt out.
+   *
+   * @platform android
+   */
+  foregroundServiceBehavior?: AndroidForegroundServiceBehavior;
+
+  /**
    * Set a notification importance for devices without channel support.
    *
    * Devices using Android API Level < 26 have no channel support, meaning incoming notifications
@@ -1542,6 +1556,20 @@ export enum AndroidLaunchActivityFlag {
  *
  * @platform android
  */
+/**
+ * Foreground service notification display behavior on Android 12+.
+ *
+ * Values match the platform `Notification.ForegroundServiceBehavior` constants.
+ */
+export enum AndroidForegroundServiceBehavior {
+  /** The system decides (may defer the notification by up to 10 seconds). */
+  DEFAULT = 0,
+  /** Show the foreground service notification immediately. */
+  IMMEDIATE = 1,
+  /** Let the system defer the foreground service notification. */
+  DEFERRED = 2,
+}
+
 export enum AndroidForegroundServiceType {
   FOREGROUND_SERVICE_TYPE_CAMERA = 64,
   FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE = 16,
