@@ -371,15 +371,15 @@ messaging().onMessage(onMessageReceived);
 messaging().setBackgroundMessageHandler(onMessageReceived);
 ```
 
-### Build-only flow with `buildFcmMessage`
+### Build-only flow with `buildFcmNotification`
 
-When you need to inspect or patch the reconstructed notification before display — for example to apply a custom Android image, modify the title per-user, or attach a `categoryId` based on the payload — use `buildFcmMessage` to build the `Notification` object without displaying it, then call `displayNotification` yourself:
+When you need to inspect or patch the reconstructed notification before display — for example to apply a custom Android image, modify the title per-user, or attach a `categoryId` based on the payload — use `buildFcmNotification` to build the `Notification` object without displaying it, then call `displayNotification` yourself:
 
 ```js
 import notifee from '@psync/notifee';
 
 async function onMessageReceived(remoteMessage) {
-  const notification = notifee.buildFcmMessage(remoteMessage);
+  const notification = notifee.buildFcmNotification(remoteMessage);
   if (!notification) return; // fallbackBehavior was 'ignore' and no payload
 
   // Modify freely — the returned object has not been validated yet
