@@ -60,6 +60,22 @@ bun run smoke:android  # launch smoke test app on Android
 cd packages/react-native && bun run build:watch
 ```
 
+## Local Development Hardware
+
+The dev workstation for this project is an **x86_64 macOS host (Darwin 26.4) with an AMD Ryzen 9 6900HS CPU**.
+
+Implications for Android emulation:
+
+- Apple's **Hypervisor.framework (HVF) is not available** on this host — `sysctl kern.hv_support` returns `0`. HVF requires an Intel CPU with VT-x, EPT and Unrestricted Guest support.
+- `emulator -accel-check` can misleadingly print `accel: 0` / `Hypervisor.Framework OS X Version 26.4`. This is a **false positive**; the emulator's real engine fails at `-enable-hvf`:
+  ```
+  HVF error: HV_ERROR
+  qemu-system-x86_64-headless: failed to initialize HVF: Invalid argument
+  ```
+  To observe it, run an AVD with `-accel on -verbose` and inspect the QEMU argv/error lines.
+- Android AVDs therefore run under **QEMU TCG software emulation**. Launch them with `-no-accel` (the local `Pixel_API36_16KB` AVD is started this way); expect slow boot and I/O.
+- Keep using **x86_64** system images (`system-images;android-36.1;google_apis_playstore;x86_64`). Do **not** switch to an arm64 image: Rosetta 2 is Apple-silicon only and does not exist on x86_64, so arm64 would also fall back to TCG — slower than x86_64 TCG — and requires a ~1.5 GB download.
+
 ## Environment Variables
 
 ```bash
@@ -73,6 +89,17 @@ export JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk-21.jdk/Contents/Home
 
 - The smoke test app pins its own SDK path via `example/android/local.properties` (gitignored); in this dev environment it points to `/Volumes/XCode/Android/sdk`.
 - iOS simulator selection defaults to `iPhone 17`; override with `IOS_SIMULATOR="..."` when running `smoke:ios` / `e2e:ios`.
+
+## Known Limitations (This Workstation)
+
+**Android emulator on AMD Hackintosh:** This workstation lacks Apple Hypervisor.framework (HVF) support because it uses an AMD Ryzen CPU. The Android emulator runs under QEMU TCG software emulation (`-no-accel`), which is ~50-100x slower than hardware-accelerated emulation. As a result:
+
+- The Android `system_server` watchdog triggers every ~4-5 minutes, killing the system process and any running apps
+- `bun run smoke:android` will **not** complete successfully on this machine
+- The iOS smoke test (`bun run smoke:ios`) works correctly
+- Android testing should be done on CI (GitHub Actions), real devices, or Intel/Apple Silicon Macs with HVF
+
+The `smoke:android` script is correct and works on supported hardware. This is a host limitation, not a project issue.
 
 ## Scripts Reference
 

@@ -281,6 +281,13 @@ xcrun simctl spawn <device_udid> log stream --predicate 'process == "SpringBoard
 
 ## Android Emulator Setup
 
+> **Host note (this dev machine):** the x86_64 macOS host (AMD Ryzen 9 6900HS) has **no working
+> Hypervisor.framework** — `sysctl kern.hv_support` returns `0`. `emulator -accel-check` prints
+> `accel: 0`, but that is a **false positive**: starting an AVD with `-accel on` fails with
+> `HVF error: HV_ERROR` / `failed to initialize HVF`. Run AVDs with **`-no-accel`** (QEMU TCG
+> software emulation) and stay on **x86_64** system images. Do not switch to arm64 — Rosetta 2 is
+> Apple-silicon only, so an arm64 image would also run under TCG (slower) and needs a ~1.5 GB download.
+
 ### Installation
 
 #### Option 1: Android Studio (Recommended)
@@ -534,7 +541,7 @@ avdmanager list avd
 ### Android Emulator
 - Use x86_64 images for better performance
 - Allocate adequate RAM (2GB minimum recommended)
-- Use hardware acceleration via Intel HAXM or Hypervisor Framework
+- Hardware acceleration needs a hypervisor (Intel HAXM or Hypervisor.framework). HAXM is deprecated and Hypervisor.framework requires an Intel CPU with VT-x/EPT — on this AMD x86_64 host neither is usable, so run with `-no-accel` (QEMU TCG) and expect slow boot and I/O.
 - Close other resource-intensive applications
 
 ## Testing Notifications
