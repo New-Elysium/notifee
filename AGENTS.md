@@ -92,14 +92,56 @@ export JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk-21.jdk/Contents/Home
 
 ## Known Limitations (This Workstation)
 
-**Android emulator on AMD Hackintosh:** This workstation lacks Apple Hypervisor.framework (HVF) support because it uses an AMD Ryzen CPU. The Android emulator runs under QEMU TCG software emulation (`-no-accel`), which is ~50-100x slower than hardware-accelerated emulation. As a result:
+**Android emulator on this AMD host:** This workstation lacks Apple Hypervisor.framework (HVF) support because it uses an AMD Ryzen CPU. The Android emulator runs under QEMU TCG software emulation (`-no-accel`), which is ~50-100x slower than hardware-accelerated emulation. As a result:
 
 - The Android `system_server` watchdog triggers every ~4-5 minutes, killing the system process and any running apps
-- `bun run smoke:android` will **not** complete successfully on this machine
+- `bun run smoke:android` against the **emulator** will **not** complete successfully on this machine
 - The iOS smoke test (`bun run smoke:ios`) works correctly
-- Android testing should be done on CI (GitHub Actions), real devices, or Intel/Apple Silicon Macs with HVF
+- For local Android testing use the **physical device over Wi-Fi adb** (see [Example App notes](#example-app-example--react-native-087-notes) below), CI (GitHub Actions), or Intel/Apple Silicon Macs with HVF
 
 The `smoke:android` script is correct and works on supported hardware. This is a host limitation, not a project issue.
+
+## Example App (`example/`) — React Native 0.87 Notes
+
+The smoke test app runs `react@^19.3.0` + `react-native@^0.87.1` (Fabric-only) on both platforms. Non-obvious requirements:
+
+### Metro must resolve a single React Native copy (both platforms)
+
+`example/metro.config.js` pins `react-native`/`react` resolution to the example's own copies via `resolveRequest`. The repo root's Bun workspace also installs its own `react-native@0.83.x` (for `tests_react_native`), and without the pin, files outside `example/` (the linked `@psync/notifee` sources) resolve that second copy. Bundling two RN copies yields two `AppRegistry` instances — `registerComponent()` lands on one while native `runApplication()` checks the other — so the app shows a **black screen** with `Invariant Violation: "example" has not been registered` even though registration succeeded.
+
+### iOS: build RN core from source
+
+RN 0.87's prebuilt core tarball is missing `ReactNativeHeaders.xcframework` on this x86_64 host, so `Pods/React-Core-prebuilt/Headers/module.modulemap` is never created and the build fails with `module map file ... not found`. Reinstall pods with prebuilt disabled:
+
+```bash
+cd example/ios && RCT_USE_PREBUILT_RNCORE=0 npx pod-install
+```
+
+### Android: RN 0.87 / AGP 9 requirements
+
+- `gradle/wrapper/gradle-wrapper.properties` → Gradle **9.4.1+** (RN 0.87 minimum; older wrappers fail with "Minimum supported Gradle version is 9.4.1").
+- `gradle.properties` → `android.builtInKotlin=false` and `android.newDsl=false` (AGP 9's built-in Kotlin conflicts with applying `org.jetbrains.kotlin.android`: "Cannot add extension with name 'kotlin'").
+- `android/build.gradle` → `kotlinVersion = "2.2.0"`.
+- `android/app/build.gradle` → `getDefaultProguardFile("proguard-android-optimize.txt")` (AGP 9 removed `proguard-android.txt`).
+- `patches/@react-native+gradle-plugin+0.87.1.patch` forces the Kotlin `jvmToolchain(21)` (JDK 17 toolchain provisioning is unavailable on this machine — see the root `build.gradle` comment).
+
+### iOS-only notification values
+
+`IOSNotificationInterruptionLevel` is a TypeScript **type union** (`'active' | 'critical' | 'passive' | 'timeSensitive'`), not a runtime enum — use the string literals. (Most other exported constants — `AndroidImportance`, `EventType`, `TriggerType`, ... — are real enums.)
+
+### Physical Android device over Wi-Fi adb
+
+The OnePlus 9R (Android 16, `arm64-v8a`) is the practical local Android test target on this machine:
+
+```bash
+# Pair/enabled via Settings → Developer options → Wireless debugging
+adb connect <phone-ip>:<port>
+adb -s <phone-ip>:<port> reverse tcp:8081 tcp:8081   # so the app can reach Metro
+ANDROID_SERIAL=<phone-ip>:<port> npx react-native run-android --no-packager
+```
+
+- Re-run `adb reverse` after reconnecting, and make sure Metro (`bun run smoke:start`) is actually running — the device fails with "Unable to load script" otherwise.
+- The same phone can appear twice in `adb devices` (USB serial + `adb-<serial>-*. _adb-tls-connect._tcp`); pin `ANDROID_SERIAL` to one of them.
 
 ## Scripts Reference
 
