@@ -345,6 +345,28 @@ avdmanager create avd -n <device_name> -k "<system_image_path>" -d "<device_type
 avdmanager create avd -n Pixel_6_API_34 -k "system-images;android-34;google_apis_playstore;x86_64" -d "pixel_6"
 ```
 
+### Connecting a Physical Android Device over Wi-Fi (wireless debugging)
+
+On this workstation the emulator is slow (see the host note above), so a real device over Wi-Fi adb is the practical Android target:
+
+```bash
+# 1. On the phone: Settings → Developer options → Wireless debugging → pair (first time)
+adb pair <phone-ip>:<pair-port>        # accepts the 6-digit pairing code
+
+# 2. Connect (port shown on the Wireless debugging screen; it changes per session)
+adb connect <phone-ip>:<port>
+
+# 3. Forward Metro so the app can load the dev bundle
+adb -s <phone-ip>:<port> reverse tcp:8081 tcp:8081
+
+# 4. Build & run, pinning the serial (the device can show up twice: USB + mDNS)
+ANDROID_SERIAL=<phone-ip>:<port> npx react-native run-android --no-packager
+```
+
+Notes:
+- Re-run `adb reverse` after every reconnect, and keep Metro (`bun run smoke:start`) running — the app fails with "Unable to load script" otherwise.
+- `adb devices` may list the same phone twice (USB serial and `adb-<serial>-*._adb-tls-connect._tcp`); always pin `ANDROID_SERIAL`.
+
 ## Notifee Project Specific Setup
 
 ### iOS Setup (Pure xtool Workflow - SwiftPM Projects)

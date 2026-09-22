@@ -47,4 +47,4 @@ notifee/
 
 ## Smoke Test Status
 - **iOS**: `bun run smoke:ios` — PASSES end-to-end (iPhone 17 sim)
-- **Android**: `bun run smoke:android` — script works on proper hardware; fails on this AMD Hackintosh due to QEMU TCG watchdog instability (system_server dies every ~4-5 min). Android testing should run on CI or HVF/KVM hardware.
+- **Android**: `bun run smoke:android` — script works on proper hardware; fails in the emulator on this AMD x86_64 macOS host due to QEMU TCG watchdog instability (system_server dies every ~4-5 min). Test locally on the physical OnePlus 9R over Wi-Fi adb (see AGENTS.md), or on CI / HVF-KVM hardware.
