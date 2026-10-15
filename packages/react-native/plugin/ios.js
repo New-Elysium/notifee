@@ -319,10 +319,9 @@ function unquote(value) {
  */
 function resolveAppTargetKey(project, modConfig) {
   const objects = project.hash.project.objects;
-  const candidates = [
-    modConfig.modRequest?.projectName,
-    modConfig.name,
-  ].filter(candidate => typeof candidate === 'string' && candidate.length > 0);
+  const candidates = [modConfig.modRequest?.projectName, modConfig.name].filter(
+    candidate => typeof candidate === 'string' && candidate.length > 0,
+  );
 
   for (const candidate of candidates) {
     const key = findObjectKeyByComment(objects.PBXNativeTarget, candidate);
@@ -487,8 +486,8 @@ function copyIOSSoundFiles(config, props) {
     const appTarget = resolveAppTargetKey(project, modConfig);
     if (!appTarget) {
       warn(
-        'Could not resolve the main app Xcode target; iOS notification sounds were copied to '
-          + `${IOS_SOUNDS_DIR}/ but NOT added to the app bundle. Re-run prebuild or link them manually.`,
+        'Could not resolve the main app Xcode target; iOS notification sounds were copied to ' +
+          `${IOS_SOUNDS_DIR}/ but NOT added to the app bundle. Re-run prebuild or link them manually.`,
       );
       return modConfig;
     }
@@ -543,10 +542,7 @@ function ensureExtensionTarget(project, props, options = {}) {
   // xcode's addTarget stores the name quoted ('"Target"'), so it cannot
   // find a target created earlier in this same run. findObjectKeyByComment
   // compares unquoted values and therefore can.
-  const existingTargetUuid = findObjectKeyByComment(
-    objects.PBXNativeTarget,
-    props.extensionName,
-  );
+  const existingTargetUuid = findObjectKeyByComment(objects.PBXNativeTarget, props.extensionName);
   let targetUuid = existingTargetUuid;
 
   objects.PBXContainerItemProxy = objects.PBXContainerItemProxy || {};

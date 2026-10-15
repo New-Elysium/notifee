@@ -332,26 +332,38 @@ async function main() {
   function resourceLabels(targetName) {
     const targetKey = findObjectKeyByComment(nativeTargets, targetName);
     if (!targetKey) return [];
-    return (nativeTargets[targetKey].buildPhases || []).flatMap(entry => {
-      const phaseKey = (entry && entry.value) || entry;
-      const phase = objects.PBXResourcesBuildPhase[phaseKey];
-      return phase && phase.files ? phase.files.map(f => (f && f.value) || f) : [];
-    }).map(buildFileKey => {
-      const comment = objects.PBXBuildFile[`${buildFileKey}_comment`];
-      if (comment) return unquote(comment);
-      const ref = objects.PBXBuildFile[buildFileKey] && fileRefs[objects.PBXBuildFile[buildFileKey].fileRef];
-      return ref ? `${unquote(ref.path)} in Resources` : buildFileKey;
-    });
+    return (nativeTargets[targetKey].buildPhases || [])
+      .flatMap(entry => {
+        const phaseKey = (entry && entry.value) || entry;
+        const phase = objects.PBXResourcesBuildPhase[phaseKey];
+        return phase && phase.files ? phase.files.map(f => (f && f.value) || f) : [];
+      })
+      .map(buildFileKey => {
+        const comment = objects.PBXBuildFile[`${buildFileKey}_comment`];
+        if (comment) return unquote(comment);
+        const ref =
+          objects.PBXBuildFile[buildFileKey] &&
+          fileRefs[objects.PBXBuildFile[buildFileKey].fileRef];
+        return ref ? `${unquote(ref.path)} in Resources` : buildFileKey;
+      });
   }
 
   const appResources = resourceLabels(appName);
   const nseResources = resourceLabels(DEFAULT_EXTENSION_NAME);
-  console.log(`=> NSE exists:${nseTargetKeys.length > 0} NSE Resources:${JSON.stringify(nseResources)}`);
+  console.log(
+    `=> NSE exists:${nseTargetKeys.length > 0} NSE Resources:${JSON.stringify(nseResources)}`,
+  );
 
   // The bug: copyIOSSoundFiles ran before addExtensionTarget, could not
   // resolve the not-yet-created NSE target and left its Resources empty.
-  check('app target Resources phase includes chime.wav', appResources.includes('chime.wav in Resources'));
-  check('NSE target Resources phase includes chime.wav', nseResources.includes('chime.wav in Resources'));
+  check(
+    'app target Resources phase includes chime.wav',
+    appResources.includes('chime.wav in Resources'),
+  );
+  check(
+    'NSE target Resources phase includes chime.wav',
+    nseResources.includes('chime.wav in Resources'),
+  );
 
   // One shared file reference, exactly one build file per target: a second
   // NSE target would mean the linker created the target twice.
