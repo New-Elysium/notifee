@@ -493,98 +493,137 @@ function copyIOSSoundFiles(config, props) {
       return modConfig;
     }
 
+    // The extension target normally exists by now (addExtensionTarget
+    // executes first in the xcodeProject chain). Create it on demand when
+    // it does not, so a future reordering of the mod chain cannot silently
+    // unlink notification sounds from the extension bundle.
+    let extensionTarget = null;
+    if (props.enableNotificationServiceExtension) {
+      extensionTarget = resolveExtensionTargetKey(project, props.extensionName);
+      if (!extensionTarget) {
+        ensureExtensionTarget(project, props, {
+          supportsTablet: modConfig.ios?.supportsTablet,
+        });
+        extensionTarget = resolveExtensionTargetKey(project, props.extensionName);
+      }
+    }
+
     for (const soundPath of props.iosSoundFiles) {
       const fileName = path.basename(soundPath);
       addResourceFileToTarget(project, fileName, appTarget, IOS_SOUNDS_DIR);
 
-      if (props.enableNotificationServiceExtension) {
-        const extensionTarget = resolveExtensionTargetKey(project, props.extensionName);
-        if (extensionTarget) {
-          addResourceFileToTarget(project, fileName, extensionTarget, IOS_SOUNDS_DIR);
-        } else {
-          warn(
-            `Notification service extension target '${props.extensionName}' was not found; ` +
-              'notification sounds were not linked into it.',
-          );
-        }
+      if (extensionTarget) {
+        addResourceFileToTarget(project, fileName, extensionTarget, IOS_SOUNDS_DIR);
       }
+    }
+
+    if (props.enableNotificationServiceExtension && !extensionTarget) {
+      warn(
+        `Notification service extension target '${props.extensionName}' was not found; ` +
+          'notification sounds were not linked into it.',
+      );
     }
 
     return modConfig;
   });
 }
 
-function addExtensionTarget(config, props) {
-  return withXcodeProject(config, modConfig => {
-    const project = modConfig.modResults;
-    const existingTargetUuid = project.findTargetKey(props.extensionName);
-    let targetUuid = existingTargetUuid;
+/**
+ * Creates the notification service extension Xcode target if it does not
+ * exist yet, then (re-)applies its build settings.
+ *
+ * Extracted from addExtensionTarget so the sound linker can create the
+ * target on demand: the withXcodeProject chain runs in reverse
+ * registration order, and a future reordering must not silently unlink
+ * notification sounds from a target that has not been created yet.
+ */
+function ensureExtensionTarget(project, props, options = {}) {
+  const objects = project.hash.project.objects;
+  // NOT project.findTargetKey(): it compares `name === name` exactly, but
+  // xcode's addTarget stores the name quoted ('"Target"'), so it cannot
+  // find a target created earlier in this same run. findObjectKeyByComment
+  // compares unquoted values and therefore can.
+  const existingTargetUuid = findObjectKeyByComment(
+    objects.PBXNativeTarget,
+    props.extensionName,
+  );
+  let targetUuid = existingTargetUuid;
 
-    const objects = project.hash.project.objects;
-    objects.PBXContainerItemProxy = objects.PBXContainerItemProxy || {};
-    objects.PBXTargetDependency = objects.PBXTargetDependency || {};
+  objects.PBXContainerItemProxy = objects.PBXContainerItemProxy || {};
+  objects.PBXTargetDependency = objects.PBXTargetDependency || {};
 
-    if (!existingTargetUuid) {
-      const target = project.addTarget(
-        props.extensionName,
-        'app_extension',
-        props.extensionName,
-        props.extensionBundleIdentifier,
-      );
-      targetUuid = target.uuid;
+  if (!existingTargetUuid) {
+    const target = project.addTarget(
+      props.extensionName,
+      'app_extension',
+      props.extensionName,
+      props.extensionBundleIdentifier,
+    );
+    targetUuid = target.uuid;
 
-      project.addBuildPhase([], 'PBXFrameworksBuildPhase', 'Frameworks', targetUuid);
-      project.addBuildPhase([], 'PBXResourcesBuildPhase', 'Resources', targetUuid);
-      project.addBuildPhase(
-        [DEFAULT_NOTIFICATION_SERVICE_FILE],
-        'PBXSourcesBuildPhase',
-        'Sources',
-        targetUuid,
-      );
+    project.addBuildPhase([], 'PBXFrameworksBuildPhase', 'Frameworks', targetUuid);
+    project.addBuildPhase([], 'PBXResourcesBuildPhase', 'Resources', targetUuid);
+    project.addBuildPhase(
+      [DEFAULT_NOTIFICATION_SERVICE_FILE],
+      'PBXSourcesBuildPhase',
+      'Sources',
+      targetUuid,
+    );
 
-      const group = project.addPbxGroup(
-        [
-          `${props.extensionName}-Info.plist`,
-          `${props.extensionName}.entitlements`,
-          'NotificationService.h',
-          DEFAULT_NOTIFICATION_SERVICE_FILE,
-        ],
-        props.extensionName,
-        props.extensionName,
-      );
+    const group = project.addPbxGroup(
+      [
+        `${props.extensionName}-Info.plist`,
+        `${props.extensionName}.entitlements`,
+        'NotificationService.h',
+        DEFAULT_NOTIFICATION_SERVICE_FILE,
+      ],
+      props.extensionName,
+      props.extensionName,
+    );
 
-      project.addToPbxGroup(group.uuid, getMainGroupUuid(project));
+    project.addToPbxGroup(group.uuid, getMainGroupUuid(project));
+  }
+
+  const configurations = project.pbxXCBuildConfigurationSection();
+  Object.keys(configurations).forEach(key => {
+    const cfg = configurations[key];
+    if (!cfg || !cfg.buildSettings) {
+      return;
     }
 
-    const configurations = project.pbxXCBuildConfigurationSection();
-    Object.keys(configurations).forEach(key => {
-      const cfg = configurations[key];
-      if (!cfg || !cfg.buildSettings) {
-        return;
-      }
+    // Compare unquoted: the pbxproj parser returns values without the
+    // quotes Xcode writes on disk, so a strict quoted compare only matches
+    // targets created earlier in the same run and settings silently stop
+    // being re-applied on re-runs over an existing project.
+    if (unquote(cfg.buildSettings.PRODUCT_NAME) === unquote(props.extensionName)) {
+      cfg.buildSettings = {
+        ...cfg.buildSettings,
+        CODE_SIGN_ENTITLEMENTS: `${props.extensionName}/${props.extensionName}.entitlements`,
+        CODE_SIGN_STYLE: 'Automatic',
+        INFOPLIST_FILE: `${props.extensionName}/${props.extensionName}-Info.plist`,
+        IPHONEOS_DEPLOYMENT_TARGET: props.iosDeploymentTarget,
+        PRODUCT_BUNDLE_IDENTIFIER: props.extensionBundleIdentifier,
+        SWIFT_VERSION: '5.0',
+        TARGETED_DEVICE_FAMILY: options.supportsTablet ? '"1,2"' : '"1"',
+      };
 
-      if (cfg.buildSettings.PRODUCT_NAME === `"${props.extensionName}"`) {
-        cfg.buildSettings = {
-          ...cfg.buildSettings,
-          CODE_SIGN_ENTITLEMENTS: `${props.extensionName}/${props.extensionName}.entitlements`,
-          CODE_SIGN_STYLE: 'Automatic',
-          INFOPLIST_FILE: `${props.extensionName}/${props.extensionName}-Info.plist`,
-          IPHONEOS_DEPLOYMENT_TARGET: props.iosDeploymentTarget,
-          PRODUCT_BUNDLE_IDENTIFIER: props.extensionBundleIdentifier,
-          SWIFT_VERSION: '5.0',
-          TARGETED_DEVICE_FAMILY: modConfig.ios?.supportsTablet ? '"1,2"' : '"1"',
-        };
-
-        if (props.appleDevTeamId) {
-          cfg.buildSettings.DEVELOPMENT_TEAM = props.appleDevTeamId;
-        }
+      if (props.appleDevTeamId) {
+        cfg.buildSettings.DEVELOPMENT_TEAM = props.appleDevTeamId;
       }
+    }
+  });
+
+  log(
+    `${existingTargetUuid ? 'Updated' : 'Created'} Xcode target '${props.extensionName}'.`,
+    props.verbose,
+  );
+}
+
+function addExtensionTarget(config, props) {
+  return withXcodeProject(config, modConfig => {
+    ensureExtensionTarget(modConfig.modResults, props, {
+      supportsTablet: modConfig.ios?.supportsTablet,
     });
-
-    log(
-      `${existingTargetUuid ? 'Updated' : 'Created'} Xcode target '${props.extensionName}'.`,
-      props.verbose,
-    );
     return modConfig;
   });
 }
@@ -723,9 +762,14 @@ function withNotifeeIos(config, props) {
   nextConfig = addAppExtensionConfig(nextConfig, props);
   nextConfig = addPodfileTarget(nextConfig, props);
   nextConfig = addExtensionFiles(nextConfig, props);
-  nextConfig = addExtensionTarget(nextConfig, props);
-  nextConfig = signTargets(nextConfig, props);
-  nextConfig = copyIOSSoundFiles(nextConfig, props);
+  // NOTE: withXcodeProject mods execute in REVERSE registration order
+  // (each new mod intercepts the previously registered one as `nextMod`).
+  // Register the sound linker FIRST so it executes AFTER addExtensionTarget
+  // has created the extension target — otherwise the linker cannot resolve
+  // the NSE target and sounds never get linked into its bundle.
+  nextConfig = copyIOSSoundFiles(nextConfig, props); // executes last
+  nextConfig = signTargets(nextConfig, props); // executes middle
+  nextConfig = addExtensionTarget(nextConfig, props); // executes first
 
   return nextConfig;
 }
