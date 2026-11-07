@@ -31,11 +31,8 @@ bun run test               # Jest unit tests (tests_react_native) — ~5s, 23 su
 bun run test:android       # Android JUnit tests (gradlew testDebugUnit, Robolectric) — all pass
 ```
 
-### Jest baseline (2026-09-22)
-**376 passed / 14 failed / 390 total is the KNOWN BASELINE.** The 14 failures are pre-existing flakes verified identical on stashed HEAD, concentrated in validator suites:
-- `validateAndroidNotification.test.ts` — `TypeError: expect(...).toThrowError is not a function` (expect@30.3.0 quirk)
-- `validateIOSNotification.test.ts` or `validateNotifications.test.ts` — stale error-message expectation (`'notification.sound'` vs `'notification.ios.sound'`)
-Which of the two suites flakes can vary run-to-run, but the total (14) is stable. Don't chase them; anything NEW failing is a regression.
+### Jest baseline (updated 2026-11-08)
+**390/390 green is the baseline** (Jest 30). The former 14 known failures were fixed: `toThrowError`→`toThrow` in validator tests, and stale `notification.sound`→`notification.ios.sound` assertions corrected. Anything failing now is a regression. Android JUnit: 13/13 green (flaky date-parity test fixed in `TimestampTriggerModelTest`).
 
 ## Smoke Test App (`example/`, npm-managed outside Bun workspace)
 ```bash

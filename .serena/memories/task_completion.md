@@ -2,7 +2,7 @@
 
 1. Run `bun run lint` and `bun run typecheck` — ESLint + TypeScript project check
 2. Run `bun run format:check` to verify formatting (google-java-format for Android, clang-format Google style for iOS, Prettier for JS/TS)
-3. Run `bun run test` for Jest unit tests — **baseline is 376 pass / 14 fail / 390 total**; the 14 are pre-existing flakes (toThrowError quirk in validateAndroidNotification tests + a stale message expectation). Only NEW failures are regressions. See `mem:suggested_commands` for details
+3. Run `bun run test` for Jest unit tests — **baseline is 390/390 green** (Jest 30, since the `toThrowError`→`toThrow` and stale-sound-assertion fixes). Only NEW failures are regressions.
 4. Run `bun run test:android` for Android JUnit/Robolectric tests (if native Android code changed) — all should pass
 5. Run `bun run docs` to regenerate TypeDoc API reference (if TS API changed)
 6. If native code changed: `bun run build:core` (Android needs ANDROID_HOME=/Volumes/XCode/Android/sdk + JAVA_HOME=/usr/local/opt/openjdk@21; iOS needs Xcode 16.2+). Rebuild commits the AAR + checksums into packages/react-native/android/libs/
