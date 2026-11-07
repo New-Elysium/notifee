@@ -837,8 +837,7 @@ class NotificationManager {
           public void onSuccess(Void result) {
             // Schedule notification with alarm manager
             if (withAlarmManager) {
-              NotifeeAlarmManager.scheduleTimestampTriggerNotification(
-                  notificationModel, trigger);
+              NotifeeAlarmManager.scheduleTimestampTriggerNotification(notificationModel, trigger);
               return;
             }
 
@@ -870,9 +869,7 @@ class NotificationManager {
               workDataBuilder.putString(Worker.KEY_WORK_REQUEST, Worker.WORK_REQUEST_PERIODIC);
               workRequestBuilder.setInputData(workDataBuilder.build());
               workManager.enqueueUniquePeriodicWork(
-                  uniqueWorkName,
-                  ExistingPeriodicWorkPolicy.UPDATE,
-                  workRequestBuilder.build());
+                  uniqueWorkName, ExistingPeriodicWorkPolicy.UPDATE, workRequestBuilder.build());
             }
           }
 
