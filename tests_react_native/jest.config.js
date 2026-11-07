@@ -6,16 +6,15 @@ module.exports = {
     '^.+\\.(js|ts|tsx)$': ['babel-jest', { rootMode: 'upward' }],
   },
   rootDir: '..',
-  testMatch: [
-    '<rootDir>/tests_react_native/__tests__/**/*.test.ts',
-    '<rootDir>/packages/react-native/plugin/__tests__/**/*.test.ts',
-  ],
+  testMatch: ['<rootDir>/tests_react_native/__tests__/**/*.test.ts'],
   modulePaths: ['node_modules', '<rootDir>/tests_react_native/node_modules'],
-  collectCoverage: true,
+  // Coverage is off by default; use `bun run test:coverage` (or --coverage) to
+  // collect it. CI uploads to Codecov via the coverage variant of the script.
+  collectCoverage: false,
 
   collectCoverageFrom: [
     '<rootDir>/packages/react-native/src/**/*.{ts,tsx}',
-    '<rootDir>/packages/react-native/plugin/**/*.{ts,tsx}',
+    '<rootDir>/packages/react-native/plugin/**/*.{js,ts,tsx}',
     '!**/node_modules/**',
     '!**/vendor/**',
   ],

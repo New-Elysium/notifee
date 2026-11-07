@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      # The release script runs packages/react-native/package.json::prepublishOnly
+      # The release script runs packages/react-native/package.json::prepare
       # which will generate these artifacts, but it does that *after* it commits
       # to git, so we don't get the Android AAR or the reference API typedoc unless
       # we generate them prior to running the release

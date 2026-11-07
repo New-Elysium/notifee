@@ -10,6 +10,10 @@ const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 const rootDir = resolve(__dirname, '..');
 
+// Escape a literal path for embedding in a RegExp. (The deprecated global
+// `escape()` URL-encodes its input, which silently broke these patterns.)
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const config = {
   projectRoot: __dirname,
   resolver: {
@@ -17,11 +21,11 @@ const config = {
     blocklist: exclusionList([
       /.*\/__fixtures__\/.*/,
       /.*\/template\/project\/node_modules\/react-native\/.*/,
-      new RegExp(`^${escape(resolve(rootDir, 'docs'))}\\/.*$`),
-      new RegExp(`^${escape(resolve(rootDir, 'tests_react_native/ios'))}\\/.*$`),
-      new RegExp(`^${escape(resolve(rootDir, 'tests_react_native/e2e'))}\\/.*$`),
-      new RegExp(`^${escape(resolve(rootDir, 'tests_react_native/android'))}\\/.*$`),
-      new RegExp(`^${escape(resolve(rootDir, 'tests_react_native/functions'))}\\/.*$`),
+      new RegExp(`^${escapeRegExp(resolve(rootDir, 'docs'))}\/.*$`),
+      new RegExp(`^${escapeRegExp(resolve(rootDir, 'tests_react_native/ios'))}\/.*$`),
+      new RegExp(`^${escapeRegExp(resolve(rootDir, 'tests_react_native/e2e'))}\/.*$`),
+      new RegExp(`^${escapeRegExp(resolve(rootDir, 'tests_react_native/android'))}\/.*$`),
+      new RegExp(`^${escapeRegExp(resolve(rootDir, 'tests_react_native/functions'))}\/.*$`),
     ]),
     extraNodeModules: new Proxy(
       {},
@@ -30,11 +34,8 @@ const config = {
           if (typeof name !== 'string') {
             return target[name];
           }
-          if (name && name.startsWith && name.startsWith('@notifee')) {
-            const packageName = name.replace('@notifee/', '');
-            const replacedPkgName = join(__dirname, `../packages/${packageName}`);
-            console.log(replacedPkgName);
-            return replacedPkgName;
+          if (name === '@psync/notifee') {
+            return join(__dirname, '../packages/react-native');
           }
           return join(__dirname, `node_modules/${name}`);
         },

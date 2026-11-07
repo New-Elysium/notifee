@@ -569,3 +569,8 @@ ios/NotifeeCore.xcworkspace
 #tests_react_native
 /tests_react_native/playgrounds
 /tests_react_native/packages
+
+# example/ is a standalone npm-managed smoke-test app with its own git history;
+# it must never be committed to (or destroyed by tooling against) this monorepo.
+# See example/SYMLINK.md and AGENTS.md.
+/example/
