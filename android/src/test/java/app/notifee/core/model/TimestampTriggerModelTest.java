@@ -159,9 +159,12 @@ public class TimestampTriggerModelTest {
     model.setNextTimestamp();
 
     ZonedDateTime next = Instant.ofEpochMilli(model.getTimestamp()).atZone(zoneId);
-    // The start is in the past; with a 2-day interval the next fire lands on an
-    // odd day-of-month (1st + 2n days) after the current time.
-    assertEquals(1, next.getDayOfMonth() % 2);
+    // The start is in the past; with a 2-day interval the next fire is an exact
+    // multiple of 2 days after the anchor and strictly in the future. Assert on
+    // absolute-day parity from the anchor — day-of-month parity is not stable
+    // across months of odd length (31/29 days flip it).
+    org.junit.Assert.assertTrue(next.toInstant().isAfter(java.time.Instant.now()));
+    assertEquals(0, Math.floorMod(next.toLocalDate().toEpochDay() - start.toLocalDate().toEpochDay(), 2));
   }
 
   @Test
