@@ -42,6 +42,7 @@ public class NotificationAndroidModel {
   // 0 = DEFAULT (system decides), 1 = IMMEDIATE, 2 = DEFERRED.
   private static final int FOREGROUND_SERVICE_DEFAULT = 0;
   private static final int FOREGROUND_SERVICE_IMMEDIATE = 1;
+  private static final int FOREGROUND_SERVICE_DEFERRED = 2;
   private Bundle mNotificationAndroidBundle;
 
   private NotificationAndroidModel(Bundle bundle) {

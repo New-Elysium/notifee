@@ -529,7 +529,7 @@ describe('Validate Android Notification', () => {
         progress: { current: 1, segments: {} as any },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.segments' expected an array.",
       );
     });
@@ -540,7 +540,7 @@ describe('Validate Android Notification', () => {
         progress: { current: 0, segments: [] },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.segments' expected a non-empty array of segment objects.",
       );
     });
@@ -551,7 +551,7 @@ describe('Validate Android Notification', () => {
         progress: { current: 1, segments: [{ length: 2, color: 'not-a-color' }] as any },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.segments[].color' invalid color. Expected an AndroidColor or hexadecimal string value.",
       );
     });
@@ -562,7 +562,7 @@ describe('Validate Android Notification', () => {
         progress: { current: 0, segments: [{ length: 0, color: '#ff0000' }] },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.segments[].length' expected a positive number value.",
       );
     });
@@ -577,7 +577,7 @@ describe('Validate Android Notification', () => {
         },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.points[].color' invalid color. Expected an AndroidColor or hexadecimal string value.",
       );
     });
@@ -592,7 +592,7 @@ describe('Validate Android Notification', () => {
         },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.points[].position' expected a positive number value.",
       );
     });
@@ -607,7 +607,7 @@ describe('Validate Android Notification', () => {
         },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.max' must not be provided when 'notification.android.progress.segments' is set.",
       );
     });
@@ -620,7 +620,7 @@ describe('Validate Android Notification', () => {
         },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.current' is required when 'notification.android.progress.segments' is provided unless indeterminate is true.",
       );
     });
@@ -661,7 +661,7 @@ describe('Validate Android Notification', () => {
         },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.current' cannot be greater than the sum of 'notification.android.progress.segments[].length'.",
       );
     });
@@ -676,7 +676,7 @@ describe('Validate Android Notification', () => {
         },
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.progress.points[].position' cannot be greater than the sum of 'notification.android.progress.segments[].length'.",
       );
     });
@@ -735,7 +735,7 @@ describe('Validate Android Notification', () => {
         style: { type: AndroidStyle.BIGTEXT, text: 'progress' } as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.style' cannot be used when 'notification.android.progress.segments' is provided.",
       );
     });
@@ -866,7 +866,7 @@ describe('Validate Android Notification', () => {
         promotedOngoing: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.promotedOngoing' expected a boolean value.",
       );
     });
@@ -877,7 +877,7 @@ describe('Validate Android Notification', () => {
         shortCriticalText: [] as any,
       };
 
-      expect(() => validateAndroidNotification(channelGroup)).toThrowError(
+      expect(() => validateAndroidNotification(channelGroup)).toThrow(
         "'notification.android.shortCriticalText' expected a string value.",
       );
     });

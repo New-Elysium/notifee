@@ -124,7 +124,7 @@ describe('Validate IOS Notification', () => {
       };
 
       expect(() => validateIOSNotification(notification)).toThrow(
-        "'notification.sound' must be a string value if specified.",
+        "'notification.ios.sound' must be a string value if specified.",
       );
 
       notification = {
@@ -132,7 +132,7 @@ describe('Validate IOS Notification', () => {
       };
 
       expect(() => validateIOSNotification(notification)).toThrow(
-        "'notification.sound' must be a string value if specified.",
+        "'notification.ios.sound' must be a string value if specified.",
       );
     });
 

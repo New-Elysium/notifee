@@ -317,17 +317,9 @@ class NotificationManager {
           builder.setPriority(androidModel.getPriority());
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
               && androidModel.getAsForegroundService()) {
-            try {
-              java.lang.reflect.Field builderField =
-                  NotificationCompat.Builder.class.getDeclaredField("mBuilder");
-              builderField.setAccessible(true);
-              Notification.Builder platformBuilder =
-                  (Notification.Builder) builderField.get(builder);
-              platformBuilder.setForegroundServiceBehavior(
-                  androidModel.getForegroundServiceBehavior());
-            } catch (Exception e) {
-              Logger.e(TAG, "Failed to set foreground service behavior", e);
-            }
+            // Public API since androidx.core 1.7.0; setting IMMEDIATE eliminates
+            // the 10-second display delay on Android 12+.
+            builder.setForegroundServiceBehavior(androidModel.getForegroundServiceBehavior());
           }
 
           applyProgress(builder, androidModel);
@@ -1059,10 +1051,10 @@ class NotificationManager {
                   NotificationModel notificationModel =
                       NotificationModel.fromBundle(ObjectUtils.bytesToBundle(notificationBytes));
 
-                  byte[] triggerBytes = workDataEntity.getTrigger();
+                  byte[] triggerBytes = workDataEntity != null ? workDataEntity.getTrigger() : null;
                   Bundle triggerBundle = null;
 
-                  if (workDataEntity.getTrigger() != null) {
+                  if (triggerBytes != null) {
                     triggerBundle = ObjectUtils.bytesToBundle(triggerBytes);
                   }
 

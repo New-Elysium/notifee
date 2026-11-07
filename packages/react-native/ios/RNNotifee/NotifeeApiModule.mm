@@ -148,11 +148,20 @@ RCT_EXPORT_MODULE();
 }
 
 - (void)cancelAllNotificationsWithIds:(NSArray *)ids
-                     notificationType:(double)notificationType
-                                  tag:(NSString *_Nullable)tag
                               resolve:(RCTPromiseResolveBlock)resolve
                                reject:(RCTPromiseRejectBlock)reject {
-  // tag is Android-only, ignored on iOS
+  [NotifeeCore cancelAllNotificationsWithIds:kReactNativeNotifeeNotificationTypeAll withIds:ids withBlock:^(NSError *_Nullable error) {
+    [self resolve:resolve orReject:reject promiseWithError:error orResult:nil];
+  }];
+}
+
+// Android-named variant from the codegen spec; on iOS the tag is ignored and
+// the notificationType selects all/displayed/trigger semantics.
+- (void)cancelAllNotificationsWithIdsAndroid:(NSArray *)ids
+                            notificationType:(double)notificationType
+                                         tag:(NSString *_Nullable)tag
+                                     resolve:(RCTPromiseResolveBlock)resolve
+                                      reject:(RCTPromiseRejectBlock)reject {
   [NotifeeCore cancelAllNotificationsWithIds:(NSInteger)notificationType withIds:ids withBlock:^(NSError *_Nullable error) {
     [self resolve:resolve orReject:reject promiseWithError:error orResult:nil];
   }];

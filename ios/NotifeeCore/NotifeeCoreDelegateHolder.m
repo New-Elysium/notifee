@@ -21,6 +21,7 @@
   struct {
     unsigned int didReceiveNotificationEvent : 1;
   } delegateRespondsTo;
+  BOOL flushScheduled;
 }
 
 @synthesize delegate;
@@ -43,20 +44,37 @@
     if (_pendingEvents.count > 0) {
       // make sure events are only processed once the module that wraps core has
       // set its delegate
-      static dispatch_once_t once;
-      // TODO temp workaround to delay initial start until RN module can queue
-      // events
-      dispatch_once(&once, ^{
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)),
-                       dispatch_get_main_queue(), ^{
-                         for (NSDictionary *event in self->_pendingEvents) {
-                           [self didReceiveNotifeeCoreEvent:event];
-                         }
-                         self->_pendingEvents = [[NSMutableArray alloc] init];
-                       });
-      });
+      [self schedulePendingEventsFlush];
     }
   }
+}
+
+// A flush must be schedulable more than once: events can arrive after the
+// first flush has already run (e.g. a second delegate is set later), and a
+// dispatch_once here would leave those events pending forever.
+- (void)schedulePendingEventsFlush {
+  // TODO temp workaround to delay initial start until RN module can queue
+  // events
+  @synchronized(self) {
+    if (flushScheduled) {
+      return;
+    }
+    flushScheduled = YES;
+  }
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)),
+                 dispatch_get_main_queue(), ^{
+                   @synchronized(self) {
+                     self->flushScheduled = NO;
+                     if (!self->delegateRespondsTo.didReceiveNotificationEvent) {
+                       return;
+                     }
+                     NSArray *events = [self->_pendingEvents copy];
+                     self->_pendingEvents = [[NSMutableArray alloc] init];
+                     for (NSDictionary *event in events) {
+                       [self didReceiveNotifeeCoreEvent:event];
+                     }
+                   }
+                 });
 }
 
 - (void)didReceiveNotifeeCoreEvent:(NSDictionary *)notificationEvent {
