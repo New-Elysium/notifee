@@ -45,12 +45,9 @@ public class TimestampTriggerModelTest {
 
     TimestampTriggerModel model = TimestampTriggerModel.fromBundle(trigger);
 
-    assertEquals(
-        "with no 'repeatFrequency', interval should be -1", -1, model.getInterval());
-    assertNull(
-        "with no 'repeatFrequency', TimeUnit should be null", model.getTimeUnit());
-    assertEquals(
-        "with no 'repeatFrequency', delay should be 0", 0, model.getDelay());
+    assertEquals("with no 'repeatFrequency', interval should be -1", -1, model.getInterval());
+    assertNull("with no 'repeatFrequency', TimeUnit should be null", model.getTimeUnit());
+    assertEquals("with no 'repeatFrequency', delay should be 0", 0, model.getDelay());
   }
 
   @Test
@@ -164,7 +161,8 @@ public class TimestampTriggerModelTest {
     // absolute-day parity from the anchor — day-of-month parity is not stable
     // across months of odd length (31/29 days flip it).
     org.junit.Assert.assertTrue(next.toInstant().isAfter(java.time.Instant.now()));
-    assertEquals(0, Math.floorMod(next.toLocalDate().toEpochDay() - start.toLocalDate().toEpochDay(), 2));
+    assertEquals(
+        0, Math.floorMod(next.toLocalDate().toEpochDay() - start.toLocalDate().toEpochDay(), 2));
   }
 
   @Test
