@@ -2,7 +2,7 @@
 
 1. Run `bun run lint` and `bun run typecheck` — ESLint + TypeScript project check
 2. Run `bun run format:check` to verify formatting (google-java-format for Android, clang-format Google style for iOS, Prettier for JS/TS)
-3. Run `bun run test` for Jest unit tests — **baseline is 392/392 green** (Jest 30, since the `toThrowError`→`toThrow`, stale-sound-assertion, and rationale/fullScreenIntent test additions). Only NEW failures are regressions.
+3. Run `bun run test` for Jest unit tests — **baseline is 398/398 green** (Jest 30, 24 suites). Only NEW failures are regressions. Note: if package.json version was bumped, re-run `bun run build:rn` first — `SDK_VERSION` must match package.json or `notifeeAppModule.test.ts` fails.
 4. Run `bun run test:android` for Android JUnit/Robolectric tests (if native Android code changed) — all should pass
 5. Run `bun run docs` to regenerate TypeDoc API reference (if TS API changed)
 6. If native code changed: `bun run build:core` (Android needs ANDROID_HOME=/Volumes/XCode/Android/sdk + JAVA_HOME=/usr/local/opt/openjdk@21; iOS needs Xcode 16.2+). Rebuild commits the AAR + checksums into packages/react-native/android/libs/
