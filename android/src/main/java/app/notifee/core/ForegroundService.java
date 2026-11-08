@@ -42,6 +42,8 @@ public class ForegroundService extends Service {
 
   public static int mCurrentForegroundServiceType = -1;
 
+  @Nullable private static Bundle mCurrentNotificationBundle = null;
+
   static void start(int hashCode, Notification notification, Bundle notificationBundle) {
     Intent intent = new Intent(ContextHolder.getApplicationContext(), ForegroundService.class);
     intent.setAction(START_FOREGROUND_SERVICE_ACTION);
@@ -93,6 +95,7 @@ public class ForegroundService extends Service {
       stopSelf();
       mCurrentNotificationId = null;
       mCurrentForegroundServiceType = -1;
+      mCurrentNotificationBundle = null;
       return Service.START_STICKY_COMPATIBILITY;
     }
 
@@ -109,13 +112,25 @@ public class ForegroundService extends Service {
 
         if (mCurrentNotificationId == null) {
           mCurrentNotificationId = notificationModel.getId();
+          mCurrentNotificationBundle = bundle;
 
+          boolean foregroundStarted;
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             int foregroundServiceType = notificationModel.getAndroid().getForegroundServiceType();
-            startForeground(hashCode, notification, foregroundServiceType);
-            mCurrentForegroundServiceType = foregroundServiceType;
+            foregroundStarted =
+                tryStartForeground(startId, hashCode, notification, foregroundServiceType);
+            if (foregroundStarted) {
+              mCurrentForegroundServiceType = foregroundServiceType;
+            }
           } else {
-            startForeground(hashCode, notification);
+            foregroundStarted = tryStartForeground(startId, hashCode, notification);
+          }
+
+          if (!foregroundStarted) {
+            mCurrentNotificationId = null;
+            mCurrentForegroundServiceType = -1;
+            mCurrentNotificationBundle = null;
+            return START_NOT_STICKY;
           }
 
           // On headless task complete
@@ -124,6 +139,7 @@ public class ForegroundService extends Service {
                 stopForeground(true);
                 mCurrentNotificationId = null;
                 mCurrentForegroundServiceType = -1;
+                mCurrentNotificationBundle = null;
               };
 
           ForegroundServiceEvent foregroundServiceEvent =
@@ -137,9 +153,11 @@ public class ForegroundService extends Service {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
               int foregroundServiceType = notificationModel.getAndroid().getForegroundServiceType();
               if (foregroundServiceType != mCurrentForegroundServiceType) {
-                startForeground(hashCode, notification, foregroundServiceType);
-                mCurrentForegroundServiceType = foregroundServiceType;
-                shouldPostNotificationAgain = false;
+                if (tryStartForeground(startId, hashCode, notification, foregroundServiceType)) {
+                  mCurrentForegroundServiceType = foregroundServiceType;
+                  mCurrentNotificationBundle = bundle;
+                  shouldPostNotificationAgain = false;
+                }
               }
             }
             if (shouldPostNotificationAgain) {
@@ -166,16 +184,89 @@ public class ForegroundService extends Service {
   @androidx.annotation.RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
   @Override
   public void onTimeout(int startId) {
-    Logger.e(TAG, "Foreground service timed out on Android 14+, stopping service to avoid ANR.");
-    stopForeground(true);
-    stopSelf(startId);
-    mCurrentNotificationId = null;
-    mCurrentForegroundServiceType = -1;
+    handleTimeout(startId, -1);
   }
 
   @androidx.annotation.RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
   @Override
   public void onTimeout(int startId, int fgsType) {
-    onTimeout(startId);
+    handleTimeout(startId, fgsType);
+  }
+
+  /**
+   * Stops the service when Android reports that it exceeded its run limit and notifies JS so the
+   * app can stop long-running work instead of being frozen or killed silently.
+   */
+  private void handleTimeout(int startId, int fgsType) {
+    Logger.e(TAG, "Foreground service timed out on Android 14+, stopping service to avoid ANR.");
+
+    Bundle notificationBundle = mCurrentNotificationBundle;
+
+    stopForeground(true);
+    stopSelf(startId);
+    mCurrentNotificationId = null;
+    mCurrentForegroundServiceType = -1;
+    mCurrentNotificationBundle = null;
+
+    if (notificationBundle == null) {
+      return;
+    }
+
+    try {
+      NotificationModel notificationModel = NotificationModel.fromBundle(notificationBundle);
+      Bundle extras = new Bundle();
+      extras.putInt("startId", startId);
+      extras.putInt("fgsType", fgsType);
+      EventBus.post(
+          new NotificationEvent(NotificationEvent.TYPE_FG_TIMEOUT, notificationModel, extras));
+    } catch (Exception e) {
+      Logger.e(TAG, "Failed to publish foreground service timeout event", e);
+    }
+  }
+
+  /**
+   * Calls {@link #startForeground(int, Notification)} and stops this service if Android denies the
+   * foreground promotion (for example a background start restriction or a missing foreground
+   * service type permission), instead of crashing the app.
+   */
+  @SuppressLint({"ForegroundServiceType", "MissingPermission"})
+  private boolean tryStartForeground(int startId, int hashCode, Notification notification) {
+    try {
+      startForeground(hashCode, notification);
+      return true;
+    } catch (Exception e) {
+      logStartForegroundFailure(e);
+      stopSelf(startId);
+      return false;
+    }
+  }
+
+  /**
+   * Calls {@link #startForeground(int, Notification, int)} and stops this service if Android denies
+   * the foreground promotion (for example a background start restriction or an invalid/missing
+   * foreground service type), instead of crashing the app.
+   */
+  @SuppressLint({"ForegroundServiceType", "MissingPermission"})
+  private boolean tryStartForeground(
+      int startId, int hashCode, Notification notification, int foregroundServiceType) {
+    try {
+      startForeground(hashCode, notification, foregroundServiceType);
+      return true;
+    } catch (Exception e) {
+      logStartForegroundFailure(e);
+      stopSelf(startId);
+      return false;
+    }
+  }
+
+  private void logStartForegroundFailure(Exception exception) {
+    String message =
+        "Unable to promote service to foreground; Android denied startForeground()."
+            + " Stopping the service to avoid an ANR.";
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      message +=
+          " See https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start";
+    }
+    Logger.e(TAG, message, exception);
   }
 }

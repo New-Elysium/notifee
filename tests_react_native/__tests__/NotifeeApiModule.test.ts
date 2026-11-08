@@ -659,6 +659,23 @@ describe('Notifee Api Module', () => {
     });
   });
 
+  describe('shouldShowRequestPermissionRationale', () => {
+    test('delegates to native on Android', async () => {
+      setPlatform('android');
+      mockNotifeeNativeModule.shouldShowRequestPermissionRationale.mockResolvedValue(true);
+
+      await expect(apiModule.shouldShowRequestPermissionRationale()).resolves.toBe(true);
+      expect(mockNotifeeNativeModule.shouldShowRequestPermissionRationale).toHaveBeenCalledTimes(1);
+    });
+
+    test('resolves false without native access on non-Android', async () => {
+      setPlatform('ios');
+
+      await expect(apiModule.shouldShowRequestPermissionRationale()).resolves.toBe(false);
+      expect(mockNotifeeNativeModule.shouldShowRequestPermissionRationale).not.toHaveBeenCalled();
+    });
+  });
+
   describe('requestPermission', () => {
     test('returns Android-shaped settings on Android', async () => {
       setPlatform('android');
@@ -666,6 +683,7 @@ describe('Notifee Api Module', () => {
         authorizationStatus: AuthorizationStatus.AUTHORIZED,
         android: {
           alarm: AndroidNotificationSetting.ENABLED,
+          fullScreenIntent: AndroidNotificationSetting.ENABLED,
         },
       });
 
@@ -675,6 +693,7 @@ describe('Notifee Api Module', () => {
         authorizationStatus: AuthorizationStatus.AUTHORIZED,
         android: {
           alarm: AndroidNotificationSetting.ENABLED,
+          fullScreenIntent: AndroidNotificationSetting.ENABLED,
         },
         ios: {
           alert: 1,
@@ -703,6 +722,7 @@ describe('Notifee Api Module', () => {
         authorizationStatus: AuthorizationStatus.NOT_DETERMINED,
         android: {
           alarm: AndroidNotificationSetting.ENABLED,
+          fullScreenIntent: AndroidNotificationSetting.ENABLED,
         },
         ios: {
           alert: 1,
@@ -734,6 +754,7 @@ describe('Notifee Api Module', () => {
           authorizationStatus: AuthorizationStatus.AUTHORIZED,
           android: {
             alarm: AndroidNotificationSetting.DISABLED,
+            fullScreenIntent: AndroidNotificationSetting.DISABLED,
           },
         });
         const settings = await apiModule.getNotificationSettings();
@@ -741,6 +762,7 @@ describe('Notifee Api Module', () => {
           authorizationStatus: AuthorizationStatus.AUTHORIZED,
           android: {
             alarm: 0,
+            fullScreenIntent: 0,
           },
           ios: {
             alert: 1,
@@ -788,6 +810,7 @@ describe('Notifee Api Module', () => {
           authorizationStatus: AuthorizationStatus.NOT_DETERMINED,
           android: {
             alarm: AndroidNotificationSetting.ENABLED,
+            fullScreenIntent: AndroidNotificationSetting.ENABLED,
           },
           ios: {
             alert: 1,

@@ -98,9 +98,24 @@ class HeadlessTask {
 
         if (!mIsReactContextInitialized.get()) {
             createReactContextAndScheduleTask(context)
-        } else {
-            invokeStartTask(getReactContext(context)!!, taskConfig)
+            return
         }
+
+        val reactContext = getReactContext(context)
+        if (reactContext == null) {
+            // The React instance can be destroyed while this process keeps running. The flag is
+            // stale in that case: reset all one-shot guards and restart the ReactHost instead of
+            // dereferencing a null context with `!!`.
+            Log.w(HEADLESS_TASK_NAME, "ReactContext is stale, reinitializing ReactHost")
+            mIsReactContextInitialized.set(false)
+            mWillDrainTaskQueue.set(false)
+            mIsInitializingReactContext.set(false)
+            mIsHeadlessJsTaskListenerRegistered.set(false)
+            createReactContextAndScheduleTask(context, reactContext)
+            return
+        }
+
+        invokeStartTask(reactContext, taskConfig)
     }
 
     @Synchronized
@@ -139,11 +154,13 @@ class HeadlessTask {
         }
     }
 
-    private fun createReactContextAndScheduleTask(context: Context) {
-        val reactContext = getReactContext(context)
+    private fun createReactContextAndScheduleTask(
+        context: Context,
+        reactContext: ReactContext? = getReactContext(context),
+    ) {
         if (reactContext != null && !mIsInitializingReactContext.get()) {
             mIsReactContextInitialized.set(true)
-            drainTaskQueue(reactContext)
+            drainTaskQueue(context, reactContext)
             return
         }
         if (mIsInitializingReactContext.compareAndSet(false, true)) {
@@ -152,7 +169,7 @@ class HeadlessTask {
             val callback = object : ReactInstanceEventListener {
                 override fun onReactContextInitialized(context: ReactContext) {
                     mIsReactContextInitialized.set(true)
-                    drainTaskQueue(context)
+                    drainTaskQueue(context, context)
                     try {
                         val removeMethod = reactHost!!.javaClass.getMethod(
                             "removeReactInstanceEventListener",
@@ -178,10 +195,13 @@ class HeadlessTask {
         }
     }
 
-    private fun drainTaskQueue(reactContext: ReactContext) {
+    private fun drainTaskQueue(context: Context, reactContext: ReactContext) {
         if (mWillDrainTaskQueue.compareAndSet(false, true)) {
             Handler(Looper.getMainLooper()).postDelayed(
                 {
+                    // The context may have been replaced while this drain was scheduled.
+                    if (getReactContext(context) !== reactContext) return@postDelayed
+
                     synchronized(mTaskQueue) {
                         for (taskConfig in mTaskQueue) {
                             invokeStartTask(reactContext, taskConfig)

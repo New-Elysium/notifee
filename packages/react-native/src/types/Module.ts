@@ -455,6 +455,16 @@ export interface Module {
   requestPermission(permissions?: IOSNotificationPermissions): Promise<NotificationSettings>;
 
   /**
+   * Returns whether the app should show a rationale before requesting the Android
+   * `POST_NOTIFICATIONS` permission (Android 13+).
+   *
+   * Always resolves `false` on platforms where the concept does not apply.
+   *
+   * @platform android API Level >= 33
+   */
+  shouldShowRequestPermissionRationale(): Promise<boolean>;
+
+  /**
    * Configures defaults used by `handleFcmMessage`.
    */
   setFcmConfig(config: FcmConfig): Promise<void>;

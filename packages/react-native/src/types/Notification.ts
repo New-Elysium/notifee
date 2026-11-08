@@ -382,6 +382,18 @@ export enum EventType {
    * Event type is sent when a notification wants to start a foreground service but a foreground service is already started.
    */
   FG_ALREADY_EXIST = 8,
+
+  /**
+   * **ANDROID ONLY**
+   *
+   * Event type is sent when Android calls `onTimeout` for a running foreground service on API 34+
+   * (Android 14+). The service has either exceeded its type-specific timeout or the system has
+   * ended it, so the notification body should stop any long-running work. The event detail
+   * includes `startId` and `fgsType`.
+   *
+   * @platform android API Level >= 34
+   */
+  FG_TIMEOUT = 9,
 }
 
 /**
@@ -401,6 +413,7 @@ export interface EventDetail {
    *  - [`EventType.DELIVERED`](/react-native/reference/eventtype#delivered)
    *  - [`EventType.TRIGGER_NOTIFICATION_CREATED`](/react-native/reference/eventtype#trigger_notification_created)
    *  - [`EventType.FG_ALREADY_EXIST`](/react-native/reference/eventtype#fg_already_exist)
+   *  - [`EventType.FG_TIMEOUT`](/react-native/reference/eventtype#fg_timeout)
    */
   notification?: Notification;
 
@@ -459,6 +472,25 @@ export interface EventDetail {
    * @platform android API Level >= 28
    */
   blocked?: boolean;
+
+  /**
+   * The `startId` passed to Android's foreground service timeout callback.
+   *
+   * The `startId` detail is available when the event type is [`EventType.FG_TIMEOUT`](/react-native/reference/eventtype#fg_timeout).
+   *
+   * @platform android API Level >= 34
+   */
+  startId?: number;
+
+  /**
+   * The foreground service type passed to Android's timeout callback.
+   *
+   * A value of `-1` is preserved when the callback overload does not provide an explicit type.
+   * The `fgsType` detail is available when the event type is [`EventType.FG_TIMEOUT`](/react-native/reference/eventtype#fg_timeout).
+   *
+   * @platform android API Level >= 34
+   */
+  fgsType?: number;
 }
 
 /**

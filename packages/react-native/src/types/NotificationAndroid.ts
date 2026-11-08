@@ -514,6 +514,19 @@ export interface AndroidNotificationSettings {
    * View the [Trigger](/react-native/android/triggers#android-12-limitations) documentation for more information.
    */
   alarm: AndroidNotificationSetting;
+
+  /**
+   * Enum describing whether the app can use full-screen intents.
+   *
+   * API < 29 reports `ENABLED` because the later permission model does not apply. API 29–33
+   * reflects `USE_FULL_SCREEN_INTENT`. API 34+ reflects Android's full-screen intent special
+   * app access, which may be restricted or revoked by the system, installer, or user.
+   *
+   * `ENABLED` does not guarantee that a particular notification will be presented full-screen.
+   *
+   * @platform android
+   */
+  fullScreenIntent?: AndroidNotificationSetting;
 }
 
 /**

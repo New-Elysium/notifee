@@ -623,6 +623,12 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       throw new Error("notifee.onForegroundEvent(*) 'observer' expected a function.");
     }
 
+    if (isAndroid || isIOS) {
+      // Foreground listeners require the shared native event relay to be initialized before
+      // registration returns. Accessing the lazy module starts it.
+      this.native;
+    }
+
     const subscriber = this.emitter.addListener(
       kReactNativeNotifeeNotificationEvent,
 
@@ -647,6 +653,14 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
     }
 
     return Promise.resolve();
+  };
+
+  public shouldShowRequestPermissionRationale = (): Promise<boolean> => {
+    if (isAndroid) {
+      return this.native.shouldShowRequestPermissionRationale();
+    }
+
+    return Promise.resolve(false);
   };
 
   public requestPermission = (
@@ -689,6 +703,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
           ios,
           android: {
             alarm: AndroidNotificationSetting.ENABLED,
+            fullScreenIntent: AndroidNotificationSetting.ENABLED,
           },
           web: {},
         };
@@ -700,6 +715,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       authorizationStatus: AuthorizationStatus.NOT_DETERMINED,
       android: {
         alarm: AndroidNotificationSetting.ENABLED,
+        fullScreenIntent: AndroidNotificationSetting.ENABLED,
       },
       ios: {
         alert: 1,
@@ -794,6 +810,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
           ios,
           android: {
             alarm: AndroidNotificationSetting.ENABLED,
+            fullScreenIntent: AndroidNotificationSetting.ENABLED,
           },
           web: {},
         };
@@ -805,6 +822,7 @@ export default class NotifeeApiModule extends NotifeeNativeModule implements Mod
       authorizationStatus: AuthorizationStatus.NOT_DETERMINED,
       android: {
         alarm: AndroidNotificationSetting.ENABLED,
+        fullScreenIntent: AndroidNotificationSetting.ENABLED,
       },
       ios: {
         alert: 1,

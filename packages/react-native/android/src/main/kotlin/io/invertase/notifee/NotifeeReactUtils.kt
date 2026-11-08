@@ -20,7 +20,13 @@ import java.lang.reflect.Method
 
 object NotifeeReactUtils {
 
+    private const val MAX_PENDING_EVENTS = 10
+
     val headlessTaskManager = HeadlessTask()
+
+    // Events emitted while the React instance is starting up or has gone away. Bounded FIFO:
+    // the newest 10 events are kept and the oldest are dropped first.
+    private val pendingEvents = mutableListOf<Pair<String, WritableMap>>()
 
     fun promiseResolver(promise: Promise, e: Exception?, bundle: Bundle?) {
         if (e != null) {
@@ -86,10 +92,15 @@ object NotifeeReactUtils {
         try {
             val reactContext = HeadlessTask.getReactContext(EventSubscriber.getContext())
 
-            // During startup/shutdown the React instance may not be active yet.
-            // Silently dropping events here is expected; they will be delivered
-            // once the JS layer subscribes via addListener.
+            // During startup/shutdown the React instance may not be active yet. Buffer the
+            // event instead of dropping it; it is delivered once JS subscribes via addListener.
             if (reactContext == null || !reactContext.hasActiveReactInstance()) {
+                synchronized(pendingEvents) {
+                    if (pendingEvents.size >= MAX_PENDING_EVENTS) {
+                        pendingEvents.removeAt(0)
+                    }
+                    pendingEvents.add(Pair(eventName, eventMap))
+                }
                 return
             }
 
@@ -98,6 +109,43 @@ object NotifeeReactUtils {
                 .emit(eventName, eventMap)
         } catch (e: Exception) {
             Log.e("SEND_EVENT", "", e)
+        }
+    }
+
+    /**
+     * Delivers events buffered while no active React instance was available. Undelivered events
+     * stay queued, ahead of events that arrive while the flush is running.
+     */
+    fun flushPendingEvents() {
+        val eventsToSend: List<Pair<String, WritableMap>>
+        synchronized(pendingEvents) {
+            eventsToSend = pendingEvents.toList()
+            pendingEvents.clear()
+        }
+
+        val undelivered = mutableListOf<Pair<String, WritableMap>>()
+        for ((eventName, eventMap) in eventsToSend) {
+            try {
+                val reactContext = HeadlessTask.getReactContext(EventSubscriber.getContext())
+                if (reactContext == null || !reactContext.hasActiveReactInstance()) {
+                    undelivered.add(Pair(eventName, eventMap))
+                    continue
+                }
+                reactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+                    .emit(eventName, eventMap)
+            } catch (e: Exception) {
+                Log.e("SEND_EVENT", "flush failed", e)
+                undelivered.add(Pair(eventName, eventMap))
+            }
+        }
+
+        if (undelivered.isNotEmpty()) {
+            synchronized(pendingEvents) {
+                val merged = undelivered + pendingEvents
+                pendingEvents.clear()
+                pendingEvents.addAll(merged.takeLast(MAX_PENDING_EVENTS))
+            }
         }
     }
 

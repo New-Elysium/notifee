@@ -30,6 +30,13 @@ import java.util.UUID;
 public class NotificationPendingIntent {
   public static final String EVENT_TYPE_INTENT_KEY = "notifee_event_type";
   public static final String NOTIFICATION_ID_INTENT_KEY = "notification_id";
+
+  /**
+   * Random id shared by the Intents of one PendingIntent so a launch Intent can be matched with the
+   * interactions recorded by {@link InitialNotificationLedger}.
+   */
+  static final String PENDING_INTENT_ID_INTENT_KEY = "notifee_pending_intent_id";
+
   public static final String PRESS_ACTION_OPT_OUT_ID = "__NOTIFEE_OPT_OUT__";
   private static final String TAG = "NotificationPendingIntent";
 
@@ -66,6 +73,12 @@ public class NotificationPendingIntent {
     setIntentExtras(launchActivityIntent, eventType, notificationId, extraKeys, extraBundles);
     setIntentExtras(receiverIntent, eventType, notificationId, extraKeys, extraBundles);
 
+    String pendingIntentId = UUID.randomUUID().toString();
+    if (launchActivityIntent != null) {
+      launchActivityIntent.putExtra(PENDING_INTENT_ID_INTENT_KEY, pendingIntentId);
+    }
+    receiverIntent.putExtra(PENDING_INTENT_ID_INTENT_KEY, pendingIntentId);
+
     // Create pending intent
     int uniqueInt = UUID.randomUUID().hashCode();
 
@@ -87,6 +100,7 @@ public class NotificationPendingIntent {
       // device unlock on Android 12+ (#877)
       Intent broadcastIntent = new Intent(context, NotificationActionReceiver.class);
       setIntentExtras(broadcastIntent, eventType, notificationId, extraKeys, extraBundles);
+      broadcastIntent.putExtra(PENDING_INTENT_ID_INTENT_KEY, pendingIntentId);
       return PendingIntent.getBroadcast(
           context,
           uniqueInt,

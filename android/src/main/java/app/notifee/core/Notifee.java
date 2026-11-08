@@ -42,7 +42,10 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -55,6 +58,12 @@ public class Notifee {
   private static final ExecutorService executorService = Executors.newCachedThreadPool();
   private static final ListeningExecutorService lExecutorService =
       MoreExecutors.listeningDecorator(executorService);
+
+  private static final Object initialNotificationLock = new Object();
+  // Activity Intents without an interaction id already returned by getInitialNotification().
+  // Intent has identity equality; weak keys let entries go with their Activity.
+  private static final Set<Intent> consumedInitialNotificationIntents =
+      Collections.newSetFromMap(new WeakHashMap<>());
 
   @KeepForSdk public static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 11111;
 
@@ -446,43 +455,83 @@ public class Notifee {
 
   @KeepForSdk
   public void getInitialNotification(Activity activity, MethodCallResult<Bundle> result) {
-    InitialNotificationEvent event = EventBus.removeStickEvent(InitialNotificationEvent.class);
-    Bundle initialNotificationBundle = new Bundle();
+    Bundle initialNotificationBundle;
+    synchronized (initialNotificationLock) {
+      initialNotificationBundle = consumeInitialNotification(activity);
+    }
+    result.onComplete(null, initialNotificationBundle);
+  }
+
+  private static @Nullable Bundle consumeInitialNotification(@Nullable Activity activity) {
+    InitialNotificationEvent event = EventBus.getStickyEvent(InitialNotificationEvent.class);
 
     if (event != null) {
-      initialNotificationBundle.putAll(event.getExtras());
-      initialNotificationBundle.putBundle("notification", event.getNotificationModel().toBundle());
-      result.onComplete(null, initialNotificationBundle);
-      return;
-    } else if (activity != null) {
-      try {
-        // get intent from current activity
-        Intent intent = activity.getIntent();
-        if (intent != null && intent.getExtras() != null && intent.hasExtra("notification")) {
-          initialNotificationBundle.putBundle(
-              "notification", intent.getBundleExtra("notification"));
-
-          // Also include pressAction if available (#1128 - canonical payload shape)
-          if (intent.hasExtra("pressAction")) {
-            initialNotificationBundle.putBundle(
-                "pressAction", intent.getBundleExtra("pressAction"));
-          }
-
-          // Consume the notification extras so they are not returned again (#880)
-          intent.removeExtra("notification");
-          intent.removeExtra("pressAction");
-          intent.removeExtra(NotificationPendingIntent.EVENT_TYPE_INTENT_KEY);
-
-          result.onComplete(null, initialNotificationBundle);
-          return;
-        }
-      } catch (Exception e) {
-        Logger.e(TAG, "getInitialNotification", e);
+      InitialNotificationLedger.TapClaim claim =
+          InitialNotificationLedger.claimTap(event.getTapSequence());
+      if (claim == InitialNotificationLedger.TapClaim.RETRY) {
+        // Keep the sticky payload, including ACTION_PRESS input, for a later durable claim.
+        return null;
       }
+      // Remove only this event: a concurrent new tap must not be discarded with it.
+      EventBus.removeStickyEvent(event);
+      if (claim == InitialNotificationLedger.TapClaim.CLAIMED) {
+        Bundle initialNotificationBundle = new Bundle();
+        initialNotificationBundle.putAll(event.getExtras());
+        initialNotificationBundle.putBundle(
+            "notification", event.getNotificationModel().toBundle());
+        return initialNotificationBundle;
+      }
+      // Otherwise this tap was already returned through its launch Intent.
     }
 
-    // If no initial notification, return
-    result.onComplete(null, null);
+    if (activity == null) {
+      return null;
+    }
+
+    // get intent from current activity
+    return consumeActivityIntent(activity.getIntent());
+  }
+
+  private static @Nullable Bundle consumeActivityIntent(@Nullable Intent intent) {
+    if (intent == null) {
+      return null;
+    }
+
+    try {
+      Bundle notification = intent.getBundleExtra("notification");
+      if (notification == null || !claimActivityIntent(intent)) {
+        return null;
+      }
+
+      Bundle initialNotificationBundle = new Bundle();
+      initialNotificationBundle.putBundle("notification", notification);
+
+      // Also include pressAction if available (#1128 - canonical payload shape)
+      if (intent.hasExtra("pressAction")) {
+        initialNotificationBundle.putBundle("pressAction", intent.getBundleExtra("pressAction"));
+      }
+
+      return initialNotificationBundle;
+    } catch (Exception e) {
+      Logger.e(TAG, "getInitialNotification", e);
+    }
+
+    return null;
+  }
+
+  /** Claims the interaction an Activity Intent carries, if it was not returned yet. */
+  private static boolean claimActivityIntent(Intent intent) {
+    String pendingIntentId =
+        intent.getStringExtra(NotificationPendingIntent.PENDING_INTENT_ID_INTENT_KEY);
+
+    if (pendingIntentId != null) {
+      // Launch Intent of a NotificationPendingIntent tap. The tap's sticky event returns it; the
+      // Intent stands in only for a recorded tap whose event was lost with its process.
+      return InitialNotificationLedger.claimLatestTap(pendingIntentId);
+    }
+
+    // No id (foreign Intent): consumption follows the Intent object.
+    return consumedInitialNotificationIntents.add(intent);
   }
 
   @KeepForSdk
@@ -533,6 +582,16 @@ public class Notifee {
       androidSettingsBundle.putInt("alarm", 1);
     } else {
       androidSettingsBundle.putInt("alarm", 0);
+    }
+
+    boolean canUseFullScreenIntent =
+        NotificationManagerCompat.from(ContextHolder.getApplicationContext())
+            .canUseFullScreenIntent();
+
+    if (canUseFullScreenIntent) {
+      androidSettingsBundle.putInt("fullScreenIntent", 1);
+    } else {
+      androidSettingsBundle.putInt("fullScreenIntent", 0);
     }
 
     notificationSettingsBundle.putBundle("android", androidSettingsBundle);

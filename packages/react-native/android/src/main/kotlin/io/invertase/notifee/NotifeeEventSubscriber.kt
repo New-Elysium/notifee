@@ -26,6 +26,8 @@ class NotifeeEventSubscriber : EventListener {
         private const val KEY_NOTIFICATION = "notification"
         private const val KEY_DETAIL_PRESS_ACTION = "pressAction"
         private const val KEY_DETAIL_INPUT = "input"
+        private const val KEY_DETAIL_START_ID = "startId"
+        private const val KEY_DETAIL_FGS_TYPE = "fgsType"
     }
 
     override fun onNotificationEvent(notificationEvent: NotificationEvent) {
@@ -44,6 +46,12 @@ class NotifeeEventSubscriber : EventListener {
             }
             extras.getString(KEY_DETAIL_INPUT)?.let { input ->
                 eventDetailMap.putString(KEY_DETAIL_INPUT, input)
+            }
+            if (extras.containsKey(KEY_DETAIL_START_ID)) {
+                eventDetailMap.putInt(KEY_DETAIL_START_ID, extras.getInt(KEY_DETAIL_START_ID))
+            }
+            if (extras.containsKey(KEY_DETAIL_FGS_TYPE)) {
+                eventDetailMap.putInt(KEY_DETAIL_FGS_TYPE, extras.getInt(KEY_DETAIL_FGS_TYPE))
             }
         }
 

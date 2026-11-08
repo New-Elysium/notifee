@@ -224,25 +224,30 @@ class NotificationManager {
             pressActionForExtras = null;
           }
 
-          int targetSdkVersion =
-              ContextHolder.getApplicationContext().getApplicationInfo().targetSdkVersion;
-          if (targetSdkVersion >= Build.VERSION_CODES.S
-              && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            builder.setContentIntent(
-                NotificationPendingIntent.createIntent(
-                    notificationModel.getHashCode(),
-                    pressActionForIntent,
-                    TYPE_PRESS,
-                    new String[] {"notification", "pressAction"},
-                    notificationModel.toBundle(),
-                    pressActionForExtras));
-          } else {
-            builder.setContentIntent(
-                ReceiverService.createIntent(
-                    ReceiverService.PRESS_INTENT,
-                    new String[] {"notification", "pressAction"},
-                    notificationModel.toBundle(),
-                    pressActionForIntent));
+          // pressActionForIntent is null only for an explicit `pressAction: null` opt-out. In
+          // that case do not attach a content intent at all, so tapping the notification does
+          // not launch the app or require the device to be unlocked.
+          if (pressActionForIntent != null) {
+            int targetSdkVersion =
+                ContextHolder.getApplicationContext().getApplicationInfo().targetSdkVersion;
+            if (targetSdkVersion >= Build.VERSION_CODES.S
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+              builder.setContentIntent(
+                  NotificationPendingIntent.createIntent(
+                      notificationModel.getHashCode(),
+                      pressActionForIntent,
+                      TYPE_PRESS,
+                      new String[] {"notification", "pressAction"},
+                      notificationModel.toBundle(),
+                      pressActionForExtras));
+            } else {
+              builder.setContentIntent(
+                  ReceiverService.createIntent(
+                      ReceiverService.PRESS_INTENT,
+                      new String[] {"notification", "pressAction"},
+                      notificationModel.toBundle(),
+                      pressActionForIntent));
+            }
           }
 
           if (notificationModel.getTitle() != null) {
@@ -484,23 +489,30 @@ class NotificationManager {
                     PendingIntent pendingIntent = null;
                     int targetSdkVersion =
                         ContextHolder.getApplicationContext().getApplicationInfo().targetSdkVersion;
+                    NotificationAndroidPressActionModel pressAction = actionBundle.getPressAction();
+                    // Quick actions only need an activity PendingIntent when they explicitly ask
+                    // to open the app. Otherwise route through ReceiverService so Android 12+
+                    // does not launch the app (and require an unlock) for background-only actions.
+                    boolean shouldCreateLaunchActivityIntent =
+                        NotificationPendingIntent.shouldCreateLaunchActivityIntent(pressAction);
                     if (targetSdkVersion >= Build.VERSION_CODES.S
-                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                        && shouldCreateLaunchActivityIntent) {
                       pendingIntent =
                           NotificationPendingIntent.createIntent(
                               notificationModel.getHashCode(),
-                              actionBundle.getPressAction().toBundle(),
+                              pressAction.toBundle(),
                               TYPE_ACTION_PRESS,
                               new String[] {"notification", "pressAction"},
                               notificationModel.toBundle(),
-                              actionBundle.getPressAction().toBundle());
+                              pressAction.toBundle());
                     } else {
                       pendingIntent =
                           ReceiverService.createIntent(
                               ACTION_PRESS_INTENT,
                               new String[] {"notification", "pressAction"},
                               notificationModel.toBundle(),
-                              actionBundle.getPressAction().toBundle());
+                              pressAction.toBundle());
                     }
 
                     String icon = actionBundle.getIcon();

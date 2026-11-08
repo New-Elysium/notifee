@@ -241,6 +241,34 @@ class NotifeeApiModule(reactContext: ReactApplicationContext) :
             }
     }
 
+    override fun shouldShowRequestPermissionRationale(promise: Promise) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            promise.resolve(false)
+            return
+        }
+
+        // Activity APIs must be queried on the main thread, not the native-modules thread.
+        reactApplicationContext.runOnUiQueueThread {
+            try {
+                val activity = reactApplicationContext.currentActivity
+                if (activity == null) {
+                    promise.reject(
+                        "ERR_NO_ACTIVITY",
+                        "A current Activity is required to query notification permission rationale.",
+                    )
+                    return@runOnUiQueueThread
+                }
+                promise.resolve(
+                    activity.shouldShowRequestPermissionRationale(
+                        Manifest.permission.POST_NOTIFICATIONS,
+                    ),
+                )
+            } catch (e: Exception) {
+                promise.reject(e)
+            }
+        }
+    }
+
     override fun requestPermission(permissions: ReadableMap, promise: Promise) {
         // permissions parameter is ignored on Android — only used by iOS
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
@@ -251,36 +279,41 @@ class NotifeeApiModule(reactContext: ReactApplicationContext) :
             return
         }
 
-        val activity = reactApplicationContext.currentActivity as? PermissionAwareActivity
-        if (activity == null) {
-            Logger.d(
-                "requestPermission",
-                "Unable to get permissionAwareActivity for ${Build.VERSION.SDK_INT}",
-            )
-            Notifee.getInstance()
-                .getNotificationSettings { e, bundle ->
-                    NotifeeReactUtils.promiseResolver(promise, e, bundle)
-                }
-            return
-        }
-
-        Notifee.getInstance()
-            .setRequestPermissionCallback { e, bundle ->
-                NotifeeReactUtils.promiseResolver(promise, e, bundle)
+        // requestPermissions() must be called on the main thread. The TurboModule method runs on
+        // the native-modules thread, where Activity APIs can reject with an NPE during screen
+        // transitions.
+        reactApplicationContext.runOnUiQueueThread {
+            val activity = reactApplicationContext.currentActivity as? PermissionAwareActivity
+            if (activity == null) {
+                Logger.d(
+                    "requestPermission",
+                    "Unable to get permissionAwareActivity for ${Build.VERSION.SDK_INT}",
+                )
+                Notifee.getInstance()
+                    .getNotificationSettings { e, bundle ->
+                        NotifeeReactUtils.promiseResolver(promise, e, bundle)
+                    }
+                return@runOnUiQueueThread
             }
 
-        try {
-            activity.requestPermissions(
-                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                Notifee.REQUEST_CODE_NOTIFICATION_PERMISSION,
-                this,
-            )
-        } catch (e: Exception) {
-            Logger.d(
-                "requestPermission",
-                "Failed to request POST_NOTIFICATIONS permission: ${e.message}",
-            )
-            NotifeeReactUtils.promiseResolver(promise, e)
+            Notifee.getInstance()
+                .setRequestPermissionCallback { e, bundle ->
+                    NotifeeReactUtils.promiseResolver(promise, e, bundle)
+                }
+
+            try {
+                activity.requestPermissions(
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    Notifee.REQUEST_CODE_NOTIFICATION_PERMISSION,
+                    this,
+                )
+            } catch (e: Exception) {
+                Logger.d(
+                    "requestPermission",
+                    "Failed to request POST_NOTIFICATIONS permission: ${e.message}",
+                )
+                NotifeeReactUtils.promiseResolver(promise, e)
+            }
         }
     }
 
@@ -332,6 +365,8 @@ class NotifeeApiModule(reactContext: ReactApplicationContext) :
 
     override fun addListener(eventName: String) {
         // Keep: Required for RN built in Event Emitter Calls.
+        // JS has now subscribed: deliver events that were buffered before the bridge was ready.
+        NotifeeReactUtils.flushPendingEvents()
     }
 
     override fun removeListeners(count: Double) {

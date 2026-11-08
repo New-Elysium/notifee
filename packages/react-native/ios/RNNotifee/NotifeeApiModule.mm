@@ -220,6 +220,12 @@ RCT_EXPORT_MODULE();
   }];
 }
 
+- (void)shouldShowRequestPermissionRationale:(RCTPromiseResolveBlock)resolve
+                                    reject:(RCTPromiseRejectBlock)reject {
+  // Android-only concept. iOS resolves false so the JS API has a consistent shape.
+  resolve(@(NO));
+}
+
 - (void)getInitialNotification:(RCTPromiseResolveBlock)resolve
                         reject:(RCTPromiseRejectBlock)reject {
   [NotifeeCore getInitialNotification:^(NSError *_Nullable error, NSDictionary *notification) {
