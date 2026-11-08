@@ -943,5 +943,18 @@ describe('Validate Android Notification', () => {
         "'notification.android.smallIconLevel' expected value to be a number.",
       );
     });
+
+    test('an absent pressAction defaults to tap-to-open', () => {
+      const $ = validateAndroidNotification({ channelId: 'channelId' });
+      expect($.pressAction).toEqual({ id: 'default', launchActivity: 'default' });
+    });
+
+    test('an explicit null pressAction becomes the opt-out sentinel', () => {
+      const $ = validateAndroidNotification({
+        channelId: 'channelId',
+        pressAction: null,
+      });
+      expect($.pressAction).toEqual({ id: '__NOTIFEE_OPT_OUT__' });
+    });
   });
 });

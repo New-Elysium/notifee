@@ -5,6 +5,8 @@ description: Notifee API releases
 
 > Historical note: the `7.8.0` entry below refers to the removal of an older Expo integration. Current `@psync/notifee` releases ship an official Expo config plugin again. See [Installation](/react-native/docs/installation) for the current Expo setup.
 
+> Fork note: releases `9.2.0` and above are published by this fork (`@psync/notifee`). Entries below `9.2.0` are the upstream `invertase/notifee` changelog, carried over from the last upstream release (`9.1.8`). Fork entries are reconstructed from the release commits and the npm publish timestamps.
+
 ## Unreleased (next release)
 
 A batch of reliability fixes and new API surface, verified against the maintained `react-native-notify-kit` fork
@@ -28,6 +30,301 @@ A batch of reliability fixes and new API surface, verified against the maintaine
 - **android:** call `requestPermission()` and `shouldShowRequestPermissionRationale()` on the main thread, fixing rejections/NPEs during screen transitions
 - **android:** copy bitmaps decoded by Fresco before using them, avoiding crashes from recycled bitmaps in BigPicture/MessagingStyle notifications
 - **android:** `getInitialNotification()` now uses a durable tap ledger, so a notification tap is returned at most once even across process restarts
+
+## 9.8.0 (2026-11-07)
+
+### Bug Fixes
+
+- **android:** set the foreground-service behavior through the public `NotificationCompat.Builder.setForegroundServiceBehavior()` API (androidx.core 1.7.0+) instead of reflecting into the platform builder's private `mBuilder` field
+- **android:** guard against a null `WorkDataEntity` when reading the persisted trigger payload of a scheduled notification
+- **ios:** make the pending-event flush in `NotifeeCoreDelegateHolder` re-schedulable — the previous `dispatch_once` left events pending forever when a second delegate was set after the first flush had already run
+- **ios:** align `cancelAllNotificationsWithIds` with the TurboModule spec by adding the Android-named `cancelAllNotificationsWithIdsAndroid` variant, and cancel the "all" notification type in the plain iOS method
+
+### Internal
+
+- **chore:** fix the npm `files` patterns (exclude the test plugins, drop `lib/`) and remove the unused `tsconfig.docs.json`
+- **chore:** refresh the Jest dependencies and prune stale entries from the lockfile
+- **test:** correct the validator test expectations (`toThrow`, `ios.sound` path)
+
+## 9.7.2 (2026-10-15)
+
+### Bug Fixes
+
+- **ios:** link iOS notification sounds into the Notification Service Extension target as well, so extension-handled notifications play their sound instead of falling back to the default
+
+### Internal
+
+- **test:** add a plugin ordering test harness (`plugin/test-order.js`) covering the iOS sound-linking order
+- **chore:** refresh the Android core maven metadata checksums
+- **style:** format the Expo plugin files with Prettier
+
+## 9.7.1 (2026-09-22)
+
+### Documentation
+
+- **docs:** correct the `buildFcmNotification` helper name in the README and the FCM integration guide
+
+## 9.7.0 (2026-09-22)
+
+### Features
+
+- **android:** add `RepeatFrequency.MONTHLY` for timestamp triggers — the notification repeats every calendar month, using native calendar semantics
+- **android:** add `TimestampTrigger.repeatInterval` to multiply the repeat frequency (for example `DAILY` with `repeatInterval: 2` repeats every two days, `MONTHLY` with `repeatInterval: 3` every three months)
+- **android:** add `AndroidForegroundServiceBehavior` (`DEFAULT`, `IMMEDIATE`, `DEFERRED`) and the `android.foregroundServiceBehavior` property, so the Android 12+ foreground-service notification can be shown immediately instead of being deferred by up to 10 seconds
+
+### Bug Fixes
+
+- **ios:** resolve the host app Xcode target correctly for Expo-managed projects when bundling notification sounds — the plugin previously failed to find the target and silently skipped the sound files
+
+### Documentation
+
+- **docs:** update the triggers, events and FCM integration guides for the new trigger and foreground-service APIs
+
+## 9.6.0 (2026-09-22)
+
+### Internal
+
+- **chore:** remove Lerna and move the example app to the repository root, simplifying the workspace scripts
+- **chore:** refresh the Android core maven metadata timestamp
+
+### Documentation
+
+- **docs:** refresh the README with badges and the current feature set
+- **docs:** document Android emulator behaviour on hosts without hardware acceleration (the local AVD runs under QEMU software emulation)
+- **docs:** document Wi-Fi `adb` device testing and the example app's React Native 0.87 / AGP 9 gotchas
+
+## 9.5.2 (2026-08-26)
+
+### Features
+
+- **android:** validate Android icon resource names in the Expo plugin — an icon whose name is not a valid Java identifier (no leading digit, lowercase letters, numbers and underscores only) now fails with a clear error, because the name becomes the generated drawable resource name
+
+### Internal
+
+- **test:** add an icon-validation test harness (`plugin/test-icons.js`)
+
+## 9.5.1 (2026-08-17)
+
+### Features
+
+- **plugin:** add the `appGroupName` option, so the app and the Notification Service Extension can share an App Group — required for EAS builds
+- **plugin:** copy iOS notification sounds to the app bundle root, so a notification can reference them by filename (for example `sound: 'chime.wav'`)
+
+### Bug Fixes
+
+- **plugin:** warn when the resolved App Group is not declared in `ios.entitlements` — EAS only syncs groups declared in the app config, so an undeclared group fails at build time
+
+## 9.5.0 (2026-08-17)
+
+### Features
+
+- **plugin:** add the `androidNotificationIcon` option — generates the monochrome (alpha-only) `notification_icon` drawable and sets the `com.google.firebase.messaging.default_notification_icon` metadata, updating an existing same-name entry in place
+
+### Documentation
+
+- **docs:** expand the Expo config plugin option descriptions, including the migration notes from `expo-notifications`
+
+## 9.4.0 (2026-08-16)
+
+### Features
+
+- **plugin:** add the `androidNotificationColor` option, writing the `notification_icon_color` color resource so FCM `default_notification_color` metadata keeps resolving after removing `expo-notifications`
+
+### Breaking Changes
+
+- **plugin:** the `notificationServiceExtension` option is renamed to `serviceExtensionSettings`. The old shape now fails with a clear error, and `serviceExtensionSettings.enabled` is rejected — use the top-level `enableNotificationServiceExtension: true` option instead
+
+### Documentation
+
+- **docs:** update the Expo plugin documentation and configuration examples
+
+## 9.3.3 (2026-05-22)
+
+### Breaking Changes
+
+- **ios:** remove the deprecated `ios.summaryArgument`, `ios.summaryArgumentCount` and `IOSCategory.summaryFormat` properties
+- **ios:** remove the deprecated `announcement` notification permission flag
+- **ios:** remove the deprecated `IOSIntentIdentifier.START_AUDIO_CALL` and `START_VIDEO_CALL` members
+
+### Features
+
+- **ios:** add `ios.relevanceScore`, `ios.filterCriteria` and `ios.contentType`, and forward them to `UNNotificationContent` (and back out in `getNotificationSettings`)
+- **ios:** add `IOSIntentIdentifier.START_CALL`
+
+## 9.3.2 (2026-05-22)
+
+### Features
+
+- **android:** add Android 16 notification support — `android.promotedOngoing` and `android.shortCriticalText`
+- **android:** add segmented progress via `android.progress.segments`, `points`, `styledByProgress` and `trackerIcon`; on older Android versions the segmented progress falls back to the linear progress bar using the summed segment length as `max`
+
+### Internal
+
+- **android:** rebuild the core AAR with the Android 16 support and add unit tests for the new model fields
+
+### Documentation
+
+- **docs:** document segmented progress indicators and update the environment support matrix
+
+## 9.3.1 (2026-04-26)
+
+### Features
+
+- **validation:** add notification payload validation for values that were previously accepted unchecked
+
+### Bug Fixes
+
+- **android:** await the trigger-notification database insert before scheduling with WorkManager or AlarmManager — creating several trigger notifications in quick succession previously registered only one or two of them
+- **android:** advance daily and weekly trigger recurrence by calendar days and weeks instead of fixed millisecond intervals, so scheduled notifications no longer drift by an hour across DST transitions
+- **android:** also reschedule on `DATE_CHANGED`, in addition to timezone and time-set changes
+- **ios:** default the notification sound when a trigger notification has no title, body, sound or attachments — `UNUserNotificationCenter` silently rejects such requests — and log the failure instead of reporting success
+- **ios:** return a descriptive error instead of silently succeeding when the trigger payload cannot be parsed
+
+### Internal
+
+- **test:** add Jest suites for the API module, the iOS lifecycle behaviour and the notification validators
+- **test:** fix the Cavy native reporter against AGP 8.8.2
+- **chore:** modernize the toolchain configuration files and revamp the example app
+
+### Documentation
+
+- **docs:** update the upstream issue triage document with the fixes applied
+
+## 9.3.0 (2026-04-25)
+
+### Internal
+
+- **build:** upgrade to TypeScript 6 and fix the resulting codegen errors
+- **build:** update dependencies and improve CI caching
+
+### Documentation
+
+- **docs:** add the example-app symlink guide, explaining why the app must resolve a single React Native copy
+
+## 9.2.8 (2026-04-25)
+
+### Features
+
+- **rn:** add a typed TurboModule spec (`src/specs/NativeNotifeeModule.ts`) and switch the JavaScript bridge to `TurboModuleRegistry`
+- **android:** migrate the bridge from Java to Kotlin with TurboModule conformance — `NotifeeApiModule.kt`, `NotifeePackage.kt`, `NotifeeInitProvider.kt`, `HeadlessTask.kt` and `NotifeeReactUtils.kt`
+- **ios:** migrate the bridge to Objective-C++ with TurboModule conformance (`NotifeeApiModule.mm`, `getTurboModule`)
+- **plugin:** add an official Expo config plugin, covering Android icons and sounds, the notification color and icon, the iOS Notification Service Extension and App Groups
+- **rn:** add FCM helpers — `parseFcmPayload`, `reconstructNotification` and `handleFcmMessage`
+- **rn:** add `setNotificationConfig()` to control iOS remote-notification interception, so Firebase Messaging's `onNotificationOpenedApp` and `getInitialNotification` are not broken by Notifee
+
+### Bug Fixes
+
+- **android:** consume the notification extras in `getInitialNotification`, so a tap is not delivered twice
+- **android:** include the `pressAction` in the intent-based `getInitialNotification` path
+- **android:** handle background-only notification actions without requiring a device unlock
+- **android:** catch the foreground-service start denial with actionable diagnostics instead of crashing the app
+- **android:** reschedule triggers on timezone and time changes
+- **android:** recover missed reboot broadcasts with a `BOOT_COUNT` cold-start check
+- **android:** pin the `app.notifee:core` dependency to `202108261754` instead of the floating `+` version
+- **ios:** remove the 15-second delayed completion handler from `didReceiveNotificationResponse`, and call the completion handler for dismissed events
+- **ios:** call the completion handler for non-Notifee notifications and let the original delegate handle them
+- **rn:** add the missing `web: {}` block to the iOS `getNotificationSettings` response, and fix the API-level check in `getChannelGroup` / `getChannelGroups`
+- **rn:** normalize the native `tag` arguments passed to the cancel APIs
+- **plugin:** surface background-handler errors during prebuild
+
+### Internal
+
+- **ci:** move CI to Bun, Node 24 and Java 21, and upgrade the Gradle wrapper to 9.0.0
+- **test:** add Jest coverage for the API module, the Expo plugin and the FCM helpers
+
+## 9.2.7 (2026-03-17)
+
+### Bug Fixes
+
+- **build:** resolve the Gradle 9 compatibility issues in the example app and the Android core
+
+### Internal
+
+- **chore:** restructure the example app for React Native 0.83 and the new architecture
+- **chore:** remove the Expo SDK 55 R8 compatibility analysis document
+
+## 9.2.6 (2026-03-17)
+
+### Bug Fixes
+
+- **android:** set the application context before initializing Notifee, so the core's `ContextHolder` is never null
+- **android:** initialize the application context in the alarm receiver, so scheduled notifications still fire after a reboot
+- **android:** skip the `hasActiveCatalystInstance()` guard in bridgeless mode — it always returns false on React Native 0.83+ / Expo SDK 55 — so background events are delivered
+- **android:** compile against SDK 36 and build with Java 17
+- **ios:** raise the iOS deployment target to 15.1
+
+## 9.2.5 (2026-03-15)
+
+### Bug Fixes
+
+- **android:** remove the `package` attribute from the library manifests, as required by AGP 8+ namespace migration
+- **android:** protect the exact-alarm permission receiver with `SCHEDULE_EXACT_ALARM`
+- **android:** restore the `KeepForSdk` annotation on the core API that is called from outside the AAR
+- **android:** add the ProGuard keep rules for the bridgeless `ReactHost` and `ReactInstanceManager` members that `HeadlessTask` reflects on, and for `StatusBarManager.collapsePanels()`
+
+### Internal
+
+- **chore:** remove the `NotifeeInitProvider` class and its ProGuard keep rule, now that Notifee is initialized lazily
+
+## 9.2.4 (2026-03-15)
+
+### Bug Fixes
+
+- **android:** remove the `NotifeeInitProvider` from the library manifest and initialize Notifee lazily from `NotifeeApiModule` instead, so the library works under R8 minification
+
+### Documentation
+
+- **docs:** add the Expo SDK 55 R8 compatibility analysis
+
+## 9.2.3 (2026-03-15)
+
+### Bug Fixes
+
+- **android:** remove the `package` attribute from the library manifest, as required by AGP 8+ namespace migration
+- **android:** replace the deprecated `onCatalystInstanceDestroy` stub with the React Native 0.74+ `invalidate()` override
+- **android:** initialize Notifee from `attachInfo` in the init provider, so it is initialized before the application starts
+
+## 9.2.2 (2026-03-15)
+
+### Internal
+
+- **build:** build the Android core with Java 17 instead of Java 21, and refresh the published AAR and its checksums
+
+## 9.2.1 (2026-03-15)
+
+### Bug Fixes
+
+- **ios:** fix the Podfile and Swift version setup so the iOS app builds against React Native 0.83
+- **android:** fix the Gradle and AGP setup for the React Native 0.83 migration
+
+### Internal
+
+- **test:** add a working Jest setup and mock for the React Native package
+- **chore:** add the GitHub Actions CI workflow for the migrated test apps
+
+### Documentation
+
+- **docs:** add the migration guide and the Firebase v14 → v23 migration guide
+
+## 9.2.0 (2026-03-15)
+
+The first release published under the `@psync` scope. The package was renamed from
+`@notifee/react-native`, and the workspace moved to Bun.
+
+### Breaking Changes
+
+- **rn:** React Native 0.83+ with the New Architecture is now required. The peer dependencies are `react >=19.2.4`, `react-native >=0.83.2` and `scheduler >=0.25.0`
+- **rn:** the package is now published as `@psync/notifee`
+
+### Internal
+
+- **build:** switch the workspace to Bun (`bun.lock`, `bunfig.toml`) and Lerna-lite
+- **build:** update the Android toolchain — AGP 8.2.2, Gradle 8.9, `compileSdk 36`, Java 11/17 source and target compatibility, and the `app.notifee.core` namespace
+- **build:** upgrade to ESLint 8 with flat config, Prettier 3 and TypeScript 5.9
+
+### Documentation
+
+- **docs:** add the repository overview and npm publishing instructions
 
 ## [9.1.8](https://github.com/invertase/notifee/compare/@psync/notifee@9.1.7...@psync/notifee@9.1.8) (2024-12-20)
 

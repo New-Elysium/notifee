@@ -53,5 +53,27 @@ describe('Validate Android Press Action', () => {
         "'mainComponent' expected a string value.",
       );
     });
+
+    test('throws an error when the reserved opt-out id is used', () => {
+      const pressAction: NotificationPressAction = {
+        id: '__NOTIFEE_OPT_OUT__',
+      };
+
+      expect(() => validateAndroidPressAction(pressAction)).toThrow(
+        "'id' is reserved for an explicit null pressAction.",
+      );
+    });
+
+    test('defaults launchActivity when the id is the default press action', () => {
+      const $ = validateAndroidPressAction({ id: 'default' });
+      expect($.id).toEqual('default');
+      expect($.launchActivity).toEqual('default');
+    });
+
+    test('does not default launchActivity for custom ids', () => {
+      const $ = validateAndroidPressAction({ id: 'mark-as-read' });
+      expect($.id).toEqual('mark-as-read');
+      expect($.launchActivity).toBeUndefined();
+    });
   });
 });

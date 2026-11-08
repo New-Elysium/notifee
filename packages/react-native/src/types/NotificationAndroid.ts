@@ -279,8 +279,12 @@ export interface NotificationAndroid {
    *
    * View the [Interaction](/react-native/android/interaction) documentation to learn
    * more.
+   *
+   * Set to `null` to explicitly opt out of tap behaviour entirely: no content intent is
+   * attached, so tapping the body does not open the app, require the device to be
+   * unlocked, or emit a `PRESS` event. When omitted (undefined), tapping opens the app.
    */
-  pressAction?: NotificationPressAction;
+  pressAction?: NotificationPressAction | null;
 
   /**
    * The `fullScreenAction` property allows you to show a custom UI
