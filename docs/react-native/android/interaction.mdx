@@ -133,6 +133,30 @@ notifee.displayNotification({
 
 Rebuild the project. Now when pressed, `CustomActivity` will be used to launch the React context.
 
+### Disabling the press action
+
+Some notifications should not be tappable at all (e.g. passive informational notifications). To explicitly opt out
+of any tap behaviour, set `pressAction` to `null`:
+
+```js
+notifee.displayNotification({
+  title: 'Not tappable',
+  android: {
+    channelId,
+    pressAction: null, // explicit opt-out
+  },
+});
+```
+
+With an explicit opt-out, no content intent is attached to the notification:
+
+- Tapping the notification body does nothing; the app is never launched and the device does not need to be unlocked.
+- No `PRESS` event is emitted, and the notification can never become an initial notification.
+- The notification can still be swiped away (`DISMISSED` still fires) and [Quick Actions](#quick-actions) still work.
+
+If the `pressAction` property is omitted entirely, the default behaviour applies and tapping the notification opens
+the application.
+
 ## Dismiss Action
 
 When a notification is displayed to users, they are able to dismiss them via the "Clear all" button or physically swiping
@@ -220,6 +244,11 @@ notifee.onForegroundEvent(({ type, detail }) => {
   }
 });
 ```
+
+Unless the action explicitly asks to open the application (see
+[Opening the application](#opening-the-application) below), it is handled without launching the app. The
+`ACTION_PRESS` event is delivered headlessly — on Android 12+ this also means the action can be performed while the
+device is locked, without requiring the user to unlock it.
 
 ### Opening the application
 

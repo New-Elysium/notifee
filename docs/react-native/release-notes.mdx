@@ -5,6 +5,30 @@ description: Notifee API releases
 
 > Historical note: the `7.8.0` entry below refers to the removal of an older Expo integration. Current `@psync/notifee` releases ship an official Expo config plugin again. See [Installation](/react-native/docs/installation) for the current Expo setup.
 
+## Unreleased (next release)
+
+A batch of reliability fixes and new API surface, verified against the maintained `react-native-notify-kit` fork
+(up to its 10.10.0):
+
+### Features
+
+- **android:** emit `EventType.FG_TIMEOUT` when Android 14+ times out a running foreground service; the event detail includes `startId` and `fgsType`
+- **android:** `getNotificationSettings()` now reports `fullScreenIntent` permission state (full-screen intent special app access on API 34+, `USE_FULL_SCREEN_INTENT` grant on API 29–33)
+- **android:** new `shouldShowRequestPermissionRationale()` API (Android 13+) to decide whether to show a custom rationale before requesting `POST_NOTIFICATIONS`
+- **android:** support an explicit `pressAction: null` opt-out, which attaches no content intent — tapping the notification does nothing (no app launch, no unlock requirement, no `PRESS` event)
+
+### Bug Fixes
+
+- **android:** guard all `startForeground()` calls in the foreground service, so a system denial (e.g. start-intent redelivery on Android 12+) stops the service instead of crashing the app
+- **android:** use stable PendingIntent identities in `ReceiverService`, so notifications dismissed/acted on across a process restart can no longer be routed to another notification's payload
+- **android:** quick actions without `launchActivity`/`mainComponent` are now handled headlessly on Android 12+ instead of launching the app and requiring device unlock
+- **android:** defer TurboModule resolution to first access, so importing Notifee very early (e.g. registering `onBackgroundEvent` in `index.js`) no longer throws in bridgeless mode
+- **android:** buffer up to 10 events emitted while the React instance is starting (FIFO, oldest dropped) and requeue undelivered events — foreground events are no longer silently lost at startup
+- **android:** re-initialize a stale React context in `HeadlessTask` instead of crashing with a null `ReactContext`
+- **android:** call `requestPermission()` and `shouldShowRequestPermissionRationale()` on the main thread, fixing rejections/NPEs during screen transitions
+- **android:** copy bitmaps decoded by Fresco before using them, avoiding crashes from recycled bitmaps in BigPicture/MessagingStyle notifications
+- **android:** `getInitialNotification()` now uses a durable tap ledger, so a notification tap is returned at most once even across process restarts
+
 ## [9.1.8](https://github.com/invertase/notifee/compare/@psync/notifee@9.1.7...@psync/notifee@9.1.8) (2024-12-20)
 
 ### Bug Fixes

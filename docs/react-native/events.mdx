@@ -136,6 +136,16 @@ Unlike the archived `@notifee/react-native`, the `DELIVERED` event now fires on 
 
 On **iOS**, `getInitialNotification` is deprecated. The `PRESS` event is delivered via `onForegroundEvent` when the app opens from a notification in any state. On **Android**, cold-start opens are only available through `getInitialNotification`.
 
+### Foreground service timeout
+
+On Android 14+ (API 34+), when the system times out a running foreground service (e.g. a `dataSync` service exceeding
+its time limit), Notifee stops the service and emits an [`EventType.FG_TIMEOUT`](/react-native/reference/eventtype#fg_timeout)
+event. The event `detail` includes the notification, plus `startId` and `fgsType` properties describing which service
+start timed out.
+
+Use this event to stop long-running work and persist state for later resumption. View the
+[Foreground Service timeouts](/react-native/android/foreground-service#service-timeouts-android-14) documentation for more.
+
 ## App open events
 
 If user interaction on a notification has caused your application to open, you may want to obtain the notification which

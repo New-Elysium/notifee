@@ -212,6 +212,12 @@ android/app/src/main/AndroidManifest.xml:
 
 > After making these changes, be sure to run `cd android` and `./gradlew clean`, then re-install the app.
 
+> On Android 14+ (API 34+), full-screen intent access is a special app access that the user (or the system) can revoke.
+> Call [`getNotificationSettings`](/react-native/reference/getnotificationsettings) and check `settings.android.fullScreenIntent`
+> to see whether your app is currently allowed to launch full-screen intents. On API 29–33 the value reflects the
+> `USE_FULL_SCREEN_INTENT` permission grant, and below API 29 it always reports `ENABLED`. See
+> [Permissions](/react-native/android/permissions#checking-permissions).
+
 Running this code, Notifee will attempt to launch the activity when the notification is displayed.
 
 > Please note that the notification may be shown as a heads-up notification, instead of a full-screen notification, while the user is using the device.

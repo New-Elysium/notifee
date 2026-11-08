@@ -31,8 +31,8 @@ bun run test               # Jest unit tests (tests_react_native) — ~5s, 23 su
 bun run test:android       # Android JUnit tests (gradlew testDebugUnit, Robolectric) — all pass
 ```
 
-### Jest baseline (updated 2026-11-08)
-**390/390 green is the baseline** (Jest 30). The former 14 known failures were fixed: `toThrowError`→`toThrow` in validator tests, and stale `notification.sound`→`notification.ios.sound` assertions corrected. Anything failing now is a regression. Android JUnit: 13/13 green (flaky date-parity test fixed in `TimestampTriggerModelTest`).
+### Jest baseline (updated 2026-11-08, post notify-kit-parity batch)
+**392/392 green is the baseline** (Jest 30; grew from 390 with `shouldShowRequestPermissionRationale` + `fullScreenIntent` tests). The former 14 known failures were fixed: `toThrowError`→`toThrow` in validator tests, and stale `notification.sound`→`notification.ios.sound` assertions corrected. Anything failing now is a regression. Android JUnit: 13/13 green (flaky date-parity test fixed in `TimestampTriggerModelTest`).
 
 ## Smoke Test App (`example/`, npm-managed outside Bun workspace)
 ```bash

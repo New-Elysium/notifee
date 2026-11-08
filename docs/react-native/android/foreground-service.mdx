@@ -213,11 +213,51 @@ If no [foregroundServiceTypes](/react-native/android/interaction#quick-actions) 
 
 If any permission was granted while running the service, the same notification (with the same notification ID and same channel ID) can be posted again with the new `foregroundServiceTypes` property array with the same notification ID and the current running service will be updated with the new types.
 
+### Service timeouts (Android 14+)
+
+On Android 14 (API level 34) and above, the system enforces type-specific timeouts on some foreground service types. For
+example, `dataSync` services are limited to around 6 hours per 24-hour window, and `shortService` services to a few
+minutes. When the timeout is reached, the system calls the service's `onTimeout` callback.
+
+When that happens, Notifee:
+
+1. Stops the foreground service and removes its notification (a crash/ANR would otherwise occur), and
+2. Emits an [`EventType.FG_TIMEOUT`](/react-native/reference/eventtype#fg_timeout) event, with `startId` and `fgsType`
+   (the timed-out service type, or `-1` if unknown) available on the event `detail`.
+
+If your foreground service performs long-running work, listen for this event and stop the work as soon as possible
+(e.g. persist the current progress, and finish up in the background):
+
+```js
+import notifee, { EventType } from '@psync/notifee';
+
+notifee.onBackgroundEvent(async ({ type, detail }) => {
+  if (type === EventType.FG_TIMEOUT) {
+    console.log(
+      'Foreground service timed out:',
+      detail.notification?.id,
+      'startId:',
+      detail.startId,
+      'fgsType:',
+      detail.fgsType,
+    );
+    // Stop long-running work and persist state for resumption
+  }
+});
+```
+
+For more information about which service types have timeouts and their limits, see the
+[Android foreground service type documentation](https://developer.android.com/develop/background-work/services/fg-service-types#runtime-restrictions).
+
 ### Background start restrictions (Android 12+)
 
 Starting with Android 12 (API level 31), the system restricts apps from starting foreground services while running in the background. If your app attempts to start a foreground service while in the background, the system will throw a `ForegroundServiceStartNotAllowedException`.
 
 Notifee handles this gracefully by catching the exception and logging an actionable error message rather than crashing your app. However, the foreground service will not start in this case.
+
+The same protection also covers the service side: if the system denies or fails a `startForeground()` call while the
+service is already starting (e.g. on a start-intent redelivery or retry), the service stops itself cleanly instead of
+crashing.
 
 To avoid this restriction, ensure that your foreground service is started only when the app is in the foreground, or from an allowed exemption context such as:
 

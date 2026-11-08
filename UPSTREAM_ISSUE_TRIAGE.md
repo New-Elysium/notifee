@@ -2,9 +2,16 @@
 
 This file is a condensed status snapshot of upstream issues reviewed against the current fork.
 All issues reference the archived `invertase/notifee` repository (archived April 7, 2026).
-Status was verified via online research and codebase inspection in June 2025.
+Status was verified via online research and codebase inspection in June 2025, and re-verified in
+November 2026 against the maintained fork `marcocrupi/react-native-notify-kit` (v10.10.0).
 
 This review was also cross-checked against the maintained fork `marcocrupi/react-native-notify-kit`, specifically its `README.md` and the published fix matrix there. That fork claims a broader set of upstream bug fixes that we have worked on as well. We should reverify when possible.
+
+> **November 2026 update:** a full code-level comparison against notify-kit 10.10.0 was completed. Every bug it
+> fixed that we shared has now been fixed in this fork as well (see "Fixed via notify-kit parity" below), and the
+> cheapest missing features (`FG_TIMEOUT` event, `fullScreenIntent` setting, `shouldShowRequestPermissionRationale`)
+> have been ported. The remaining deltas are larger-scope items (Server SDK, CLI scaffolder, FCM payload extras,
+> iOS rolling rebalance, pre-emptive dataSync demotion) and are listed under "Still open".
 
 ---
 
@@ -20,9 +27,15 @@ These no longer look like active top-level problems:
 
 ### `#880` Android `getInitialNotification` does not consume the notification
 - Current Android code consumes/removes the initial notification extras after reading them.
+- **November 2026:** consumption is now also durable — a tap ledger guarantees each tap is returned at most once,
+  even across process restarts (see "Fixed via notify-kit parity" — notify-kit `#88`).
 
 ### `#877` Android quick action always requires device unlock on Android 12+
-- Current Android action handling uses a background receiver path for background-only actions.
+- **Fixed.** Quick actions whose `pressAction` has no `launchActivity`/`mainComponent` now route through `ReceiverService`
+  (headless broadcast) on all API levels, including `targetSdk >= S`. They no longer launch the activity — which is
+  what forced the unlock — and are handled in the background instead. Actions that explicitly set
+  `launchActivity`/`mainComponent` still open the app. See `NotificationManager.java`
+  (`shouldCreateLaunchActivityIntent` check) and `NotificationPendingIntent.java`.
 
 ### `#870` Android `onBackgroundEvent` vs `getInitialNotification` inconsistency
 - **Possibly improved in v9.1.2, but not confirmed closed in this fork.** The reported root cause was a React Native new architecture (Fabric/TurboModules) compatibility bug where `onBackgroundEvent` would not fire on Android 13+ when the app was in the quit state.
@@ -53,6 +66,94 @@ These issues received direct code fixes in the `@psync/notifee` fork:
   2. Added `NSLog` error logging when `addNotificationRequest` fails for better debuggability.
   3. Changed the nil-trigger path to return a descriptive `NSError` (domain `NotifeeCore`, code 1001) instead of silently succeeding.
 
+### Fixed via notify-kit parity (November 2026)
+
+The following were identified by diffing against `marcocrupi/react-native-notify-kit` v10.10.0, confirmed present in
+our code, and fixed. Notify-kit issue numbers are referenced where applicable.
+
+#### Foreground service `startForeground()` denial crash (notify-kit `#81`) — **FIXED**
+- **Problem:** `ForegroundService.onStartCommand` called `startForeground(...)` without any try/catch. On Android 12+,
+  a framework retry or start-intent redelivery can be denied (`ForegroundServiceStartNotAllowedException`), crashing
+  the app. The caller-side `start()` path was guarded; the service-side promotion path was not.
+- **Fix applied:** All `startForeground` promotions now go through `tryStartForeground(...)` helpers which catch the
+  exception, log it, and `stopSelf(startId)` cleanly (`ForegroundService.java`).
+
+#### ReceiverService PendingIntent identity collision (notify-kit `#69`) — **FIXED**
+- **Problem:** `ReceiverService.createIntent` keyed PendingIntents off a static `AtomicInteger` that resets to `0` on
+  process death. With `FLAG_UPDATE_CURRENT`, dismiss/action intents attached to already-posted tray notifications
+  could be silently overwritten with another notification's payload after a restart, routing taps/dismissals to the
+  wrong notification.
+- **Fix applied:** PendingIntent identity is now a stable Intent data URI (scheme `notifee`, authority
+  `receiver-service`, notification + request identity in query params plus `*Present` flags) with a fixed request
+  code of `0`, so the same logical intent resolves to the same PendingIntent across restarts (`ReceiverService.java`).
+
+#### Android 12+ quick actions launching the app — upstream `#877` twin (notify-kit `#38`) — **FIXED**
+- Covered under `#877` above: actions without launch metadata route headlessly via `ReceiverService` on all API levels.
+
+#### Import-time TurboModule resolution (notify-kit `#42`) — **FIXED**
+- **Problem:** `NotifeeNativeModule`'s constructor called `TurboModuleRegistry.getEnforcing()` and `src/index.ts`
+  constructed the module at import time. In bridgeless mode, early imports (e.g. `onBackgroundEvent` registered in
+  `index.js`) could throw because the TurboModule manager was not yet available.
+- **Fix applied:** TurboModule + `NativeEventEmitter` resolution is now lazy (resolved on first access of `native`).
+  `onForegroundEvent` touches `this.native` first so the event relay is initialized on subscription
+  (`NotifeeNativeModule.ts`, `NotifeeApiModule.ts`).
+
+#### HeadlessTask stale `ReactContext` (notify-kit `#39`) — **FIXED**
+- **Problem:** `HeadlessTask`'s `mIsReactContextInitialized` flag was never reset when the React context became null,
+  so a later `invokeStartTask(getReactContext(context)!!)` could NPE, with no stale-context restart path.
+- **Fix applied:** All state flags reset when the context goes null and the context is re-initialized on the next
+  task; task-queue draining re-checks context identity (`HeadlessTask.kt`).
+
+#### `requestPermission()` on the native-modules thread (notify-kit `#92`) — **FIXED**
+- **Problem:** `NotifeeApiModule.kt` called `activity.requestPermissions(...)` directly in the promise method on the
+  native-modules thread. During screen transitions the activity can be null mid-call, producing rejections/NPEs.
+- **Fix applied:** Both `requestPermission` and the new `shouldShowRequestPermissionRationale` hop to the UI queue
+  thread before touching the activity, and reject with `ERR_NO_ACTIVITY` when there is no foreground activity.
+
+#### Fresco-owned bitmap lifetime — **FIXED**
+- **Problem:** `ResourceUtils.getImageBitmapFromUrl` handed the Fresco-owned bitmap straight out of
+  `onNewResultImpl` without copying it. Fresco can recycle the bitmap while Notifee still holds it (BigPicture /
+  MessagingStyle), causing crashes or parcel corruption.
+- **Fix applied:** The bitmap is copied (`bitmap.copy(config, false)`) before being returned (`ResourceUtils.java`).
+
+#### Android startup event loss (notify-kit 10.5.0 fix) — **FIXED**
+- **Problem:** `NotifeeReactUtils.sendEvent` silently dropped events when there was no active ReactContext — the
+  Android twin of the iOS `dispatch_once` flush bug fixed earlier in this fork. Events emitted while the React
+  instance was starting (a common window on cold start) were lost forever.
+- **Fix applied:** The Kotlin bridge now buffers up to 10 pending events (FIFO, oldest dropped) and flushes them on
+  listener registration; undelivered events are requeued when the context goes away (`NotifeeReactUtils.kt`,
+  `NotifeeApiModule.kt` `addListener`). This substantially narrows the readiness gap referenced under `#1279`.
+
+#### Initial-notification replay after process death (notify-kit `#88`) — **FIXED**
+- **Problem:** In-process consumption of the initial notification (sticky event + `removeExtra`) does not survive
+  process death: Android re-delivers the original activity Intent with extras restored, so a cold-start tap could be
+  replayed and double-handled after a crash/restart cycle.
+- **Fix applied:** A durable tap-only ledger (`InitialNotificationLedger`, SharedPreferences) records each tap with a
+  sequence number; `getInitialNotification` claims taps atomically and ignores foreign/replayed intents via a
+  WeakHashMap identity set. Each notification tap is now returned at most once, even across process restarts
+  (`InitialNotificationLedger.java`, `Notifee.java`, `NotificationReceiverHandler.java`). This closes the remaining
+  replay gap referenced under `#880` / `#1128`.
+
+#### New API surface ported from notify-kit — **ADDED**
+- `EventType.FG_TIMEOUT` (`9`): emitted when Android 14+ times out a running foreground service; `EventDetail`
+  gains `startId` / `fgsType` (`types/Notification.ts`, `ForegroundService.java` `handleTimeout`,
+  `NotificationEvent.java`).
+- `getNotificationSettings().android.fullScreenIntent`: full-screen intent access state (API 34+ special access,
+  API 29–33 `USE_FULL_SCREEN_INTENT` grant, below 29 `ENABLED`) (`Notifee.java`, `types/NotificationAndroid.ts`).
+- `shouldShowRequestPermissionRationale()`: Android 13+ `POST_NOTIFICATIONS` rationale check; resolves `false`
+  elsewhere (`NotifeeApiModule.kt`, `NotifeeApiModule.mm` stub, `types/Module.ts`).
+- Explicit `pressAction: null` opt-out: no content intent is attached at all — no app launch, no unlock requirement,
+  no `PRESS` event; the reserved `__NOTIFEE_OPT_OUT__` id is rejected by the validator
+  (`validateAndroidNotification.ts`, `validateAndroidPressAction.ts`, `NotificationManager.java`).
+
+#### Still open from the notify-kit comparison (deliberately not ported yet)
+- Pre-emptive `dataSync` demotion / `foregroundServiceBestEffortStopAfterMs` (their 10.9.0; requires an
+  `AlarmManager`-based self-limit scheduler) — the `FG_TIMEOUT` event now makes the timeout observable, but OEM
+  freezes that never invoke `onTimeout` remain unmitigated (their `#82`, open upstream there too).
+- Server SDK (`/server` subpath, `buildNotifyKitPayload`), `init-nse` CLI scaffolder, FCM Mode payload extras
+  (`subtitle`, `circularLargeIcon`, expanded styles, action `icon`/`input`), iOS rolling-schedule rebalancing.
+- Baseline Profile / WarmupHelper equivalents (we deliberately ship no warmup code — low value for this fork).
+
 ---
 
 ## Partially addressed, but still worth tracking
@@ -68,6 +169,8 @@ These have meaningful improvements, but do not look fully closed:
 - **Current state in this fork:** Several notify-kit-style fixes already appear to exist locally:
   - Android `getInitialNotification()` returns a canonical payload shape and includes `pressAction` when present.
   - Android initial notification extras are consumed after read, avoiding duplicate delivery.
+  - **November 2026:** a durable tap ledger now guarantees each tap is returned at most once, even across process
+    restarts (see "Fixed via notify-kit parity" — notify-kit `#88`). The Android cold-start replay gap is closed.
   - iOS initial-notification gathering and response storage are already more complete than the archived upstream implementation.
 - **Remaining gap:** The main unresolved part now looks less like missing initial-notification plumbing and more like cross-state parity for FCM-owned notifications vs Notifee-owned notifications. In other words, this is now primarily an integration/lifecycle ownership problem plus a testing gap.
 - **Workaround:** Send **data-only FCM messages** (no `notification` key in payload) and use `messaging().setBackgroundMessageHandler()` → `notifee.displayNotification()` to ensure Notifee owns the full lifecycle. For quit state, use `messaging().getInitialNotification()` as fallback when the notification was OS-owned.
@@ -93,12 +196,17 @@ These remain relevant in the current codebase. The original `invertase/notifee` 
 - **Status:** Open upstream. Not fully closed in this fork.
 - **Problem:** `notifee.onBackgroundEvent()` is not triggered when pressing a push notification while the app is in the background or quit state. Foreground handling works.
 - **Root cause:** When FCM sends a notification with a `notification` payload, the OS handles display and tap natively. Notifee never gets the press event because it did not create the notification. This is an architectural limitation of how FCM display notifications interact with Notifee's event system. There is also a separate Android-side readiness problem where foreground press events can be dropped if the React instance is not ready yet.
-- **Current state in this fork:** Some of the lower-level plumbing that maintained forks call out as fixes already appears to exist locally, especially around initial-notification handling and event routing infrastructure. However, that does not by itself solve the OS-owned FCM notification path.
+- **Current state in this fork:** The React-instance-readiness edge case is now fixed: events emitted while the
+  React instance is starting are buffered (max 10, FIFO) and flushed/requeued, so foreground press events are no
+  longer dropped (see "Fixed via notify-kit parity" above). However, that does not by itself solve the OS-owned FCM
+  notification path.
 - **Workaround:** Send **data-only FCM messages** and use `messaging().setBackgroundMessageHandler()` → `notifee.displayNotification()`. For quit state, use `notifee.getInitialNotification()` as fallback.
 - **Comparison with `react-native-notify-kit`:**
-  - Its README claims an Android fix for `#1279`: foreground press events no longer get dropped when the React instance is not ready.
-  - It also introduces an explicit FCM handling path (`handleFcmMessage` / “FCM Mode”) to make Notifee the single display layer across Android and iOS.
-- **Gap in this fork:** The remaining gap looks narrower than previously stated: this fork does not yet expose a first-class FCM ownership path like notify-kit, and it is not yet verified whether the React-instance-readiness edge case is fully covered. A prominent integration guide is still needed.
+  - Its README claims an Android fix for `#1279`: foreground press events no longer get dropped when the React instance is not ready. **This fork now has the equivalent fix** (pending-event buffer + requeue).
+  - It also introduces an explicit FCM handling path (`handleFcmMessage` / “FCM Mode”) to make Notifee the single display layer across Android and iOS. This fork already ships `setFcmConfig`/`buildFcmNotification`/`handleFcmMessage` with a narrower payload contract.
+- **Gap in this fork:** No first-class FCM ownership docs/guide equivalent to notify-kit's FCM Mode, and its extra
+  payload fields (`subtitle`, `circularLargeIcon`, expanded styles, action `icon`/`input`) are not yet supported in
+  the FCM wire contract.
 
 #### `#1076` iOS `onBackgroundEvent` PRESS / DISMISSED / DELIVERED issues
 - **Status:** Open upstream. More likely documentation/verification gap than missing core implementation in this fork.
@@ -127,7 +235,7 @@ These remain relevant in the current codebase. The original `invertase/notifee` 
 - **Status:** Open upstream. Substantially mitigated in this fork, but not fully closed.
 - **Problem:** On Android SDK 34 (Android 14), scheduled trigger notifications only display when the app is open/foregrounded. When the app is killed (swiped away), the notification never appears.
 - **Root cause:** Android 14 has stricter background execution limits. Force-stopping an app cancels all `PendingIntent`-based alarms. Some OEMs (Samsung, Xiaomi) treat "swipe away" as force-stop. WorkManager-based paths are also subject to Android 14's background work restrictions.
-- **Current state in this fork:** Several notify-kit-style mitigations already appear to exist locally:
+- **Current state in this fork:** Several notify-kit-style fixes already appear to exist locally:
   1. async receiver handoff / safe receiver finishing in alarm paths
   2. fallback when exact-alarm permission is denied
   3. `SCHEDULE_EXACT_ALARM` permission handling and reschedule-on-permission-change support
@@ -149,8 +257,13 @@ These remain relevant in the current codebase. The original `invertase/notifee` 
 ### Android actions / foreground service
 
 #### `#470` `startForegroundService()` not allowed due to Android background-start restrictions
-- **Status:** Open. **OS-level constraint** — cannot be fully resolved at the library level.
+- **Status:** Open. **OS-level constraint** — cannot be fully resolved at the library level. The crash-class symptom
+  is fixed (see below); the restriction itself remains.
 - **Problem:** When the app is killed and starts in headless mode to fire a notification as a Foreground Service, Android 12+ blocks the `startForegroundService()` call with `mAllowStartForeground false`.
+- **Current state in this fork:** All `startForeground()` promotions (caller- and service-side, including retries and
+  start-intent redeliveries) are guarded — a denial is caught, logged, and the service stops itself instead of
+  crashing (see "Fixed via notify-kit parity" — notify-kit `#81`). The service still will not start in this
+  situation; that part is an OS restriction.
 - **Workaround:** Ensure FCM messages are sent as **high priority** (`priority: 'high'` in FCM payload) — Android exempts high-priority FCM from the background foreground service restriction. Set `asForegroundService: false` (loses styling). Declare the appropriate foreground service type in `AndroidManifest.xml` for Android 14+.
 - **Action needed:** Document the Android 12+ foreground service restrictions and the high-priority FCM workaround prominently.
 
@@ -204,14 +317,23 @@ These changes improve build reliability, but they do **not** by themselves close
 1. ~~Revisit Android scheduling semantics for DST behavior~~ **Done** — `#875` fixed with `java.time` DST-aware scheduling
 2. ~~Fix race condition in concurrent `createTriggerNotification`~~ **Done** — `#1283` fixed with awaited DB writes
 3. ~~Fix iOS silent notification rejection~~ **Done** — `#826` fixed with default sound fallback and error reporting
-4. **Validate and document behavior already present locally** — especially `#1076`, `#1128`, and `#1100`, where several notify-kit-style fixes already appear to exist in this fork
-5. **Expand E2E coverage for lifecycle-heavy scenarios** — Implement the `#1126` test matrix to regress `#1279`, `#1128`, `#1076`, `#870`
-6. **Document FCM integration patterns** — Add prominent guide for data-only FCM messages, and consider whether a first-class FCM handling API is warranted
-7. **Document iOS event-routing behavior precisely** — Address `#1076` confusion with explicit state-transition docs and validate current native routing with tests
-8. **Close `#1041` as "by design"** — Add FAQ entry clarifying Notifee is a local notification library
-9. **Document Android 12+/14+ restrictions** — Foreground service (`#470`) and alarm (`#1100`) OS limitations
-10. **Add packaged-artifact CI testing or remove the split packaging model** — Address `#1115` / `#1079`
-11. **Revisit `#1078` foreground service JS freeze** — Investigate native-only foreground service API
+4. ~~Port notify-kit shared-bug fixes~~ **Done (November 2026)** — `startForeground` guards, PendingIntent identity,
+   headless actions on Android 12+, lazy TurboModule resolution, HeadlessTask stale context, `requestPermission`
+   main-thread hop, Fresco bitmap copy, Android startup event buffer, initial-notification tap ledger
+   (notify-kit `#81`, `#69`, `#38`, `#42`, `#39`, `#92`, 10.5.0, `#88`)
+5. ~~Port cheapest notify-kit features~~ **Done (November 2026)** — `EventType.FG_TIMEOUT`,
+   `getNotificationSettings().android.fullScreenIntent`, `shouldShowRequestPermissionRationale()`, explicit
+   `pressAction: null` opt-out
+6. **Validate and document behavior already present locally** — especially `#1076`, `#1128`, and `#1100`, where several notify-kit-style fixes already appear to exist in this fork
+7. **Expand E2E coverage for lifecycle-heavy scenarios** — Implement the `#1126` test matrix to regress `#1279`, `#1128`, `#1076`, `#870`, and the new initial-notification ledger / startup event buffer
+8. **Document FCM integration patterns** — Add prominent guide for data-only FCM messages, and consider whether a first-class FCM handling API is warranted
+9. **Document iOS event-routing behavior precisely** — Address `#1076` confusion with explicit state-transition docs and validate current native routing with tests
+10. **Close `#1041` as "by design"** — Add FAQ entry clarifying Notifee is a local notification library
+11. **Document Android 12+/14+ restrictions** — Foreground service (`#470`, incl. the new `FG_TIMEOUT` event) and alarm (`#1100`) OS limitations
+12. **Add packaged-artifact CI testing or remove the split packaging model** — Address `#1115` / `#1079`
+13. **Revisit `#1078` foreground service JS freeze** — Investigate native-only foreground service API
+14. **Optional larger-scope notify-kit features** — pre-emptive `dataSync` demotion (`FG_RUN_LIMIT_REACHED`), FCM
+    payload extras, Server SDK, `init-nse` CLI, iOS rolling rebalance
 
 ---
 
@@ -223,6 +345,12 @@ This fork has improved tooling, packaging, Expo support, and Android build relia
 - DST drift in repeating notifications (`#875`)
 - iOS silent notification rejection (`#826`)
 - Improvements likely reduced the new architecture `onBackgroundEvent` inconsistency (`#870`), but this is not claimed as definitively closed here
+- **(November 2026)** Every shared bug found in the notify-kit comparison (see "Fixed via notify-kit parity"):
+  foreground-service `startForeground` denial crash, ReceiverService PendingIntent identity collision, Android 12+
+  quick actions launching the app (`#877`), import-time TurboModule resolution, HeadlessTask stale React context,
+  `requestPermission` threading, Fresco bitmap lifetime, Android startup event loss, and initial-notification
+  replay after process death — plus the `FG_TIMEOUT`, `fullScreenIntent` setting, `shouldShowRequestPermissionRationale`
+  and `pressAction: null` API surface
 
 Cross-checking against `react-native-notify-kit` changes the picture in an important way:
 
@@ -230,7 +358,9 @@ Cross-checking against `react-native-notify-kit` changes the picture in an impor
 - After comparing those claims against local code, several notify-kit-style fixes already appear to exist in this fork as well, especially around iOS event routing, Android initial-notification handling, exact-alarm fallback, and reboot/alarm recovery.
 - That means some items previously described here as likely needing major library work are better understood as **verification, documentation, and regression-testing gaps**.
 - Other items, especially `#1041`, still look fundamentally architectural/by-design even after that comparison.
-- The clearest remaining product gap versus notify-kit is not raw plumbing everywhere, but the lack of a first-class FCM ownership path and the lack of explicit lifecycle documentation/tests proving current behavior.
+- After the November 2026 parity batch, the clearest remaining product gap versus notify-kit is the larger-scope
+  surface: Server SDK, `init-nse` CLI, FCM Mode payload extras, pre-emptive `dataSync` demotion, and iOS
+  rolling-schedule rebalancing — plus the lack of explicit lifecycle documentation/tests proving current behavior.
 
 The remaining open issues fall into clearer categories:
 
